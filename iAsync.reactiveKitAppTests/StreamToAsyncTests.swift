@@ -140,8 +140,9 @@ class StreamToAsyncTests: XCTestCase {
 
         let expectation = expectationWithDescription("")
 
-        let _ = loader(progressCallback: { (progressInfo) -> () in
+        let _ = loader(progressCallback: { (progress) -> () in
 
+            XCTAssertEqual(progressCalledCount, progress as? Int)
             progressCalledCount += 1
         }, stateCallback: { (state) -> () in
 
@@ -164,20 +165,13 @@ class StreamToAsyncTests: XCTestCase {
             }
         }
 
+        XCTAssertNotNil(weakDeinitTest)
+
         waitForExpectationsWithTimeout(0.5, handler: nil)
 
-        if weakDeinitTest != nil {
-            XCTFail()
-        }
+        XCTAssertNil(weakDeinitTest)
 
         XCTAssertEqual(5, progressCalledCount)
         XCTAssertEqual("ok", resultValue)
-    }
-
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock {
-            // Put the code you want to measure the time of here.
-        }
     }
 }

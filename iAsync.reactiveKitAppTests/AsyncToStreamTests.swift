@@ -72,7 +72,6 @@ class AsyncToStreamTests: XCTestCase {
     func testDisposeStream() {
 
         let loader = testAsync()
-
         let stream = asyncToStream(loader)
 
         var deinitTest: NSObject? = NSObject()
@@ -95,10 +94,43 @@ class AsyncToStreamTests: XCTestCase {
         XCTAssertNil(weakDeinitTest)
     }
 
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock {
-            // Put the code you want to measure the time of here.
+    func testNormalFinishStream() {
+
+        let loader = testAsync()
+        let stream = asyncToStream(loader)
+
+        var progressCalledCount = 0
+        var resultValue: String?
+
+        var deinitTest: NSObject? = NSObject()
+        weak var weakDeinitTest = deinitTest
+
+        let expectation = expectationWithDescription("")
+
+        stream.observe { ev -> Void in
+
+            switch ev {
+            case .Success(let value):
+                if deinitTest != nil {
+                    deinitTest = nil
+                    resultValue = value
+                    expectation.fulfill()
+                }
+            case .Failure:
+                XCTFail()
+            case .Progress(let progress):
+                XCTAssertEqual(progressCalledCount, progress as? Int)
+                progressCalledCount += 1
+            }
         }
+
+        XCTAssertNotNil(weakDeinitTest)
+
+        waitForExpectationsWithTimeout(0.5, handler: nil)
+
+        XCTAssertNil(weakDeinitTest)
+
+        XCTAssertEqual(5, progressCalledCount)
+        XCTAssertEqual("ok", resultValue)
     }
 }
