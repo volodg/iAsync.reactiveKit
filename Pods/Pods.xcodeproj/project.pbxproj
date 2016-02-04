@@ -70,9 +70,11 @@
 		BB1AF653473B78493810EE349086DEAA /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8293178D9C8FC93057132C1879B6D55 /* Result.framework */; };
 		BEC9FD518E85FC2F25D1E61E49718B8B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F51A2022B86A4185DF165C76BFC64416 /* Foundation.framework */; };
 		BF7189B8ADC0D7EA350D0DEEE2F6F1A5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F51A2022B86A4185DF165C76BFC64416 /* Foundation.framework */; };
+		C35E4CE61C63CF9100AB0981 /* AsyncEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35E4CE31C63CF9100AB0981 /* AsyncEvent.swift */; };
+		C35E4CE71C63CF9100AB0981 /* AsyncToStreamTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35E4CE41C63CF9100AB0981 /* AsyncToStreamTest.swift */; };
+		C35E4CE81C63CF9100AB0981 /* StreamToAsyncTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35E4CE51C63CF9100AB0981 /* StreamToAsyncTest.swift */; };
 		C46B46FECF9645C419C80CBECA844F80 /* WeakBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44974E31404C7A46C0F4E9BDF08D50CB /* WeakBox.swift */; };
 		C9C2168662FF5496CC4F1D45EFC5F56A /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4C386F97998FCFEDFF1E687D647265 /* Helpers.swift */; };
-		D91D991DC01D315CF3EC994D9901510B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BD9DC9CAFDFB4C69F22DBC32303A58E /* AppDelegate.swift */; };
 		D950C09981AA66C59A25CFF112B3C3AE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F51A2022B86A4185DF165C76BFC64416 /* Foundation.framework */; };
 		DE6EA7FB9D61D9837014A15F6B207CB6 /* AsyncError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0888770DF06EC736CCCDA79644DF2EA6 /* AsyncError.swift */; };
 		DF45D5827E3D37091754F98A7B42F722 /* NSData+ToString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97D2D536AAB62E65066BF1B116475B7E /* NSData+ToString.swift */; };
@@ -194,7 +196,6 @@
 		3927DAE0854E32CECE317618D02C2DA0 /* JQueueState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = JQueueState.swift; sourceTree = "<group>"; };
 		399FA90B9F4D9E5BD4F72F17EEDDF485 /* AsyncHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AsyncHelpers.swift; sourceTree = "<group>"; };
 		3BB61E2AC61F591D74661BCD4045EAA0 /* Result-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Result-umbrella.h"; sourceTree = "<group>"; };
-		3BD9DC9CAFDFB4C69F22DBC32303A58E /* AppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3E73749E18F81585F28673874876EF20 /* Pods-iAsync.reactiveKitTests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-iAsync.reactiveKitTests.modulemap"; sourceTree = "<group>"; };
 		411FAD94132E541C7F133135162A2FA9 /* AsyncHandlerTask.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AsyncHandlerTask.swift; sourceTree = "<group>"; };
 		42A6A5B95D225C20B4A258E1A7313BF7 /* BaseLoaderOwner.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BaseLoaderOwner.swift; sourceTree = "<group>"; };
@@ -252,6 +253,9 @@
 		C19F40E8EA9E7F54555245C640C6DF7C /* Pods-iAsync.reactiveKitTests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-iAsync.reactiveKitTests-resources.sh"; sourceTree = "<group>"; };
 		C22832AC4B9755F9F70153545FB96EF5 /* Pods_iAsync_reactiveKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iAsync_reactiveKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2BC7BDE303E63B52FE2B42B5E87B98C /* iAsync.reactiveKit-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "iAsync.reactiveKit-prefix.pch"; sourceTree = "<group>"; };
+		C35E4CE31C63CF9100AB0981 /* AsyncEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncEvent.swift; sourceTree = "<group>"; };
+		C35E4CE41C63CF9100AB0981 /* AsyncToStreamTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncToStreamTest.swift; sourceTree = "<group>"; };
+		C35E4CE51C63CF9100AB0981 /* StreamToAsyncTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamToAsyncTest.swift; sourceTree = "<group>"; };
 		C668D27E421B807DD1EB98EB6D701876 /* Error.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
 		C73A227E7B3F658F199C4699A994E725 /* Pods-iAsync.reactiveKit.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-iAsync.reactiveKit.debug.xcconfig"; sourceTree = "<group>"; };
 		C84BAC8FD25ABE0AE01EB954D58EAF4D /* AsyncState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AsyncState.swift; sourceTree = "<group>"; };
@@ -384,7 +388,9 @@
 		20DCB5BB01A474BC1AD5123D063ADF54 /* Lib */ = {
 			isa = PBXGroup;
 			children = (
-				3BD9DC9CAFDFB4C69F22DBC32303A58E /* AppDelegate.swift */,
+				C35E4CE31C63CF9100AB0981 /* AsyncEvent.swift */,
+				C35E4CE41C63CF9100AB0981 /* AsyncToStreamTest.swift */,
+				C35E4CE51C63CF9100AB0981 /* StreamToAsyncTest.swift */,
 			);
 			path = Lib;
 			sourceTree = "<group>";
@@ -963,13 +969,16 @@
 				25A00F4A92741E8D3BBEA874A34078D4 /* BaseLoaderOwner.swift in Sources */,
 				46AA1C3E99DB05485226C352739AE1E4 /* BaseStrategy.swift in Sources */,
 				E1388E3BC9CD93EE4EFF6B29054BFDEB /* CachedAsync.swift in Sources */,
+				C35E4CE61C63CF9100AB0981 /* AsyncEvent.swift in Sources */,
 				4449BBCFD39D40CCF4DD2C60F6B01C03 /* iAsync.async-dummy.m in Sources */,
 				2D9E088BD71CB7A38B554DFA7B0527CF /* JAsyncError.swift in Sources */,
 				F50C52AD9137BCADE0B1D19D9D3F6824 /* JQueueState.swift in Sources */,
+				C35E4CE81C63CF9100AB0981 /* StreamToAsyncTest.swift in Sources */,
 				BA5F6C170859475C79279A361489B36E /* LimitedLoadersQueue.swift in Sources */,
 				4F8281E5A4660AE195912427EF6E1418 /* NSURL+LocalDataLoader.swift in Sources */,
 				8E1546BA451BE3BBAC1988D9F02215C8 /* QueueStrategy.swift in Sources */,
 				12CAFF4CE5CF224C4262C5F26DABF552 /* StrategyFifo.swift in Sources */,
+				C35E4CE71C63CF9100AB0981 /* AsyncToStreamTest.swift in Sources */,
 				7C74CC8658DE6406CF8014ECA928B0C3 /* StrategyRandom.swift in Sources */,
 				1DEB9BF31D1CCC76A30F70E77BB4196D /* StrategyStack.swift in Sources */,
 				53FCD69AAB26AF9D31AE4DFC6683E96D /* TimerAsyncHelpers.swift in Sources */,
@@ -980,7 +989,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D91D991DC01D315CF3EC994D9901510B /* AppDelegate.swift in Sources */,
 				50A82C283475CCFBCDA951261742D2B8 /* iAsync.reactiveKit-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
