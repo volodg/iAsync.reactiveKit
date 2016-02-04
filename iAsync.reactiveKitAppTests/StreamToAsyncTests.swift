@@ -31,6 +31,10 @@ private func testStream() -> Stream<AsyncEvent<String, AnyObject, NSError>> {
             if progress == 5 {
                 cancel()
                 observer(.Success("ok"))
+                observer(.Success("ok2"))
+
+                observer(.Progress(progress))
+                progress += 1
             }
 
             observer(.Progress(progress))

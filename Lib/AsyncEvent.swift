@@ -182,8 +182,7 @@ extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
     }
 }
 
-//TODO test
-func ensureOnceStreamFinish<
+private func ensureOnceStreamFinish<
     Value, Progress, Error: ErrorType, Input: StreamType where Input.Event == AsyncEvent<Value, Progress, Error>>(input: Input)
     -> Stream<Input.Event> {
 
