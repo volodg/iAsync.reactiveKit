@@ -1,15 +1,47 @@
 //
-//  iAsync_reactiveKitTests.swift
-//  iAsync.reactiveKitTests
+//  StreamToAsyncTests.swift
+//  iAsync.reactiveKit
 //
 //  Created by Gorbenko Vladimir on 04/02/16.
 //  Copyright © 2016 EmbeddedSystems. All rights reserved.
 //
 
 import XCTest
-@testable import iAsync_reactiveKit
 
-class iAsync_reactiveKitTests: XCTestCase {
+import iAsync_async
+import iAsync_utils
+import iAsync_reactiveKit
+
+import ReactiveKit
+
+typealias Event = AsyncEvent<String, AnyObject, NSError>
+
+private func testStream() -> Stream<AsyncEvent<String, AnyObject, NSError>> {
+
+    let stream = Stream(producer: { (observer: Event -> ()) -> DisposableType? in
+
+        var progress = 0
+
+        let cancel = Timer.sharedByThreadTimer().addBlock({ (cancel) -> Void in
+
+            if progress == 5 {
+                cancel()
+                observer(.Success("ok"))
+            }
+
+            observer(.Progress(progress))
+            progress += 1
+        }, duration: 0.1)
+
+        return BlockDisposable({ () -> () in
+            cancel()
+        })
+    })
+
+    return stream
+}
+
+class StreamToAsyncTests: XCTestCase {
     
     override func setUp() {
         super.setUp()

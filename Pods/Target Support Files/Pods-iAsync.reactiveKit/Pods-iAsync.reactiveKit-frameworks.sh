@@ -84,12 +84,14 @@ strip_invalid_archs() {
 
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
+  install_framework "Pods-iAsync.reactiveKit/ReactiveKit.framework"
   install_framework "Pods-iAsync.reactiveKit/Result.framework"
   install_framework "Pods-iAsync.reactiveKit/iAsync_async.framework"
   install_framework "Pods-iAsync.reactiveKit/iAsync_reactiveKit.framework"
   install_framework "Pods-iAsync.reactiveKit/iAsync_utils.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
+  install_framework "Pods-iAsync.reactiveKit/ReactiveKit.framework"
   install_framework "Pods-iAsync.reactiveKit/Result.framework"
   install_framework "Pods-iAsync.reactiveKit/iAsync_async.framework"
   install_framework "Pods-iAsync.reactiveKit/iAsync_reactiveKit.framework"

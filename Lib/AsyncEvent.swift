@@ -213,7 +213,7 @@ func ensureOnceStreamFinish<
 }
 
 //TODO test
-func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Error>.Async) -> Stream<AsyncEvent<Value, AnyObject, Error>> {
+public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Error>.Async) -> Stream<AsyncEvent<Value, AnyObject, Error>> {
 
     typealias Event = AsyncEvent<Value, AnyObject, Error>
 
@@ -251,7 +251,7 @@ func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Error>.Asy
     return activeStream//.map(id)
 }
 
-func streamToAsync<
+public func streamToAsync<
     Value, Error: ErrorType, Input: StreamType where Input.Event == AsyncEvent<Value, AnyObject, Error>>(input: Input)
 -> AsyncTypes<Value, Error>.Async {
 
