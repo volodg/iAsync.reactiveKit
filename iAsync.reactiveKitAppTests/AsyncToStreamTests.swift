@@ -32,7 +32,7 @@ private func testAsync() -> AsyncTypes<String, NSError>.Async {
                 cancel()
                 if let finishCallback = finishCallbackHolder {
                     progressCallbackHolder = nil
-                    finishCallbackHolder = nil
+                    finishCallbackHolder   = nil
                     finishCallback(result: .Success("ok"))
                 }
             }
@@ -48,14 +48,14 @@ private func testAsync() -> AsyncTypes<String, NSError>.Async {
                 cancel()
                 if let finishCallback = finishCallbackHolder {
                     progressCallbackHolder = nil
-                    finishCallbackHolder = nil
+                    finishCallbackHolder   = nil
                     finishCallback(result: .Interrupted)
                 }
             case .UnSubscribe:
                 cancel()
                 if let finishCallback = finishCallbackHolder {
                     progressCallbackHolder = nil
-                    finishCallbackHolder = nil
+                    finishCallbackHolder   = nil
                     finishCallback(result: .Unsubscribed)
                 }
             case .Resume:
@@ -69,7 +69,7 @@ private func testAsync() -> AsyncTypes<String, NSError>.Async {
 
 class AsyncToStreamTests: XCTestCase {
 
-    func testCancelStream() {
+    func testDisposeStream() {
 
         let loader = testAsync()
 

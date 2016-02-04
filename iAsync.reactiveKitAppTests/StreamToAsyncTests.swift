@@ -43,17 +43,7 @@ private func testStream() -> Stream<AsyncEvent<String, AnyObject, NSError>> {
 
 class StreamToAsyncTests: XCTestCase {
 
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
-
-    func testCancelStream() {
+    func testCancelAsync() {
 
         let stream = testStream()
         let loader = streamToAsync(stream)
@@ -86,18 +76,16 @@ class StreamToAsyncTests: XCTestCase {
             }
         }
 
-        autoreleasepool { () -> () in
-            handler(task: .Cancel)
-        }
+        XCTAssertNotNil(weakDeinitTest)
 
-        if weakDeinitTest != nil {
-            XCTFail()
-        }
+        handler(task: .Cancel)
+
+        XCTAssertNil(weakDeinitTest)
 
         XCTAssertTrue(testPassed)
     }
 
-    func testUnsubscribeStream() {
+    func testUnsubscribeAsync() {
 
         let stream = testStream()
         let loader = streamToAsync(stream)
@@ -130,18 +118,16 @@ class StreamToAsyncTests: XCTestCase {
             }
         }
 
-        autoreleasepool { () -> () in
-            handler(task: .UnSubscribe)
-        }
+        XCTAssertNotNil(weakDeinitTest)
 
-        if weakDeinitTest != nil {
-            XCTFail()
-        }
+        handler(task: .UnSubscribe)
+
+        XCTAssertNil(weakDeinitTest)
 
         XCTAssertTrue(testPassed)
     }
 
-    func testNormalFinishStream() {
+    func testNormalFinishAsync() {
 
         let stream = testStream()
         let loader = streamToAsync(stream)
