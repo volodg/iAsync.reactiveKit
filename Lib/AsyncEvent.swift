@@ -212,7 +212,6 @@ func ensureOnceStreamFinish<
     })
 }
 
-//TODO test
 public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Error>.Async) -> Stream<AsyncEvent<Value, AnyObject, Error>> {
 
     typealias Event = AsyncEvent<Value, AnyObject, Error>
@@ -225,6 +224,7 @@ public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Err
         }, stateCallback: { (state) -> () in
 
             //ignore, still not used
+            fatalError()
         }, finishCallback: { (result) -> Void in
 
             switch result {
