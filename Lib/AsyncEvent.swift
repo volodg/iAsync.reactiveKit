@@ -180,35 +180,32 @@ extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
             })
         }
     }
-}
 
-private func ensureOnceStreamFinish<
-    Value, Progress, Error: ErrorType, Input: StreamType where Input.Event == AsyncEvent<Value, Progress, Error>>(input: Input)
-    -> Stream<Input.Event> {
+    public func ensureOnceStreamFinish() -> Stream<Event> {
 
-    typealias Event = AsyncEvent<Value, Progress, Error>
-    return Stream(producer: { (observer: Event -> ()) -> DisposableType? in
+        return Stream(producer: { (observer: Event -> ()) -> DisposableType? in
 
-        var finished = false
-        let callObserverOnce = { (event: Event) -> Void in
-            if !finished {
-                finished = true
-                observer(event)
+            var finished = false
+            let callObserverOnce = { (event: Event) -> Void in
+                if !finished {
+                    finished = true
+                    observer(event)
+                }
             }
-        }
 
-        let dispose = input.observe(on: nil, observer: { (event) -> () in
-
-            switch event {
-            case .Success, .Failure://, .Interrupted, .Unsubscribed:
-                callObserverOnce(event)
-            case .Progress:
-                observer(event)
-            }
+            let dispose = self.observe(on: nil, observer: { (event) -> () in
+                
+                switch event {
+                case .Success, .Failure://, .Interrupted, .Unsubscribed:
+                    callObserverOnce(event)
+                case .Progress:
+                    observer(event)
+                }
+            })
+            
+            return dispose
         })
-
-        return dispose
-    })
+    }
 }
 
 public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Error>.Async) -> Stream<AsyncEvent<Value, AnyObject, Error>> {
@@ -247,24 +244,24 @@ public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Err
     return result
 }
 
-public func streamToAsync<
-    Value, Error: ErrorType, Input: StreamType where Input.Event == AsyncEvent<Value, AnyObject, Error>>(input: Input)
--> AsyncTypes<Value, Error>.Async {
+public func streamToAsync<Input: AsyncStreamType where
+    Input.Progress == AnyObject,
+    Input.Event == AsyncEvent<Input.Value, AnyObject, Input.Error>>(input: Input) -> AsyncTypes<Input.Value, Input.Error>.Async {
 
     return { (
         progressCallback: AsyncProgressCallback?,
         stateCallback   : AsyncChangeStateCallback?,
-        finishCallback  : AsyncTypes<Value, Error>.DidFinishAsyncCallback?) -> AsyncHandler in
+        finishCallback  : AsyncTypes<Input.Value, Input.Error>.DidFinishAsyncCallback?) -> AsyncHandler in
 
         var finishCallbackHolder = finishCallback
-        let finishOnce = { (result: AsyncResult<Value, Error>) -> Void in
+        let finishOnce = { (result: AsyncResult<Input.Value, Input.Error>) -> Void in
             if let finishCallback = finishCallbackHolder {
                 finishCallbackHolder = nil
                 finishCallback(result: result)
             }
         }
 
-        let dispose = ensureOnceStreamFinish(input).observe(on: nil, observer: { (event) -> () in
+        let dispose = input.ensureOnceStreamFinish().observe(on: nil, observer: { event -> () in
 
             if finishCallbackHolder == nil { return }
 
