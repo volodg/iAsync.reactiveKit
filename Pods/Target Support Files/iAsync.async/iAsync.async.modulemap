@@ -1,0 +1,6 @@
+framework module iAsync_async {
+  umbrella header "iAsync.async-umbrella.h"
+
+  export *
+  module * { export * }
+}

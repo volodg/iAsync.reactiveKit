@@ -8,12 +8,12 @@
 
 Pod::Spec.new do |s|
 
-  s.name         = "iAsync.restkit"
+  s.name         = "iAsync.reactiveKit"
   s.version      = "0.0.1"
-  s.summary      = "iAsync.restkit lib provides tools used in other iAsync libraries"
+  s.summary      = "iAsync.reactiveKit lib provides tools used in other iAsync libraries"
 
   s.description  = <<-DESC
-                   iAsync.restkit lib provides tools used in other iAsync libraries
+                   iAsync.reactiveKit lib provides tools used in other iAsync libraries
 
                    * contains usefull Arrays, Dict, String extensions
                    DESC
@@ -64,7 +64,7 @@ Pod::Spec.new do |s|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "https://github.com/volodg/iAsync.restkit.git", :tag => "0.0.1" }
+  s.source       = { :git => "https://github.com/volodg/iAsync.reactiveKit.git", :tag => "0.0.1" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -75,7 +75,7 @@ Pod::Spec.new do |s|
   #  Not including the public_header_files will make all headers public.
   #
 
-  s.source_files  = "iAsync.restkit/**/*.{swift,m,h}"
+  s.source_files  = "iAsync.reactiveKit/**/*.{swift,m,h}"
   # s.exclude_files = "Classes/Exclude"
 
   # s.public_header_files = "iAsync.social/iAsync.social-Bridging-Header.h"
