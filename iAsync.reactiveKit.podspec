@@ -1,5 +1,5 @@
 #
-#  Be sure to run `pod spec lint iAsync.social.podspec' to ensure this is a
+#  Be sure to run `pod spec lint iAsync.reactiveKit.podspec' to ensure this is a
 #  valid spec and to remove all comments including this before submitting the spec.
 #
 #  To learn more about Podspec attributes see http://docs.cocoapods.org/specification.html
@@ -75,10 +75,8 @@ Pod::Spec.new do |s|
   #  Not including the public_header_files will make all headers public.
   #
 
-  s.source_files  = "iAsync.reactiveKit/**/*.{swift,m,h}"
+  s.source_files  = "Lib/**/*.{swift,m,h}"
   # s.exclude_files = "Classes/Exclude"
-
-  # s.public_header_files = "iAsync.social/iAsync.social-Bridging-Header.h"
 
 
   # ――― Resources ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -90,7 +88,6 @@ Pod::Spec.new do |s|
   #
 
   # s.resource  = "icon.png"
-  # s.resource = "iAsync.cache/Resources/JCacheDBInfo.plist"
 
   # s.preserve_paths = "FilesToSave", "MoreFilesToSave"
 
@@ -117,7 +114,6 @@ Pod::Spec.new do |s|
   # s.requires_arc = true
 
   # s.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
-  # s.xcconfig = { "SWIFT_OBJC_BRIDGING_HEADER" => "iAsync.cache/iAsync_cache-Bridging-Header.h" }
 
   s.xcconfig = { "CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES" => "YES" }
   

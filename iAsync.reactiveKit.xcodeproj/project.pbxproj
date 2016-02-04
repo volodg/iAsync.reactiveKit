@@ -16,7 +16,7 @@
 		C35E4C781C63C4E400AB0981 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C35E4C761C63C4E400AB0981 /* LaunchScreen.storyboard */; };
 		C35E4C831C63C4E400AB0981 /* iAsync_reactiveKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35E4C821C63C4E400AB0981 /* iAsync_reactiveKitTests.swift */; };
 		C35E4C8E1C63C4E400AB0981 /* iAsync_reactiveKitUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35E4C8D1C63C4E400AB0981 /* iAsync_reactiveKitUITests.swift */; };
-		C35E4CA21C63CA5500AB0981 /* iAsync.reactiveKit.podspec in Resources */ = {isa = PBXBuildFile; fileRef = C35E4CA11C63CA5500AB0981 /* iAsync.reactiveKit.podspec */; };
+		C35E4CE21C63CDD100AB0981 /* iAsync.reactiveKit.podspec in Resources */ = {isa = PBXBuildFile; fileRef = C35E4CE11C63CDD000AB0981 /* iAsync.reactiveKit.podspec */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,7 +53,7 @@
 		C35E4C891C63C4E400AB0981 /* iAsync.reactiveKitUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iAsync.reactiveKitUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C35E4C8D1C63C4E400AB0981 /* iAsync_reactiveKitUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iAsync_reactiveKitUITests.swift; sourceTree = "<group>"; };
 		C35E4C8F1C63C4E400AB0981 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		C35E4CA11C63CA5500AB0981 /* iAsync.reactiveKit.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = iAsync.reactiveKit.podspec; sourceTree = "<group>"; };
+		C35E4CE11C63CDD000AB0981 /* iAsync.reactiveKit.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = iAsync.reactiveKit.podspec; sourceTree = SOURCE_ROOT; };
 		D2F37D2E857CF007244278FB /* Pods-iAsync.reactiveKitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iAsync.reactiveKitTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-iAsync.reactiveKitTests/Pods-iAsync.reactiveKitTests.release.xcconfig"; sourceTree = "<group>"; };
 		DEA5A7392688887AE12B9247 /* Pods_iAsync_reactiveKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iAsync_reactiveKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2948855CD3CE612CB7B5444 /* Pods-iAsync.reactiveKit.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iAsync.reactiveKit.release.xcconfig"; path = "Pods/Target Support Files/Pods-iAsync.reactiveKit/Pods-iAsync.reactiveKit.release.xcconfig"; sourceTree = "<group>"; };
@@ -122,7 +122,7 @@
 		C35E4C6C1C63C4E400AB0981 /* iAsync.reactiveKit */ = {
 			isa = PBXGroup;
 			children = (
-				C35E4CA11C63CA5500AB0981 /* iAsync.reactiveKit.podspec */,
+				C35E4CE11C63CDD000AB0981 /* iAsync.reactiveKit.podspec */,
 				C35E4C6D1C63C4E400AB0981 /* AppDelegate.swift */,
 				C35E4C6F1C63C4E400AB0981 /* ViewController.swift */,
 				C35E4C711C63C4E400AB0981 /* Main.storyboard */,
@@ -271,8 +271,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				C35E4C781C63C4E400AB0981 /* LaunchScreen.storyboard in Resources */,
-				C35E4CA21C63CA5500AB0981 /* iAsync.reactiveKit.podspec in Resources */,
 				C35E4C751C63C4E400AB0981 /* Assets.xcassets in Resources */,
+				C35E4CE21C63CDD100AB0981 /* iAsync.reactiveKit.podspec in Resources */,
 				C35E4C731C63C4E400AB0981 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
