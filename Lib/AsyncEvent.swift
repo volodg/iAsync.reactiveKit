@@ -1,6 +1,6 @@
 //
 //  AsyncEvent.swift
-//  AppDaddy
+//  iAsync.reactiveKit
 //
 //  Created by Gorbenko Vladimir on 03/02/16.
 //  Copyright © 2016 Volodymyr. All rights reserved.
@@ -172,7 +172,7 @@ extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
             }
 
             return BlockDisposable({ () -> () in
-                
+
                 observers[0] = nil
                 if observers.all({ $0 == nil }) {
                     dispose.dispose()

@@ -69,10 +69,10 @@ private func testAsync() -> AsyncTypes<String, NSError>.Async {
 
 class AsyncToStreamTests: XCTestCase {
 
-    //current
     func testCancelStream() {
 
         let loader = testAsync()
+
         let stream = asyncToStream(loader)
 
         var deinitTest: NSObject? = NSObject()
@@ -81,26 +81,18 @@ class AsyncToStreamTests: XCTestCase {
         let dispose = stream.observe { result -> Void in
 
             if deinitTest != nil {
-                deinitTest = nil
-            }
-
-            switch result {
-            case .Success:
                 XCTFail()
-            case .Failure:
-                XCTFail()
-            case .Progress:
+            } else {
                 XCTFail()
             }
         }
 
-        autoreleasepool { () -> () in
-            dispose.dispose()
-        }
+        dispose.dispose()
 
-        if weakDeinitTest != nil {
-            XCTFail()
-        }
+        XCTAssertNotNil(weakDeinitTest)
+        deinitTest = nil
+
+        XCTAssertNil(weakDeinitTest)
     }
 
     func testPerformanceExample() {
