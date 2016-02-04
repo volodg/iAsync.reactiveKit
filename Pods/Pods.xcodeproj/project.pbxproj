@@ -80,7 +80,6 @@
 		9DE917604D106DC133E894D0A4CAFD12 /* AsyncHandlerTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411FAD94132E541C7F133135162A2FA9 /* AsyncHandlerTask.swift */; };
 		AA38226E5A9890E355972102CBFA4C0F /* OptionalType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 250ED2E1840FBAF2AF6E2638B77352E7 /* OptionalType.swift */; };
 		AC9A0577A78F90FA26BE01E41AB7CAEC /* AsyncsOwner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28DA3A14759BC92BE5F49F6F254ED533 /* AsyncsOwner.swift */; };
-		B078E8610875DA434D9ADAB67C971170 /* AsyncToStreamTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1E3857F1D7532D211964AC990834A7 /* AsyncToStreamTest.swift */; };
 		B0E6A26611B949571D4BFCAAE3AF3808 /* NSLocale+CurrentInterfaceLanguageCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CE3E8BA4E7369D2E2881C9F82CA58E8 /* NSLocale+CurrentInterfaceLanguageCode.swift */; };
 		B1B74E88823BDF68F331AC9F24E9F831 /* iAsync.reactiveKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = F14C21D525072A8A528E08C63CE8BED0 /* iAsync.reactiveKit-dummy.m */; };
 		B68FC313ED4D11CBB26D5DA559A650DE /* NSString+FileAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A63CD664922AE9A5BAF7E97D77151C7A /* NSString+FileAttributes.swift */; };
@@ -335,7 +334,6 @@
 		B5038AFEF9187A9A0BD9E1BA95BE9684 /* Pods_iAsync_reactiveKitAppTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iAsync_reactiveKitAppTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7C78754196C452CE2B996FA1ED7A4A5 /* NSNumber+FSStorable.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "NSNumber+FSStorable.swift"; sourceTree = "<group>"; };
 		B87D63C61EFC9FFDFCBCC67267D75A20 /* Pods-iAsync.reactiveKitAppTests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-iAsync.reactiveKitAppTests-acknowledgements.plist"; sourceTree = "<group>"; };
-		BA1E3857F1D7532D211964AC990834A7 /* AsyncToStreamTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AsyncToStreamTest.swift; sourceTree = "<group>"; };
 		BA6428E9F66FD5A23C0A2E06ED26CD2F /* Podfile */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		BE533AC3E758AE8099182BA27758B6F6 /* ExecutionContext.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExecutionContext.swift; path = ReactiveKit/Other/ExecutionContext.swift; sourceTree = "<group>"; };
 		BEE296050683622493D8D7AE726A4730 /* ReactiveKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ReactiveKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -647,7 +645,6 @@
 			isa = PBXGroup;
 			children = (
 				D193EF87716515EAC1D25F01853EE98D /* AsyncEvent.swift */,
-				BA1E3857F1D7532D211964AC990834A7 /* AsyncToStreamTest.swift */,
 			);
 			path = Lib;
 			sourceTree = "<group>";
@@ -1171,7 +1168,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B11EC72493B4D35E16BB8C7E4D78F65 /* AsyncEvent.swift in Sources */,
-				B078E8610875DA434D9ADAB67C971170 /* AsyncToStreamTest.swift in Sources */,
 				B1B74E88823BDF68F331AC9F24E9F831 /* iAsync.reactiveKit-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

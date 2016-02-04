@@ -217,7 +217,7 @@ public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Err
 
     typealias Event = AsyncEvent<Value, AnyObject, Error>
 
-    let activeStream = Stream { (observer: Event -> ()) -> DisposableType? in
+    let result = Stream { (observer: Event -> ()) -> DisposableType? in
 
         let handler = loader(progressCallback: { (progressInfo) -> () in
 
@@ -233,10 +233,8 @@ public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Err
             case .Failure(let error):
                 observer(.Failure(error))
             case .Interrupted:
-                //observer(.Interrupted)
                 break
             case .Unsubscribed:
-                //observer(.Unsubscribed)
                 break
             }
         })
@@ -244,11 +242,10 @@ public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Err
         return BlockDisposable({ () -> () in
 
             handler(task: .Cancel)
-            //observer(.Interrupted)
         })
     }
 
-    return activeStream//.map(id)
+    return result
 }
 
 public func streamToAsync<

@@ -10,11 +10,9 @@ import XCTest
 
 import iAsync_async
 import iAsync_utils
+import iAsync_reactiveKit
 
 import ReactiveKit
-
-//@testable
-import iAsync_reactiveKit
 
 typealias Event = AsyncEvent<String, AnyObject, NSError>
 
@@ -44,17 +42,17 @@ private func testStream() -> Stream<AsyncEvent<String, AnyObject, NSError>> {
 }
 
 class StreamToAsyncTests: XCTestCase {
-    
+
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
-    
+
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
-    
+
     func testCancelStream() {
 
         let stream = testStream()
@@ -151,6 +149,9 @@ class StreamToAsyncTests: XCTestCase {
         var progressCalledCount = 0
         var resultValue: String?
 
+        var deinitTest: NSObject? = NSObject()
+        weak var weakDeinitTest = deinitTest
+
         let expectation = expectationWithDescription("")
 
         let _ = loader(progressCallback: { (progressInfo) -> () in
@@ -163,8 +164,11 @@ class StreamToAsyncTests: XCTestCase {
 
             switch result {
             case .Success(let value):
-                resultValue = value
-                expectation.fulfill()
+                if deinitTest != nil {
+                    deinitTest = nil
+                    resultValue = value
+                    expectation.fulfill()
+                }
             case .Failure:
                 XCTFail()
             case .Interrupted:
@@ -176,6 +180,10 @@ class StreamToAsyncTests: XCTestCase {
 
         waitForExpectationsWithTimeout(0.5, handler: nil)
 
+        if weakDeinitTest != nil {
+            XCTFail()
+        }
+
         XCTAssertEqual(5, progressCalledCount)
         XCTAssertEqual("ok", resultValue)
     }
@@ -186,5 +194,4 @@ class StreamToAsyncTests: XCTestCase {
             // Put the code you want to measure the time of here.
         }
     }
-    
 }
