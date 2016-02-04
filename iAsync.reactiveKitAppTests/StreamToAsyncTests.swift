@@ -1,6 +1,6 @@
 //
 //  StreamToAsyncTests.swift
-//  iAsync.reactiveKit
+//  iAsync.reactiveKitApp
 //
 //  Created by Gorbenko Vladimir on 04/02/16.
 //  Copyright © 2016 EmbeddedSystems. All rights reserved.
@@ -10,9 +10,11 @@ import XCTest
 
 import iAsync_async
 import iAsync_utils
-import iAsync_reactiveKit
 
 import ReactiveKit
+
+//@testable
+import iAsync_reactiveKit
 
 typealias Event = AsyncEvent<String, AnyObject, NSError>
 
@@ -53,11 +55,50 @@ class StreamToAsyncTests: XCTestCase {
         super.tearDown()
     }
     
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    func testCancelStream() {
+
+        let stream = testStream()
+        let loader = streamToAsync(stream)
+
+        var deinitTest: NSObject? = NSObject()
+        weak var weakDeinitTest = deinitTest
+
+        var testPassed = false
+
+        let handler = loader(progressCallback: { (progressInfo) -> () in
+
+            XCTFail()
+        }, stateCallback: { (state) -> () in
+
+            XCTFail()
+        }) { (result) -> Void in
+
+            switch result {
+            case .Success:
+                XCTFail()
+            case .Failure:
+                XCTFail()
+            case .Interrupted:
+                if deinitTest != nil {
+                    deinitTest = nil
+                    testPassed = true
+                }
+            case .Unsubscribed:
+                XCTFail()
+            }
+        }
+
+        autoreleasepool { () -> () in
+            handler(task: .Cancel)
+        }
+
+        if weakDeinitTest != nil {
+            XCTFail()
+        }
+
+        XCTAssertTrue(testPassed)
     }
-    
+
     func testPerformanceExample() {
         // This is an example of a performance test case.
         self.measureBlock {

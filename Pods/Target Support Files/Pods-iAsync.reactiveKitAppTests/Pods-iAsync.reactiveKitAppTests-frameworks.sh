@@ -84,16 +84,16 @@ strip_invalid_archs() {
 
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
-  install_framework "Pods-iAsync.reactiveKit/ReactiveKit.framework"
-  install_framework "Pods-iAsync.reactiveKit/Result.framework"
-  install_framework "Pods-iAsync.reactiveKit/iAsync_async.framework"
-  install_framework "Pods-iAsync.reactiveKit/iAsync_reactiveKit.framework"
-  install_framework "Pods-iAsync.reactiveKit/iAsync_utils.framework"
+  install_framework "Pods-iAsync.reactiveKitAppTests/ReactiveKit.framework"
+  install_framework "Pods-iAsync.reactiveKitAppTests/Result.framework"
+  install_framework "Pods-iAsync.reactiveKitAppTests/iAsync_async.framework"
+  install_framework "Pods-iAsync.reactiveKitAppTests/iAsync_reactiveKit.framework"
+  install_framework "Pods-iAsync.reactiveKitAppTests/iAsync_utils.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
-  install_framework "Pods-iAsync.reactiveKit/ReactiveKit.framework"
-  install_framework "Pods-iAsync.reactiveKit/Result.framework"
-  install_framework "Pods-iAsync.reactiveKit/iAsync_async.framework"
-  install_framework "Pods-iAsync.reactiveKit/iAsync_reactiveKit.framework"
-  install_framework "Pods-iAsync.reactiveKit/iAsync_utils.framework"
+  install_framework "Pods-iAsync.reactiveKitAppTests/ReactiveKit.framework"
+  install_framework "Pods-iAsync.reactiveKitAppTests/Result.framework"
+  install_framework "Pods-iAsync.reactiveKitAppTests/iAsync_async.framework"
+  install_framework "Pods-iAsync.reactiveKitAppTests/iAsync_reactiveKit.framework"
+  install_framework "Pods-iAsync.reactiveKitAppTests/iAsync_utils.framework"
 fi

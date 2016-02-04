@@ -44,46 +44,6 @@ private func testStream() -> Stream<AsyncEvent<String, AnyObject, NSError>> {
     return stream
 }
 
-private func testCancelStream() {
-
-    let stream = testStream()
-    let loader = streamToAsync(stream)
-
-    var deinitTest: NSObject? = NSObject()
-    weak var weakDeinitTest = deinitTest
-
-    let handler = loader(progressCallback: { (progressInfo) -> () in
-
-        fatalError()
-    }, stateCallback: { (state) -> () in
-
-        fatalError()
-    }) { (result) -> Void in
-
-        switch result {
-        case .Success:
-            fatalError()
-        case .Failure:
-            fatalError()
-        case .Interrupted:
-            if deinitTest != nil {
-                deinitTest = nil
-                print("ok1")
-            }
-        case .Unsubscribed:
-            fatalError()
-        }
-    }
-
-    autoreleasepool { () -> () in
-        handler(task: .Cancel)
-    }
-
-    if weakDeinitTest != nil {
-        fatalError()
-    }
-}
-
 private func testUnsubscribeStream() {
 
     let stream = testStream()
@@ -140,7 +100,6 @@ private func testNormalFinishStream() {
 
 func testAll() {
 
-    testCancelStream()
 //    testUnsubscribeStream()
 //    testNormalFinishStream()
     print("----------------------------------------------")

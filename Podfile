@@ -3,16 +3,17 @@ use_frameworks!
 
 def import_pods
 
-pod 'iAsync.async'      , :path => '../iAsync.async'
-pod 'iAsync.utils'      , :path => '../iAsync.utils'
-pod 'iAsync.reactiveKit', :path => '.'
+  pod 'ReactiveKit'      #, '~> 1.1.2'
+  pod 'iAsync.async'      , :path => '../iAsync.async'
+  pod 'iAsync.utils'      , :path => '../iAsync.utils'
+  pod 'iAsync.reactiveKit', :path => '.'
 
 end
 
-target 'iAsync.reactiveKit', :exclusive => true do
+target 'iAsync.reactiveKitApp’, :exclusive => true do
   import_pods
 end
 
-target 'iAsync.reactiveKitTests', :exclusive => true do
+target 'iAsync.reactiveKitAppTests', :exclusive => true do
   import_pods
 end

@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  iAsync.reactiveKit
+//  iAsync.reactiveKitApp
 //
 //  Created by Gorbenko Vladimir on 04/02/16.
 //  Copyright © 2016 EmbeddedSystems. All rights reserved.

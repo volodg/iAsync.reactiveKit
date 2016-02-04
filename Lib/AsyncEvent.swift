@@ -29,7 +29,7 @@ public protocol AsyncStreamType: StreamType {
 
 extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
 
-    func mapValue<U>(transform: Value -> U) -> Stream<AsyncEvent<U, Progress, Error>> {
+    public func mapValue<U>(transform: Value -> U) -> Stream<AsyncEvent<U, Progress, Error>> {
         return create { observer in
             return self.observe(on: nil) { event in
 
@@ -49,7 +49,7 @@ extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
         }
     }
 
-    func mapError<U>(transform: Error -> U) -> Stream<AsyncEvent<Value, Progress, U>> {
+    public func mapError<U>(transform: Error -> U) -> Stream<AsyncEvent<Value, Progress, U>> {
         return create { observer in
             return self.observe(on: nil) { event in
 
@@ -69,7 +69,7 @@ extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
         }
     }
 
-    func mapProgress<U>(transform: Progress -> U) -> Stream<AsyncEvent<Value, U, Error>> {
+    public func mapProgress<U>(transform: Progress -> U) -> Stream<AsyncEvent<Value, U, Error>> {
         return create { observer in
             return self.observe(on: nil) { event in
 
@@ -89,7 +89,7 @@ extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
         }
     }
 
-    func unsubscribe() -> Stream<Event> {
+    public func unsubscribe() -> Stream<Event> {
 
         return create { observer in
 
@@ -108,7 +108,7 @@ extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
     }
 
     //TODO test
-    func withEventValue(getter: () -> Event?, setter: Event -> Void) -> Stream<Event> {
+    public func withEventValue(getter: () -> Event?, setter: Event -> Void) -> Stream<Event> {
 
         return create { observer in
 
@@ -129,7 +129,7 @@ extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
     }
 
     //TODO test
-    func mergedObservers() -> Stream<Event> {
+    public func mergedObservers() -> Stream<Event> {
 
         var observers: [(Event -> ())?] = []
 

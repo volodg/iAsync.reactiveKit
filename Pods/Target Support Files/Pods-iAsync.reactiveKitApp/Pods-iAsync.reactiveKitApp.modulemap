@@ -1,0 +1,6 @@
+framework module Pods_iAsync_reactiveKitApp {
+  umbrella header "Pods-iAsync.reactiveKitApp-umbrella.h"
+
+  export *
+  module * { export * }
+}

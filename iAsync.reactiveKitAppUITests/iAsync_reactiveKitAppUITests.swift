@@ -1,6 +1,6 @@
 //
-//  iAsync_reactiveKitUITests.swift
-//  iAsync.reactiveKitUITests
+//  iAsync_reactiveKitAppUITests.swift
+//  iAsync.reactiveKitAppUITests
 //
 //  Created by Gorbenko Vladimir on 04/02/16.
 //  Copyright © 2016 EmbeddedSystems. All rights reserved.
@@ -8,7 +8,7 @@
 
 import XCTest
 
-class iAsync_reactiveKitUITests: XCTestCase {
+class iAsync_reactiveKitAppUITests: XCTestCase {
         
     override func setUp() {
         super.setUp()
