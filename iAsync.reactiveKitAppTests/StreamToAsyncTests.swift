@@ -99,6 +99,50 @@ class StreamToAsyncTests: XCTestCase {
         XCTAssertTrue(testPassed)
     }
 
+    func testUnsubscribeStream() {
+
+        let stream = testStream()
+        let loader = streamToAsync(stream)
+
+        var testPassed = false
+
+        var deinitTest: NSObject? = NSObject()
+        weak var weakDeinitTest = deinitTest
+
+        let handler = loader(progressCallback: { (progressInfo) -> () in
+
+            XCTFail()
+        }, stateCallback: { (state) -> () in
+
+            XCTFail()
+        }) { (result) -> Void in
+
+            switch result {
+            case .Success:
+                XCTFail()
+            case .Failure:
+                XCTFail()
+            case .Interrupted:
+                XCTFail()
+            case .Unsubscribed:
+                if deinitTest != nil {
+                    deinitTest = nil
+                    testPassed = true
+                }
+            }
+        }
+
+        autoreleasepool { () -> () in
+            handler(task: .UnSubscribe)
+        }
+
+        if weakDeinitTest != nil {
+            XCTFail()
+        }
+
+        XCTAssertTrue(testPassed)
+    }
+
     func testPerformanceExample() {
         // This is an example of a performance test case.
         self.measureBlock {

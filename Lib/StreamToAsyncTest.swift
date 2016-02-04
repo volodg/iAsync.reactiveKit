@@ -44,34 +44,6 @@ private func testStream() -> Stream<AsyncEvent<String, AnyObject, NSError>> {
     return stream
 }
 
-private func testUnsubscribeStream() {
-
-    let stream = testStream()
-    let loader = streamToAsync(stream)
-
-    let handler = loader(progressCallback: { (progressInfo) -> () in
-
-        fatalError()
-    }, stateCallback: { (state) -> () in
-
-        fatalError()
-    }) { (result) -> Void in
-
-        switch result {
-        case .Success:
-            fatalError()
-        case .Failure:
-            fatalError()
-        case .Interrupted:
-            fatalError()
-        case .Unsubscribed:
-            print("ok2")
-        }
-    }
-
-    handler(task: .UnSubscribe)
-}
-
 private func testNormalFinishStream() {
 
     let stream = testStream()

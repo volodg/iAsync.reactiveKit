@@ -289,7 +289,6 @@ public func streamToAsync<
                 dispose.dispose()
                 finishOnce(.Interrupted)
             case .UnSubscribe:
-                finishCallbackHolder = nil
                 finishOnce(.Unsubscribed)
             case .Resume:
                 fatalError()
