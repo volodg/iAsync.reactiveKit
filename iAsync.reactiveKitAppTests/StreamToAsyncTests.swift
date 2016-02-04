@@ -33,7 +33,7 @@ private func testStream() -> Stream<AsyncEvent<String, AnyObject, NSError>> {
 
             observer(.Progress(progress))
             progress += 1
-        }, duration: 0.1)
+        }, duration: 0.01)
 
         return BlockDisposable({ () -> () in
             cancel()
@@ -141,6 +141,43 @@ class StreamToAsyncTests: XCTestCase {
         }
 
         XCTAssertTrue(testPassed)
+    }
+
+    func testNormalFinishStream() {
+
+        let stream = testStream()
+        let loader = streamToAsync(stream)
+
+        var progressCalledCount = 0
+        var resultValue: String?
+
+        let expectation = expectationWithDescription("")
+
+        let _ = loader(progressCallback: { (progressInfo) -> () in
+
+            progressCalledCount += 1
+        }, stateCallback: { (state) -> () in
+
+            XCTFail()
+        }) { (result) -> Void in
+
+            switch result {
+            case .Success(let value):
+                resultValue = value
+                expectation.fulfill()
+            case .Failure:
+                XCTFail()
+            case .Interrupted:
+                XCTFail()
+            case .Unsubscribed:
+                XCTFail()
+            }
+        }
+
+        waitForExpectationsWithTimeout(0.5, handler: nil)
+
+        XCTAssertEqual(5, progressCalledCount)
+        XCTAssertEqual("ok", resultValue)
     }
 
     func testPerformanceExample() {

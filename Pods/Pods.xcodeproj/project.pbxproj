@@ -83,7 +83,6 @@
 		B078E8610875DA434D9ADAB67C971170 /* AsyncToStreamTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1E3857F1D7532D211964AC990834A7 /* AsyncToStreamTest.swift */; };
 		B0E6A26611B949571D4BFCAAE3AF3808 /* NSLocale+CurrentInterfaceLanguageCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CE3E8BA4E7369D2E2881C9F82CA58E8 /* NSLocale+CurrentInterfaceLanguageCode.swift */; };
 		B1B74E88823BDF68F331AC9F24E9F831 /* iAsync.reactiveKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = F14C21D525072A8A528E08C63CE8BED0 /* iAsync.reactiveKit-dummy.m */; };
-		B56F51C8FCBC7A54AE6D09328BC5B660 /* StreamToAsyncTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2ACDB474E8535180FACEEA844DA37A8 /* StreamToAsyncTest.swift */; };
 		B68FC313ED4D11CBB26D5DA559A650DE /* NSString+FileAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A63CD664922AE9A5BAF7E97D77151C7A /* NSString+FileAttributes.swift */; };
 		B6D9B453AD8D6F89C544C88FE7DEEAFA /* iAsync.utils-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B67DE9C6C2C5581177816B45540411 /* iAsync.utils-dummy.m */; };
 		B70DE67A2E5F4FAECDD90B2DAE10EB76 /* String+Trimm.swift in Sources */ = {isa = PBXBuildFile; fileRef = F858618A485D0272582C8F9BC19E5F57 /* String+Trimm.swift */; };
@@ -322,7 +321,6 @@
 		A0CAF52E265DF42428BC68EB7EEF2463 /* String+PathExtensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "String+PathExtensions.swift"; sourceTree = "<group>"; };
 		A2489B2B74A8EDDD35F20087ACFD080C /* BaseStrategy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BaseStrategy.swift; sourceTree = "<group>"; };
 		A27C6EC23DED7441500C86B89D1D13CD /* AsyncsPredefinedBlocks.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AsyncsPredefinedBlocks.swift; sourceTree = "<group>"; };
-		A2ACDB474E8535180FACEEA844DA37A8 /* StreamToAsyncTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StreamToAsyncTest.swift; sourceTree = "<group>"; };
 		A2AEDC124CDE0708BFEB64CF71FC1AD0 /* ReactiveKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = ReactiveKit.modulemap; sourceTree = "<group>"; };
 		A568F4198C90B3A9C471065E124489E8 /* iAsync.reactiveKit-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "iAsync.reactiveKit-prefix.pch"; sourceTree = "<group>"; };
 		A63CD664922AE9A5BAF7E97D77151C7A /* NSString+FileAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "NSString+FileAttributes.swift"; sourceTree = "<group>"; };
@@ -649,7 +647,6 @@
 			isa = PBXGroup;
 			children = (
 				D193EF87716515EAC1D25F01853EE98D /* AsyncEvent.swift */,
-				A2ACDB474E8535180FACEEA844DA37A8 /* StreamToAsyncTest.swift */,
 				BA1E3857F1D7532D211964AC990834A7 /* AsyncToStreamTest.swift */,
 			);
 			path = Lib;
@@ -1176,7 +1173,6 @@
 				6B11EC72493B4D35E16BB8C7E4D78F65 /* AsyncEvent.swift in Sources */,
 				B078E8610875DA434D9ADAB67C971170 /* AsyncToStreamTest.swift in Sources */,
 				B1B74E88823BDF68F331AC9F24E9F831 /* iAsync.reactiveKit-dummy.m in Sources */,
-				B56F51C8FCBC7A54AE6D09328BC5B660 /* StreamToAsyncTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
