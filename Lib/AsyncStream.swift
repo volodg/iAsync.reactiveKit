@@ -50,13 +50,18 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         stream = Stream  { observer in
             var observerHolder: Observer? = observer
 
-            return producer { event in
+            let dispose = producer { event in
                 if let observer = observerHolder {
                     if event.isTerminal {
                         observerHolder = nil
                     }
                     observer(event)
                 }
+            }
+
+            return BlockDisposable { () -> Void in
+                observerHolder = nil
+                dispose?.dispose()
             }
         }
     }
@@ -530,7 +535,6 @@ public extension AsyncStreamType where Value: AsyncStreamType, Value.Next == Nex
 //        }
     }
 
-    //TODO test
     @warn_unused_result
     public func switchToLatest() -> AsyncStream<Value.Value, Value.Next, Value.Error> {
 

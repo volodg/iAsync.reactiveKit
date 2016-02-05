@@ -87,7 +87,7 @@ class AsyncStreamFlatMap: XCTestCase {
         XCTAssertEqual(numberOfObservers2, 1)
     }
 
-    func RtestCancelAfterStart() {
+    func testCancelAfterStart() {
 
         let stream1 = testStream()
 
