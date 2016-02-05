@@ -13,7 +13,9 @@ import iAsync_utils
 
 import ReactiveKit
 
-extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
+public extension AsyncStreamType {
+
+    typealias Event = AsyncEvent<Value, Progress, Error>
 
     public func mapValue<U>(transform: Value -> U) -> Stream<AsyncEvent<U, Progress, Error>> {
         return create { observer in
@@ -26,10 +28,10 @@ extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
                     observer(.Failure(error))
                 case .Progress(let progress):
                     observer(.Progress(progress))
-                    //                case .Interrupted:
-                    //                    observer(.Interrupted)
-                    //                case .Unsubscribed:
-                    //                    observer(.Unsubscribed)
+//                case .Interrupted:
+//                    observer(.Interrupted)
+//                case .Unsubscribed:
+//                    observer(.Unsubscribed)
                 }
             }
         }
@@ -46,10 +48,10 @@ extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
                     observer(.Failure(transform(error)))
                 case .Progress(let progress):
                     observer(.Progress(progress))
-                    //                case .Interrupted:
-                    //                    observer(.Interrupted)
-                    //                case .Unsubscribed:
-                    //                    observer(.Unsubscribed)
+//                case .Interrupted:
+//                    observer(.Interrupted)
+//                case .Unsubscribed:
+//                    observer(.Unsubscribed)
                 }
             }
         }
@@ -75,7 +77,7 @@ extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
         }
     }
 
-    public func unsubscribe() -> Stream<Event> {
+    public func unsubscribe() -> AsyncStream<Value, Progress, Error> {
 
         return create { observer in
 
@@ -94,7 +96,7 @@ extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
     }
 
     //TODO test
-    public func withEventValue(getter: () -> Event?, setter: Event -> Void) -> Stream<Event> {
+    public func withEventValue(getter: () -> AsyncEvent<Value, Progress, Error>?, setter: AsyncEvent<Value, Progress, Error> -> Void) -> AsyncStream<Value, Progress, Error> {
 
         return create { observer in
 
@@ -115,9 +117,9 @@ extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
     }
 
     //TODO test
-    public func mergedObservers() -> Stream<Event> {
+    public func mergedObservers() -> AsyncStream<Value, Progress, Error> {
 
-        var observers: [(Event -> ())?] = []
+        var observers: [(AsyncEvent<Value, Progress, Error> -> ())?] = []
 
         return create { observer in
 
@@ -132,10 +134,10 @@ extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
                 })
             }
 
-            let notify = { (observers: [(Event -> ())?], event: Event) in
+            let notify = { (observers: [(AsyncEvent<Value, Progress, Error> -> ())?], event: AsyncEvent<Value, Progress, Error>) in
                 observers.forEach { $0?(event) }
             }
-            let finishNotify = { (event: Event) in
+            let finishNotify = { (event: AsyncEvent<Value, Progress, Error>) in
                 let observers_ = observers
                 observers.removeAll()
                 notify(observers_, event)
@@ -166,39 +168,13 @@ extension AsyncStreamType where Event == AsyncEvent<Value, Progress, Error> {
             })
         }
     }
-
-    public func ensureOnceStreamFinish() -> Stream<Event> {
-
-        return Stream(producer: { (observer: Event -> ()) -> DisposableType? in
-
-            var finished = false
-            let callObserverOnce = { (event: Event) -> Void in
-                if !finished {
-                    finished = true
-                    observer(event)
-                }
-            }
-
-            let dispose = self.observe(on: nil, observer: { (event) -> () in
-
-                switch event {
-                case .Success, .Failure://, .Interrupted, .Unsubscribed:
-                    callObserverOnce(event)
-                case .Progress:
-                    observer(event)
-                }
-            })
-
-            return dispose
-        })
-    }
 }
 
-public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Error>.Async) -> Stream<AsyncEvent<Value, AnyObject, Error>> {
+public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Error>.Async) -> AsyncStream<Value, AnyObject, Error> {
 
     typealias Event = AsyncEvent<Value, AnyObject, Error>
 
-    let result = Stream { (observer: Event -> ()) -> DisposableType? in
+    let result = AsyncStream { (observer: Event -> ()) -> DisposableType? in
 
         let handler = loader(progressCallback: { (progressInfo) -> () in
 
@@ -230,9 +206,7 @@ public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Err
     return result
 }
 
-public func streamToAsync<Input: AsyncStreamType where
-    Input.Progress == AnyObject,
-    Input.Event == AsyncEvent<Input.Value, AnyObject, Input.Error>>(input: Input) -> AsyncTypes<Input.Value, Input.Error>.Async {
+public func streamToAsync<Input: AsyncStreamType where Input.Progress == AnyObject>(input: Input) -> AsyncTypes<Input.Value, Input.Error>.Async {
 
     return { (
         progressCallback: AsyncProgressCallback?,
@@ -247,7 +221,7 @@ public func streamToAsync<Input: AsyncStreamType where
             }
         }
 
-        let dispose = input.ensureOnceStreamFinish().observe(on: nil, observer: { event -> () in
+        let dispose = input.observe(on: nil, observer: { event -> () in
 
             if finishCallbackHolder == nil { return }
 

@@ -37,17 +37,14 @@ public protocol AsyncStreamType: StreamType {
     func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Progress, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E>
 }
 
-public struct AsyncStream<ValueT, ProgressT, ErrorT: ErrorType>: AsyncStreamType {
+public struct AsyncStream<Value, Progress, Error: ErrorType>: AsyncStreamType {
 
-    public typealias Value    = ValueT
-    public typealias Progress = ProgressT
-    public typealias Error    = ErrorT
-    public typealias Event    = AsyncEvent<Value, Progress, Error>
+    public typealias Event = AsyncEvent<Value, Progress, Error>
 
     private let stream: Stream<Event>
 
     public typealias Observer = Event -> ()
-    
+
     public init(producer: (Observer -> DisposableType?)) {
         stream = Stream  { observer in
             var completed: Bool = false
@@ -94,7 +91,7 @@ public func create<Value, Progress, Error: ErrorType>(producer producer: (AsyncE
 }
 
 //public extension OperationType {
-//    
+//
 //    public func on(next next: (Value -> ())? = nil, success: (() -> ())? = nil, failure: (Error -> ())? = nil, start: (() -> Void)? = nil, completed: (() -> Void)? = nil, context: ExecutionContext? = ImmediateOnMainExecutionContext) -> Operation<Value, Error> {
 //        return create { observer in
 //            start?()
@@ -109,12 +106,12 @@ public func create<Value, Progress, Error: ErrorType>(producer producer: (AsyncE
 //                    success?()
 //                    completed?()
 //                }
-//                
+//
 //                observer.observer(event)
 //            }
 //        }
 //    }
-//    
+//
 //    public func observeNext(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Value -> ()) -> DisposableType {
 //        return self.observe(on: context) { event in
 //            switch event {
@@ -124,7 +121,7 @@ public func create<Value, Progress, Error: ErrorType>(producer producer: (AsyncE
 //            }
 //        }
 //    }
-//    
+//
 //    public func observeError(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Error -> ()) -> DisposableType {
 //        return self.observe(on: context) { event in
 //            switch event {
@@ -134,7 +131,7 @@ public func create<Value, Progress, Error: ErrorType>(producer producer: (AsyncE
 //            }
 //        }
 //    }
-//    
+//
 //    @warn_unused_result
 //    public func shareNext(limit: Int = Int.max, context: ExecutionContext? = nil) -> ObservableBuffer<Value> {
 //        return ObservableBuffer(limit: limit) { observer in
