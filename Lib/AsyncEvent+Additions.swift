@@ -3,7 +3,7 @@
 //  iAsync.reactiveKit
 //
 //  Created by Gorbenko Vladimir on 05/02/16.
-//  Copyright © 2016 Volodymyr. All rights reserved.
+//  Copyright © 2016 EmbeddedSystems. All rights reserved.
 //
 
 import Foundation
@@ -125,7 +125,7 @@ public extension AsyncStreamType {
         }
     }
 
-    //TODO test
+    //TODO test - current
     public func mergedObservers() -> AsyncStream<Value, Progress, Error> {
 
         typealias ObserverHolder = AsyncObserverHolder<Value, Progress, Error>
