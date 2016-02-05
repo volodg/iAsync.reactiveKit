@@ -55,7 +55,7 @@ class AsyncStreamFlatMap: XCTestCase {
 
         waitForExpectationsWithTimeout(0.5, handler: nil)
 
-        let expectedNexts = [0,1,2,3,4,16]
+        let expectedNexts = [0,1,2,3,4,16,16]
         XCTAssertEqual(expectedNexts.count, nexts.count)
         for (index, _) in expectedNexts.enumerate() {
             XCTAssertEqual(expectedNexts[index], nexts[index])

@@ -39,7 +39,7 @@ class MergedObserversTests: XCTestCase {
             case .Failure:
                 XCTFail()
             case .Next(let next):
-                XCTAssertEqual(nextCalledCount1, next as? Int)
+                XCTAssertEqual(nextCalledCount1, next)
                 nextCalledCount1 += 1
             }
         }
@@ -64,7 +64,7 @@ class MergedObserversTests: XCTestCase {
             case .Failure:
                 XCTFail()
             case .Next(let next):
-                XCTAssertEqual(nextCalledCount2, next as? Int)
+                XCTAssertEqual(nextCalledCount2, next)
                 nextCalledCount2 += 1
             }
         }

@@ -52,10 +52,17 @@ func testStreamWithValue<Value, Next>(value: Value, next: Next) -> AsyncStream<V
 
     let stream = AsyncStream(producer: { (observer: AsyncEvent<Value, Next, NSError> -> ()) -> DisposableType? in
 
+        var nextCount = 0
+
         let cancel = Timer.sharedByThreadTimer().addBlock({ (cancel) -> Void in
 
-            observer(.Next(next))
-            observer(.Success(value))
+            if nextCount == 2 {
+                cancel()
+                observer(.Success(value))
+            } else {
+                observer(.Next(next))
+                nextCount += 1
+            }
         }, duration: 0.01)
 
         return BlockDisposable({ () -> () in
