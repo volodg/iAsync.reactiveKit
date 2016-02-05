@@ -25,14 +25,14 @@ private func testAsync() -> AsyncTypes<String, NSError>.Async {
 
         numberOfAsyncs += 1
 
-        var progress = 0
+        var next = 0
 
         var progressCallbackHolder = progressCallback
         var finishCallbackHolder   = finishCallback
 
         let cancel = Timer.sharedByThreadTimer().addBlock({ (cancel) -> Void in
 
-            if progress == 5 {
+            if next == 5 {
                 cancel()
                 if let finishCallback = finishCallbackHolder {
                     progressCallbackHolder = nil
@@ -41,8 +41,8 @@ private func testAsync() -> AsyncTypes<String, NSError>.Async {
                 }
             }
 
-            progressCallbackHolder?(progressInfo: progress)
-            progress += 1
+            progressCallbackHolder?(progressInfo: next)
+            next += 1
         }, duration: 0.01)
 
         return { (task: AsyncHandlerTask) -> Void in
@@ -127,8 +127,8 @@ class AsyncToStreamTests: XCTestCase {
                 }
             case .Failure:
                 XCTFail()
-            case .Progress(let progress):
-                XCTAssertEqual(progressCalledCount, progress as? Int)
+            case .Next(let next):
+                XCTAssertEqual(progressCalledCount, next as? Int)
                 progressCalledCount += 1
             }
         }
@@ -150,7 +150,7 @@ class AsyncToStreamTests: XCTestCase {
         let loader = testAsync()
         let stream = asyncToStream(loader)
 
-        var progressCalledCount1 = 0
+        var nextCalledCount1 = 0
         var resultValue1: String?
 
         var deinitTest1: NSObject? = NSObject()
@@ -169,13 +169,13 @@ class AsyncToStreamTests: XCTestCase {
                 }
             case .Failure:
                 XCTFail()
-            case .Progress(let progress):
-                XCTAssertEqual(progressCalledCount1, progress as? Int)
-                progressCalledCount1 += 1
+            case .Next(let next):
+                XCTAssertEqual(nextCalledCount1, next as? Int)
+                nextCalledCount1 += 1
             }
         }
 
-        var progressCalledCount2 = 0
+        var nextCalledCount2 = 0
         var resultValue2: String?
 
         var deinitTest2: NSObject? = NSObject()
@@ -194,9 +194,9 @@ class AsyncToStreamTests: XCTestCase {
                 }
             case .Failure:
                 XCTFail()
-            case .Progress(let progress):
-                XCTAssertEqual(progressCalledCount2, progress as? Int)
-                progressCalledCount2 += 1
+            case .Next(let next):
+                XCTAssertEqual(nextCalledCount2, next as? Int)
+                nextCalledCount2 += 1
             }
         }
 
@@ -208,8 +208,8 @@ class AsyncToStreamTests: XCTestCase {
         XCTAssertNil(weakDeinitTest1)
         XCTAssertNil(weakDeinitTest2)
 
-        XCTAssertEqual(5, progressCalledCount1)
-        XCTAssertEqual(5, progressCalledCount2)
+        XCTAssertEqual(5, nextCalledCount1)
+        XCTAssertEqual(5, nextCalledCount2)
         XCTAssertEqual("ok", resultValue1)
         XCTAssertEqual("ok", resultValue2)
 

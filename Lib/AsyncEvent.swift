@@ -13,17 +13,17 @@ import iAsync_utils
 
 import ReactiveKit
 
-public enum AsyncEvent<ValueT, ProgressT, ErrorT: ErrorType> {
+public enum AsyncEvent<ValueT, NextT, ErrorT: ErrorType> {
 
     case Success(ValueT)
     case Failure(ErrorT)
-    case Progress(ProgressT)
+    case Next(NextT)
 
     public var isTerminal: Bool {
         switch self {
         case .Success, .Failure:
             return true
-        case .Progress:
+        case .Next:
             return false
         }
     }
@@ -31,18 +31,18 @@ public enum AsyncEvent<ValueT, ProgressT, ErrorT: ErrorType> {
 
 public protocol AsyncStreamType: StreamType {
     typealias Value
-    typealias Progress
+    typealias Next
     typealias Error: ErrorType
 
-    func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Progress, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E>
+    func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Next, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E>
 }
 
-public struct AsyncObserver<Value, Progress, Error: ErrorType> {
+public struct AsyncObserver<Value, Next, Error: ErrorType> {
 
-    public let observer: AsyncEvent<Value, Progress, Error> -> ()
+    public let observer: AsyncEvent<Value, Next, Error> -> ()
 
-    public func next(event: Progress) {
-        observer(.Progress(event))
+    public func next(event: Next) {
+        observer(.Next(event))
     }
 
     public func success(value: Value) {
@@ -54,9 +54,9 @@ public struct AsyncObserver<Value, Progress, Error: ErrorType> {
     }
 }
 
-public struct AsyncStream<Value, Progress, Error: ErrorType>: AsyncStreamType {
+public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
 
-    public typealias Event = AsyncEvent<Value, Progress, Error>
+    public typealias Event = AsyncEvent<Value, Next, Error>
 
     private let stream: Stream<Event>
 
@@ -94,51 +94,51 @@ public struct AsyncStream<Value, Progress, Error: ErrorType>: AsyncStreamType {
         }
     }
 
-    public func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Progress, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E> {
+    public func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Next, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E> {
         return create { observer in
             return transform(self.stream).observe(on: nil, observer: observer)
         }
     }
 }
 
-public func create<Value, Progress, Error: ErrorType>(producer producer: (AsyncEvent<Value, Progress, Error> -> ()) -> DisposableType?) -> AsyncStream<Value, Progress, Error> {
-    return AsyncStream<Value, Progress, Error> { observer in
+public func create<Value, Next, Error: ErrorType>(producer producer: (AsyncEvent<Value, Next, Error> -> ()) -> DisposableType?) -> AsyncStream<Value, Next, Error> {
+    return AsyncStream<Value, Next, Error> { observer in
         return producer(observer)
     }
 }
 
-//public extension OperationType {
-//
-//    public func on(next next: (Value -> ())? = nil, success: (() -> ())? = nil, failure: (Error -> ())? = nil, start: (() -> Void)? = nil, completed: (() -> Void)? = nil, context: ExecutionContext? = ImmediateOnMainExecutionContext) -> Operation<Value, Error> {
-//        return create { observer in
-//            start?()
-//            return self.observe(on: context) { event in
-//                switch event {
-//                case .Next(let value):
-//                    next?(value)
-//                case .Failure(let error):
-//                    failure?(error)
-//                    completed?()
-//                case .Success:
-//                    success?()
-//                    completed?()
-//                }
-//
-//                observer.observer(event)
-//            }
-//        }
-//    }
-//
-//    public func observeNext(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Value -> ()) -> DisposableType {
-//        return self.observe(on: context) { event in
-//            switch event {
-//            case .Next(let event):
-//                observer(event)
-//            default: break
-//            }
-//        }
-//    }
-//
+public extension AsyncStreamType {
+
+    public func on(next next: (Next -> ())? = nil, success: (Value -> ())? = nil, failure: (Error -> ())? = nil, start: (() -> Void)? = nil, completed: (() -> Void)? = nil, context: ExecutionContext? = ImmediateOnMainExecutionContext) -> AsyncStream<Value, Next, Error> {
+        return create { observer in
+            start?()
+            return self.observe(on: context) { event in
+                switch event {
+                case .Next(let value):
+                    next?(value)
+                case .Failure(let error):
+                    failure?(error)
+                    completed?()
+                case .Success(let value):
+                    success?(value)
+                    completed?()
+                }
+
+                observer(event)
+            }
+        }
+    }
+
+    public func observeProgress(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Next -> ()) -> DisposableType {
+        return self.observe(on: context) { event in
+            switch event {
+            case .Next(let event):
+                observer(event)
+            default: break
+            }
+        }
+    }
+
 //    public func observeError(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Error -> ()) -> DisposableType {
 //        return self.observe(on: context) { event in
 //            switch event {
@@ -695,8 +695,8 @@ public func create<Value, Progress, Error: ErrorType>(producer producer: (AsyncE
 //            return serialDisposable
 //        }
 //    }
-//}
-//
+}
+
 //@warn_unused_result
 //public func combineLatest<A: OperationType, B: OperationType where A.Error == B.Error>(a: A, _ b: B) -> Operation<(A.Value, B.Value), A.Error> {
 //    return a.combineLatestWith(b)

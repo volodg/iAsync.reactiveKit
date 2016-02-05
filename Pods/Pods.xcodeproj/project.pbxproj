@@ -265,6 +265,7 @@
 		C0EB58D3ECAB615DA0E22092932DDF10 /* NSFileHandle+RACSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = E6534EF7AD42BB2778BBCAD39CE10BFA /* NSFileHandle+RACSupport.m */; };
 		C1AFE04D901EF17E30B25D212E9F6FEA /* UIControl+RACSignalSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = F8BF9A5DCFE93F970163DC52BA10519A /* UIControl+RACSignalSupport.m */; };
 		C33453CAB1E714487632F73B8EA8431D /* UIActionSheet+RACSignalSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 18BEA676F75167B1198B3D132BB1DAAB /* UIActionSheet+RACSignalSupport.m */; };
+		C36304111C64C31F00521989 /* UniqueObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C36304101C64C31F00521989 /* UniqueObservable.swift */; };
 		C46B46FECF9645C419C80CBECA844F80 /* WeakBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44974E31404C7A46C0F4E9BDF08D50CB /* WeakBox.swift */; };
 		C557D19A126D284A71387AD592B4EB7E /* UIBarButtonItem+RACCommandSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CB5AC79D6A35062AA2A79A95D3C5A12 /* UIBarButtonItem+RACCommandSupport.m */; };
 		C5B8FB747F1C12B63064585105DED82A /* Observable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32AB27B6A90379D4B549C4EFA1022498 /* Observable.swift */; };
@@ -739,6 +740,7 @@
 		C1D200B989843A27F153F50A89566773 /* RACKVOProxy.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RACKVOProxy.h; path = "ReactiveCocoa/Objective-C/RACKVOProxy.h"; sourceTree = "<group>"; };
 		C1FE262E7BD8B516EA45A59159295FD2 /* iAsync.reactiveKit-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "iAsync.reactiveKit-umbrella.h"; sourceTree = "<group>"; };
 		C2927EEC0FC7E33E3D96266B207BD590 /* Result-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Result-prefix.pch"; sourceTree = "<group>"; };
+		C36304101C64C31F00521989 /* UniqueObservable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UniqueObservable.swift; sourceTree = "<group>"; };
 		C3F9200BF4FEA0EA7E87B3F854D56D53 /* AsyncEvent+Additions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AsyncEvent+Additions.swift"; sourceTree = "<group>"; };
 		C44D3F44A6CBA1495B2EC568670FF6E1 /* UIGestureRecognizer+RACSignalSupport.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIGestureRecognizer+RACSignalSupport.m"; path = "ReactiveCocoa/Objective-C/UIGestureRecognizer+RACSignalSupport.m"; sourceTree = "<group>"; };
 		C4FA37EFB91F306009140C3C4DBE4746 /* RACGroupedSignal.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RACGroupedSignal.h; path = "ReactiveCocoa/Objective-C/RACGroupedSignal.h"; sourceTree = "<group>"; };
@@ -1538,6 +1540,7 @@
 			children = (
 				7F5BF8245C2CC5F8BA62D60D19E201E4 /* AsyncEvent.swift */,
 				C3F9200BF4FEA0EA7E87B3F854D56D53 /* AsyncEvent+Additions.swift */,
+				C36304101C64C31F00521989 /* UniqueObservable.swift */,
 			);
 			path = Lib;
 			sourceTree = "<group>";
@@ -2007,6 +2010,7 @@
 				2733C756116B4B620422DE03550AB8B6 /* AsyncBuilder.swift in Sources */,
 				85D008123DED9283DECCF2C5FF78CE70 /* AsyncContinuity.swift in Sources */,
 				DE6EA7FB9D61D9837014A15F6B207CB6 /* AsyncError.swift in Sources */,
+				C36304111C64C31F00521989 /* UniqueObservable.swift in Sources */,
 				9DE917604D106DC133E894D0A4CAFD12 /* AsyncHandlerTask.swift in Sources */,
 				8696851C5863F3403132E52F22F2D870 /* AsyncHelpers.swift in Sources */,
 				AC9A0577A78F90FA26BE01E41AB7CAEC /* AsyncsOwner.swift in Sources */,

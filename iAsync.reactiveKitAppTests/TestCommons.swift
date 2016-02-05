@@ -23,21 +23,21 @@ func testStream() -> AsyncStream<String, AnyObject, NSError> {
 
         numberOfObservers += 1
 
-        var progress = 0
+        var next = 0
 
         let cancel = Timer.sharedByThreadTimer().addBlock({ (cancel) -> Void in
 
-            if progress == 5 {
+            if next == 5 {
                 cancel()
                 observer(.Success("ok"))
                 observer(.Success("ok2"))
 
-                observer(.Progress(progress))
-                progress += 1
+                observer(.Next(next))
+                next += 1
             }
 
-            observer(.Progress(progress))
-            progress += 1
+            observer(.Next(next))
+            next += 1
         }, duration: 0.01)
 
         return BlockDisposable({ () -> () in

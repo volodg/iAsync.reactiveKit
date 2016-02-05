@@ -117,9 +117,9 @@ class StreamToAsyncTests: XCTestCase {
 
         let expectation = expectationWithDescription("")
 
-        let _ = loader(progressCallback: { (progress) -> () in
+        let _ = loader(progressCallback: { (next) -> () in
 
-            XCTAssertEqual(progressCalledCount, progress as? Int)
+            XCTAssertEqual(progressCalledCount, next as? Int)
             progressCalledCount += 1
         }, stateCallback: { (state) -> () in
 
@@ -159,7 +159,7 @@ class StreamToAsyncTests: XCTestCase {
         let stream = testStream()
         let loader = stream.streamToAsync()
 
-        var progressCalledCount1 = 0
+        var nextCalledCount1 = 0
         var resultValue1: String?
 
         var deinitTest1: NSObject? = NSObject()
@@ -167,10 +167,10 @@ class StreamToAsyncTests: XCTestCase {
 
         let expectation1 = expectationWithDescription("")
 
-        let _ = loader(progressCallback: { (progress) -> () in
+        let _ = loader(progressCallback: { (next) -> () in
 
-            XCTAssertEqual(progressCalledCount1, progress as? Int)
-            progressCalledCount1 += 1
+            XCTAssertEqual(nextCalledCount1, next as? Int)
+            nextCalledCount1 += 1
         }, stateCallback: { (state) -> () in
 
             XCTFail()
@@ -192,7 +192,7 @@ class StreamToAsyncTests: XCTestCase {
             }
         }
 
-        var progressCalledCount2 = 0
+        var nextCalledCount2 = 0
         var resultValue2: String?
 
         var deinitTest2: NSObject? = NSObject()
@@ -200,10 +200,10 @@ class StreamToAsyncTests: XCTestCase {
 
         let expectation2 = expectationWithDescription("")
 
-        let _ = loader(progressCallback: { (progress) -> () in
+        let _ = loader(progressCallback: { (next) -> () in
 
-            XCTAssertEqual(progressCalledCount2, progress as? Int)
-            progressCalledCount2 += 1
+            XCTAssertEqual(nextCalledCount2, next as? Int)
+            nextCalledCount2 += 1
         }, stateCallback: { (state) -> () in
 
             XCTFail()
@@ -233,8 +233,8 @@ class StreamToAsyncTests: XCTestCase {
         XCTAssertNil(weakDeinitTest1)
         XCTAssertNil(weakDeinitTest2)
 
-        XCTAssertEqual(5, progressCalledCount1)
-        XCTAssertEqual(5, progressCalledCount2)
+        XCTAssertEqual(5, nextCalledCount1)
+        XCTAssertEqual(5, nextCalledCount2)
         XCTAssertEqual("ok", resultValue1)
         XCTAssertEqual("ok", resultValue2)
 

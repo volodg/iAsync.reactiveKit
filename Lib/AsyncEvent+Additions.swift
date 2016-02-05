@@ -13,20 +13,20 @@ import iAsync_utils
 
 import ReactiveKit
 
-private class AsyncObserverHolder<Value, Progress, Error: ErrorType> {
+private class AsyncObserverHolder<Value, Next, Error: ErrorType> {
 
-    let observer: AsyncEvent<Value, Progress, Error> -> ()
+    let observer: AsyncEvent<Value, Next, Error> -> ()
 
-    init(observer: AsyncEvent<Value, Progress, Error> -> ()) {
+    init(observer: AsyncEvent<Value, Next, Error> -> ()) {
         self.observer = observer
     }
 }
 
 public extension AsyncStreamType {
 
-    typealias Event = AsyncEvent<Value, Progress, Error>
+    typealias Event = AsyncEvent<Value, Next, Error>
 
-    public func mapValue<U>(transform: Value -> U) -> Stream<AsyncEvent<U, Progress, Error>> {
+    public func mapValue<U>(transform: Value -> U) -> Stream<AsyncEvent<U, Next, Error>> {
         return create { observer in
             return self.observe(on: nil) { event in
 
@@ -35,14 +35,14 @@ public extension AsyncStreamType {
                     observer(.Success(transform(value)))
                 case .Failure(let error):
                     observer(.Failure(error))
-                case .Progress(let progress):
-                    observer(.Progress(progress))
+                case .Next(let next):
+                    observer(.Next(next))
                 }
             }
         }
     }
 
-    public func mapError<U>(transform: Error -> U) -> Stream<AsyncEvent<Value, Progress, U>> {
+    public func mapError<U>(transform: Error -> U) -> Stream<AsyncEvent<Value, Next, U>> {
         return create { observer in
             return self.observe(on: nil) { event in
 
@@ -51,14 +51,14 @@ public extension AsyncStreamType {
                     observer(.Success(value))
                 case .Failure(let error):
                     observer(.Failure(transform(error)))
-                case .Progress(let progress):
-                    observer(.Progress(progress))
+                case .Next(let next):
+                    observer(.Next(next))
                 }
             }
         }
     }
 
-    public func mapProgress<U>(transform: Progress -> U) -> Stream<AsyncEvent<Value, U, Error>> {
+    public func mapNext<U>(transform: Next -> U) -> Stream<AsyncEvent<Value, U, Error>> {
         return create { observer in
             return self.observe(on: nil) { event in
 
@@ -67,18 +67,18 @@ public extension AsyncStreamType {
                     observer(.Success(value))
                 case .Failure(let error):
                     observer(.Failure(error))
-                case .Progress(let progress):
-                    observer(.Progress(transform(progress)))
+                case .Next(let next):
+                    observer(.Next(transform(next)))
                 }
             }
         }
     }
 
-    public func unsubscribe() -> AsyncStream<Value, Progress, Error> {
+    public func unsubscribe() -> AsyncStream<Value, Next, Error> {
 
         return create { observer in
 
-            typealias Observer = AsyncEvent<Value, Progress, Error> -> ()
+            typealias Observer = AsyncEvent<Value, Next, Error> -> ()
             var observerHolder: Observer? = observer
 
             self.observe(on: nil) { event in
@@ -93,7 +93,7 @@ public extension AsyncStreamType {
         }
     }
 
-    public func withEventValue(getter: () -> AsyncEvent<Value, Progress, Error>?, setter: AsyncEvent<Value, Progress, Error> -> Void) -> AsyncStream<Value, Progress, Error> {
+    public func withEventValue(getter: () -> AsyncEvent<Value, Next, Error>?, setter: AsyncEvent<Value, Next, Error> -> Void) -> AsyncStream<Value, Next, Error> {
 
         return create { observer in
 
@@ -113,9 +113,9 @@ public extension AsyncStreamType {
         }
     }
 
-    public func mergedObservers() -> AsyncStream<Value, Progress, Error> {
+    public func mergedObservers() -> AsyncStream<Value, Next, Error> {
 
-        typealias ObserverHolder = AsyncObserverHolder<Value, Progress, Error>
+        typealias ObserverHolder = AsyncObserverHolder<Value, Next, Error>
         var observers: [ObserverHolder] = []
 
         return create { observer in
@@ -138,10 +138,10 @@ public extension AsyncStreamType {
                 return BlockDisposable( removeObserver )
             }
 
-            let notify = { (observers: [ObserverHolder], event: AsyncEvent<Value, Progress, Error>) in
+            let notify = { (observers: [ObserverHolder], event: AsyncEvent<Value, Next, Error>) in
                 observers.forEach { $0.observer(event) }
             }
-            let finishNotify = { (event: AsyncEvent<Value, Progress, Error>) in
+            let finishNotify = { (event: AsyncEvent<Value, Next, Error>) in
                 let observers_ = observers
                 observers.removeAll()
                 notify(observers_, event)
@@ -154,7 +154,7 @@ public extension AsyncStreamType {
                     finishNotify(event)
                 case .Failure:
                     finishNotify(event)
-                case .Progress:
+                case .Next:
                     notify(observers, event)
                 }
             }
@@ -178,7 +178,7 @@ public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Err
 
         let handler = loader(progressCallback: { (progressInfo) -> () in
 
-            observer(.Progress(progressInfo))
+            observer(.Next(progressInfo))
         }, stateCallback: { (state) -> () in
 
             //ignore, still not used
@@ -206,7 +206,7 @@ public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Err
     return result
 }
 
-public extension AsyncStreamType where Self.Progress == AnyObject {
+public extension AsyncStreamType where Self.Next == AnyObject {
 
     public func streamToAsync() -> AsyncTypes<Self.Value, Self.Error>.Async {
 
@@ -232,8 +232,8 @@ public extension AsyncStreamType where Self.Progress == AnyObject {
                     finishOnce(.Success(value))
                 case .Failure(let error):
                     finishOnce(.Failure(error))
-                case .Progress(let progress):
-                    progressCallback?(progressInfo: progress)
+                case .Next(let next):
+                    progressCallback?(progressInfo: next)
                 }
             })
 

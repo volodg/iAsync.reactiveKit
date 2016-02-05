@@ -19,7 +19,7 @@ class MergedObserversTests: XCTestCase {
 
         let stream = testStream().mergedObservers()
 
-        var progressCalledCount1 = 0
+        var nextCalledCount1 = 0
         var resultValue1: String?
 
         var deinitTest1: NSObject? = NSObject()
@@ -38,13 +38,13 @@ class MergedObserversTests: XCTestCase {
                 }
             case .Failure:
                 XCTFail()
-            case .Progress(let progress):
-                XCTAssertEqual(progressCalledCount1, progress as? Int)
-                progressCalledCount1 += 1
+            case .Next(let next):
+                XCTAssertEqual(nextCalledCount1, next as? Int)
+                nextCalledCount1 += 1
             }
         }
 
-        var progressCalledCount2 = 0
+        var nextCalledCount2 = 0
         var resultValue2: String?
 
         var deinitTest2: NSObject? = NSObject()
@@ -63,9 +63,9 @@ class MergedObserversTests: XCTestCase {
                 }
             case .Failure:
                 XCTFail()
-            case .Progress(let progress):
-                XCTAssertEqual(progressCalledCount2, progress as? Int)
-                progressCalledCount2 += 1
+            case .Next(let next):
+                XCTAssertEqual(nextCalledCount2, next as? Int)
+                nextCalledCount2 += 1
             }
         }
 
@@ -77,8 +77,8 @@ class MergedObserversTests: XCTestCase {
         XCTAssertNil(weakDeinitTest1)
         XCTAssertNil(weakDeinitTest2)
 
-        XCTAssertEqual(5, progressCalledCount1)
-        XCTAssertEqual(5, progressCalledCount2)
+        XCTAssertEqual(5, nextCalledCount1)
+        XCTAssertEqual(5, nextCalledCount2)
         XCTAssertEqual("ok", resultValue1)
         XCTAssertEqual("ok", resultValue2)
 
@@ -89,7 +89,7 @@ class MergedObserversTests: XCTestCase {
 
         let stream = testStream().mergedObservers()
 
-        var progressCalledCount1 = 0
+        var nextCalledCount1 = 0
         var resultValue1: String?
 
         var deinitTest1: NSObject? = NSObject()
@@ -105,13 +105,13 @@ class MergedObserversTests: XCTestCase {
                 }
             case .Failure:
                 XCTFail()
-            case .Progress(let progress):
-                XCTAssertEqual(progressCalledCount1, progress as? Int)
-                progressCalledCount1 += 1
+            case .Next(let next):
+                XCTAssertEqual(nextCalledCount1, next as? Int)
+                nextCalledCount1 += 1
             }
         }
 
-        var progressCalledCount2 = 0
+        var nextCalledCount2 = 0
         var resultValue2: String?
 
         var deinitTest2: NSObject? = NSObject()
@@ -130,9 +130,9 @@ class MergedObserversTests: XCTestCase {
                 }
             case .Failure:
                 XCTFail()
-            case .Progress(let progress):
-                XCTAssertEqual(progressCalledCount2, progress as? Int)
-                progressCalledCount2 += 1
+            case .Next(let next):
+                XCTAssertEqual(nextCalledCount2, next as? Int)
+                nextCalledCount2 += 1
             }
         }
 
@@ -147,8 +147,8 @@ class MergedObserversTests: XCTestCase {
         XCTAssertNil(weakDeinitTest1)
         XCTAssertNil(weakDeinitTest2)
 
-        XCTAssertEqual(0, progressCalledCount1)
-        XCTAssertEqual(5, progressCalledCount2)
+        XCTAssertEqual(0, nextCalledCount1)
+        XCTAssertEqual(5, nextCalledCount2)
         XCTAssertNil(resultValue1)
         XCTAssertEqual("ok", resultValue2)
 
@@ -159,7 +159,7 @@ class MergedObserversTests: XCTestCase {
 
         let stream = testStream().mergedObservers()
 
-        var progressCalledCount1 = 0
+        var nextCalledCount1 = 0
         var resultValue1: String?
 
         var deinitTest1: NSObject? = NSObject()
@@ -175,16 +175,16 @@ class MergedObserversTests: XCTestCase {
                 }
             case .Failure:
                 XCTFail()
-            case .Progress(let progress):
-                XCTAssertEqual(progressCalledCount1, progress as? Int)
-                progressCalledCount1 += 1
+            case .Next(let next):
+                XCTAssertEqual(nextCalledCount1, next as? Int)
+                nextCalledCount1 += 1
             }
         }
 
         dispose1.dispose()
         deinitTest1 = nil
 
-        var progressCalledCount2 = 0
+        var nextCalledCount2 = 0
         var resultValue2: String?
 
         var deinitTest2: NSObject? = NSObject()
@@ -203,9 +203,9 @@ class MergedObserversTests: XCTestCase {
                 }
             case .Failure:
                 XCTFail()
-            case .Progress(let progress):
-                XCTAssertEqual(progressCalledCount2, progress as? Int)
-                progressCalledCount2 += 1
+            case .Next(let next):
+                XCTAssertEqual(nextCalledCount2, next as? Int)
+                nextCalledCount2 += 1
             }
         }
 
@@ -216,8 +216,8 @@ class MergedObserversTests: XCTestCase {
 
         XCTAssertNil(weakDeinitTest2)
 
-        XCTAssertEqual(0, progressCalledCount1)
-        XCTAssertEqual(5, progressCalledCount2)
+        XCTAssertEqual(0, nextCalledCount1)
+        XCTAssertEqual(5, nextCalledCount2)
         XCTAssertNil(resultValue1)
         XCTAssertEqual("ok", resultValue2)
 
@@ -228,7 +228,7 @@ class MergedObserversTests: XCTestCase {
 
         let stream = testStream().mergedObservers()
 
-        var progressCalledCount1 = 0
+        var nextCalledCount1 = 0
         var resultValue1: String?
 
         var deinitTest1: NSObject? = NSObject()
@@ -247,13 +247,13 @@ class MergedObserversTests: XCTestCase {
                 }
             case .Failure:
                 XCTFail()
-            case .Progress(let progress):
-                XCTAssertEqual(progressCalledCount1, progress as? Int)
-                progressCalledCount1 += 1
+            case .Next(let next):
+                XCTAssertEqual(nextCalledCount1, next as? Int)
+                nextCalledCount1 += 1
             }
         }
 
-        var progressCalledCount2 = 0
+        var nextCalledCount2 = 0
         var resultValue2: String?
 
         var deinitTest2: NSObject? = NSObject()
@@ -269,9 +269,9 @@ class MergedObserversTests: XCTestCase {
                 }
             case .Failure:
                 XCTFail()
-            case .Progress(let progress):
-                XCTAssertEqual(progressCalledCount2, progress as? Int)
-                progressCalledCount2 += 1
+            case .Next(let next):
+                XCTAssertEqual(nextCalledCount2, next as? Int)
+                nextCalledCount2 += 1
             }
         }
 
@@ -285,8 +285,8 @@ class MergedObserversTests: XCTestCase {
 
         XCTAssertNil(weakDeinitTest1)
 
-        XCTAssertEqual(5, progressCalledCount1)
-        XCTAssertEqual(0, progressCalledCount2)
+        XCTAssertEqual(5, nextCalledCount1)
+        XCTAssertEqual(0, nextCalledCount2)
         XCTAssertEqual("ok", resultValue1)
         XCTAssertNil(resultValue2)
 
@@ -297,7 +297,7 @@ class MergedObserversTests: XCTestCase {
 
         let stream = testStream().mergedObservers()
 
-        var progressCalledCount1 = 0
+        var nextCalledCount1 = 0
         var resultValue1: String?
 
         var deinitTest1: NSObject? = NSObject()
@@ -313,13 +313,13 @@ class MergedObserversTests: XCTestCase {
                 }
             case .Failure:
                 XCTFail()
-            case .Progress(let progress):
-                XCTAssertEqual(progressCalledCount1, progress as? Int)
-                progressCalledCount1 += 1
+            case .Next(let next):
+                XCTAssertEqual(nextCalledCount1, next as? Int)
+                nextCalledCount1 += 1
             }
         }
 
-        var progressCalledCount2 = 0
+        var nextCalledCount2 = 0
         var resultValue2: String?
 
         var deinitTest2: NSObject? = NSObject()
@@ -335,9 +335,9 @@ class MergedObserversTests: XCTestCase {
                 }
             case .Failure:
                 XCTFail()
-            case .Progress(let progress):
-                XCTAssertEqual(progressCalledCount2, progress as? Int)
-                progressCalledCount2 += 1
+            case .Next(let next):
+                XCTAssertEqual(nextCalledCount2, next as? Int)
+                nextCalledCount2 += 1
             }
         }
 
@@ -349,8 +349,8 @@ class MergedObserversTests: XCTestCase {
         XCTAssertNil(weakDeinitTest1)
         XCTAssertNil(weakDeinitTest2)
 
-        XCTAssertEqual(0, progressCalledCount1)
-        XCTAssertEqual(0, progressCalledCount2)
+        XCTAssertEqual(0, nextCalledCount1)
+        XCTAssertEqual(0, nextCalledCount2)
         XCTAssertNil(resultValue1)
         XCTAssertNil(resultValue2)
 
@@ -361,7 +361,7 @@ class MergedObserversTests: XCTestCase {
 
         let stream = testStream().mergedObservers()
 
-        var progressCalledCount1 = 0
+        var nextCalledCount1 = 0
         var resultValue1: String?
 
         var deinitTest1: NSObject? = NSObject()
@@ -377,13 +377,13 @@ class MergedObserversTests: XCTestCase {
                 }
             case .Failure:
                 XCTFail()
-            case .Progress(let progress):
-                XCTAssertEqual(progressCalledCount1, progress as? Int)
-                progressCalledCount1 += 1
+            case .Next(let next):
+                XCTAssertEqual(nextCalledCount1, next as? Int)
+                nextCalledCount1 += 1
             }
         }
 
-        var progressCalledCount2 = 0
+        var nextCalledCount2 = 0
         var resultValue2: String?
 
         var deinitTest2: NSObject? = NSObject()
@@ -399,9 +399,9 @@ class MergedObserversTests: XCTestCase {
                 }
             case .Failure:
                 XCTFail()
-            case .Progress(let progress):
-                XCTAssertEqual(progressCalledCount2, progress as? Int)
-                progressCalledCount2 += 1
+            case .Next(let next):
+                XCTAssertEqual(nextCalledCount2, next as? Int)
+                nextCalledCount2 += 1
             }
         }
 
@@ -413,8 +413,8 @@ class MergedObserversTests: XCTestCase {
         XCTAssertNil(weakDeinitTest1)
         XCTAssertNil(weakDeinitTest2)
 
-        XCTAssertEqual(0, progressCalledCount1)
-        XCTAssertEqual(0, progressCalledCount2)
+        XCTAssertEqual(0, nextCalledCount1)
+        XCTAssertEqual(0, nextCalledCount2)
         XCTAssertNil(resultValue1)
         XCTAssertNil(resultValue2)
 
