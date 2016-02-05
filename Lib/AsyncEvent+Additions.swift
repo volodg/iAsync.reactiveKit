@@ -37,10 +37,6 @@ public extension AsyncStreamType {
                     observer(.Failure(error))
                 case .Progress(let progress):
                     observer(.Progress(progress))
-//                case .Interrupted:
-//                    observer(.Interrupted)
-//                case .Unsubscribed:
-//                    observer(.Unsubscribed)
                 }
             }
         }
@@ -57,10 +53,6 @@ public extension AsyncStreamType {
                     observer(.Failure(transform(error)))
                 case .Progress(let progress):
                     observer(.Progress(progress))
-//                case .Interrupted:
-//                    observer(.Interrupted)
-//                case .Unsubscribed:
-//                    observer(.Unsubscribed)
                 }
             }
         }
@@ -77,10 +69,6 @@ public extension AsyncStreamType {
                     observer(.Failure(error))
                 case .Progress(let progress):
                     observer(.Progress(transform(progress)))
-//                case .Interrupted:
-//                    observer(.Interrupted)
-//                case .Unsubscribed:
-//                    observer(.Unsubscribed)
                 }
             }
         }
@@ -90,21 +78,21 @@ public extension AsyncStreamType {
 
         return create { observer in
 
-            var disposed = false
+            typealias Observer = AsyncEvent<Value, Progress, Error> -> ()
+            var observerHolder: Observer? = observer
 
             self.observe(on: nil) { event in
-                if !disposed {
+                if let observer = observerHolder {
                     observer(event)
                 }
             }
 
             return BlockDisposable({ () -> () in
-                disposed = true
+                observerHolder = nil
             })
         }
     }
 
-    //TODO test
     public func withEventValue(getter: () -> AsyncEvent<Value, Progress, Error>?, setter: AsyncEvent<Value, Progress, Error> -> Void) -> AsyncStream<Value, Progress, Error> {
 
         return create { observer in
