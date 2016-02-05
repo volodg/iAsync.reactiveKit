@@ -26,7 +26,7 @@ public extension AsyncStreamType {
 
     typealias Event = AsyncEvent<Value, Next, Error>
 
-    public func mapValue<U>(transform: Value -> U) -> Stream<AsyncEvent<U, Next, Error>> {
+    public func mapValue<U>(transform: Value -> U) -> AsyncStream<U, Next, Error> {
         return create { observer in
             return self.observe(on: nil) { event in
 
@@ -42,7 +42,7 @@ public extension AsyncStreamType {
         }
     }
 
-    public func mapError<U>(transform: Error -> U) -> Stream<AsyncEvent<Value, Next, U>> {
+    public func mapError<U>(transform: Error -> U) -> AsyncStream<Value, Next, U> {
         return create { observer in
             return self.observe(on: nil) { event in
 
@@ -58,7 +58,7 @@ public extension AsyncStreamType {
         }
     }
 
-    public func mapNext<U>(transform: Next -> U) -> Stream<AsyncEvent<Value, U, Error>> {
+    public func mapNext<U>(transform: Next -> U) -> AsyncStream<Value, U, Error> {
         return create { observer in
             return self.observe(on: nil) { event in
 
