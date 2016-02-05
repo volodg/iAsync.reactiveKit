@@ -42,22 +42,6 @@ public extension AsyncStreamType {
         }
     }
 
-    public func mapError<U>(transform: Error -> U) -> AsyncStream<Value, Next, U> {
-        return create { observer in
-            return self.observe(on: nil) { event in
-
-                switch event {
-                case .Success(let value):
-                    observer(.Success(value))
-                case .Failure(let error):
-                    observer(.Failure(transform(error)))
-                case .Next(let next):
-                    observer(.Next(next))
-                }
-            }
-        }
-    }
-
     public func mapNext<U>(transform: Next -> U) -> AsyncStream<Value, U, Error> {
         return create { observer in
             return self.observe(on: nil) { event in

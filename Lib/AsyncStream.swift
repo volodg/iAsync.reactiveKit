@@ -165,16 +165,16 @@ public extension AsyncStreamType {
         }
     }
 
-//    @warn_unused_result
-//    public func mapError<F>(transform: Error -> F) -> Operation<Value, F> {
-//        return lift { $0.map { $0.mapError(transform) } }
-//    }
-//    
-//    @warn_unused_result
-//    public func filter(include: Value -> Bool) -> Operation<Value, Error> {
-//        return lift { $0.filter { $0.filter(include) } }
-//    }
-//    
+    @warn_unused_result
+    public func mapError<F>(transform: Error -> F) -> AsyncStream<Value, Next, F> {
+        return lift { $0.map { $0.mapError(transform) } }
+    }
+
+    @warn_unused_result
+    public func filter(include: Value -> Bool) -> AsyncStream<Value, Next, Error> {
+        return lift { $0.filter { $0.filter(include) } }
+    }
+
 //    @warn_unused_result
 //    public func switchTo(context: ExecutionContext) -> Operation<Value, Error> {
 //        return lift { $0.switchTo(context) }
