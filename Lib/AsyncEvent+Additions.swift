@@ -13,6 +13,15 @@ import iAsync_utils
 
 import ReactiveKit
 
+private class AsyncObserverHolder<Value, Progress, Error: ErrorType> {
+
+    let observer: AsyncEvent<Value, Progress, Error> -> ()
+
+    init(observer: AsyncEvent<Value, Progress, Error> -> ()) {
+        self.observer = observer
+    }
+}
+
 public extension AsyncStreamType {
 
     typealias Event = AsyncEvent<Value, Progress, Error>
@@ -119,23 +128,31 @@ public extension AsyncStreamType {
     //TODO test
     public func mergedObservers() -> AsyncStream<Value, Progress, Error> {
 
-        var observers: [(AsyncEvent<Value, Progress, Error> -> ())?] = []
+        typealias ObserverHolder = AsyncObserverHolder<Value, Progress, Error>
+        var observers: [ObserverHolder] = []
 
         return create { observer in
 
-            observers.append(observer)
+            let observerHolder = ObserverHolder(observer: observer)
+            observers.append(observerHolder)
 
-            if observers.count > 1 {
+            let removeObserver = { () -> Void in
 
-                let index = observers.count - 1
-                return BlockDisposable({ () -> () in
-
-                    observers[index] = nil
-                })
+                let observers_ = observers
+                for (index, observer) in observers_.enumerate() {
+                    if observer === observerHolder {
+                        observers.removeAtIndex(index)
+                        break
+                    }
+                }
             }
 
-            let notify = { (observers: [(AsyncEvent<Value, Progress, Error> -> ())?], event: AsyncEvent<Value, Progress, Error>) in
-                observers.forEach { $0?(event) }
+            if observers.count > 1 {
+                return BlockDisposable( removeObserver )
+            }
+
+            let notify = { (observers: [ObserverHolder], event: AsyncEvent<Value, Progress, Error>) in
+                observers.forEach { $0.observer(event) }
             }
             let finishNotify = { (event: AsyncEvent<Value, Progress, Error>) in
                 let observers_ = observers
@@ -150,10 +167,6 @@ public extension AsyncStreamType {
                     finishNotify(event)
                 case .Failure:
                     finishNotify(event)
-//                case .Interrupted:
-//                    finishNotify(event)
-//                case .Unsubscribed:
-//                    finishNotify(event)
                 case .Progress:
                     notify(observers, event)
                 }
@@ -161,8 +174,8 @@ public extension AsyncStreamType {
 
             return BlockDisposable({ () -> () in
 
-                observers[0] = nil
-                if observers.all({ $0 == nil }) {
+                removeObserver()
+                if observers.isEmpty {
                     dispose.dispose()
                 }
             })

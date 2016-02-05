@@ -37,6 +37,23 @@ public protocol AsyncStreamType: StreamType {
     func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Progress, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E>
 }
 
+public struct AsyncObserver<Value, Progress, Error: ErrorType> {
+
+    public let observer: AsyncEvent<Value, Progress, Error> -> ()
+
+    public func next(event: Progress) {
+        observer(.Progress(event))
+    }
+
+    public func success(value: Value) {
+        observer(.Success(value))
+    }
+
+    public func failure(error: Error) {
+        observer(.Failure(error))
+    }
+}
+
 public struct AsyncStream<Value, Progress, Error: ErrorType>: AsyncStreamType {
 
     public typealias Event = AsyncEvent<Value, Progress, Error>
