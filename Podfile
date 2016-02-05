@@ -7,6 +7,7 @@ def import_pods
   pod 'iAsync.async'      , :path => '../iAsync.async'
   pod 'iAsync.utils'      , :path => '../iAsync.utils'
   pod 'iAsync.reactiveKit', :path => '.'
+  pod 'ReactiveCocoa'
 
 end
 
