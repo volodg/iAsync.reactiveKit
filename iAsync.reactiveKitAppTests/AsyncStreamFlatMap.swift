@@ -16,7 +16,9 @@ class AsyncStreamFlatMap: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+
+        numberOfObservers1 = 0
+        numberOfObservers2 = 0
     }
 
     override func tearDown() {
@@ -56,19 +58,40 @@ class AsyncStreamFlatMap: XCTestCase {
         waitForExpectationsWithTimeout(0.5, handler: nil)
 
         let expectedNexts = [0,1,2,3,4,16,16]
-        XCTAssertEqual(expectedNexts.count, nexts.count)
-        for (index, _) in expectedNexts.enumerate() {
-            XCTAssertEqual(expectedNexts[index], nexts[index])
-        }
+        XCTAssertEqual(expectedNexts, nexts)
 
         XCTAssertEqual(firstResult, "ok")
         XCTAssertEqual(secondResult, 32)
+
+        XCTAssertEqual(numberOfObservers1, 1)
+        XCTAssertEqual(numberOfObservers2, 1)
     }
 
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock {
-            // Put the code you want to measure the time of here.
+    func testCancelAfterStart() {
+
+        let stream1 = testStream()
+
+        let stream = stream1.flatMap(.Latest) { result -> AsyncStream<Int, Int, NSError> in
+
+            XCTFail()
+            return testStreamWithValue(32, next: 16)
         }
+
+        let dispose = stream.observe { event -> () in
+
+            switch event {
+            case .Success:
+                XCTFail()
+            case .Next:
+                XCTFail()
+            case .Failure:
+                XCTFail()
+            }
+        }
+
+        dispose.dispose()
+
+        XCTAssertEqual(numberOfObservers1, 1)
+        XCTAssertEqual(numberOfObservers2, 0)
     }
 }

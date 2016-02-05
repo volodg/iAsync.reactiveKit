@@ -17,7 +17,7 @@ class StreamToAsyncTests: XCTestCase {
 
     override func setUp() {
 
-        numberOfObservers = 0
+        numberOfObservers1 = 0
     }
 
     func testCancelAsync() {
@@ -151,7 +151,7 @@ class StreamToAsyncTests: XCTestCase {
         XCTAssertEqual(5, progressCalledCount)
         XCTAssertEqual("ok", resultValue)
 
-        XCTAssertEqual(1, numberOfObservers)
+        XCTAssertEqual(1, numberOfObservers1)
     }
 
     func testNumberOfObservers() {
@@ -238,6 +238,6 @@ class StreamToAsyncTests: XCTestCase {
         XCTAssertEqual("ok", resultValue1)
         XCTAssertEqual("ok", resultValue2)
 
-        XCTAssertEqual(2, numberOfObservers)
+        XCTAssertEqual(2, numberOfObservers1)
     }
 }

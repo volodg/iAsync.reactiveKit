@@ -12,7 +12,7 @@ class MergedObserversTests: XCTestCase {
 
     override func setUp() {
 
-        numberOfObservers = 0
+        numberOfObservers1 = 0
     }
 
     func testTwoObservsers() {
@@ -82,7 +82,7 @@ class MergedObserversTests: XCTestCase {
         XCTAssertEqual("ok", resultValue1)
         XCTAssertEqual("ok", resultValue2)
 
-        XCTAssertEqual(1, numberOfObservers)
+        XCTAssertEqual(1, numberOfObservers1)
     }
 
     func testTwoObservsersDisposeFirst() {
@@ -152,7 +152,7 @@ class MergedObserversTests: XCTestCase {
         XCTAssertNil(resultValue1)
         XCTAssertEqual("ok", resultValue2)
 
-        XCTAssertEqual(1, numberOfObservers)
+        XCTAssertEqual(1, numberOfObservers1)
     }
 
     func testTwoObservsersDisposeFirstImmediately() {
@@ -221,7 +221,7 @@ class MergedObserversTests: XCTestCase {
         XCTAssertNil(resultValue1)
         XCTAssertEqual("ok", resultValue2)
 
-        XCTAssertEqual(2, numberOfObservers)
+        XCTAssertEqual(2, numberOfObservers1)
     }
 
     func testTwoObservsersDisposeSecond() {
@@ -290,7 +290,7 @@ class MergedObserversTests: XCTestCase {
         XCTAssertEqual("ok", resultValue1)
         XCTAssertNil(resultValue2)
 
-        XCTAssertEqual(1, numberOfObservers)
+        XCTAssertEqual(1, numberOfObservers1)
     }
 
     func testTwoObservsersDisposeBoth() {
@@ -354,7 +354,7 @@ class MergedObserversTests: XCTestCase {
         XCTAssertNil(resultValue1)
         XCTAssertNil(resultValue2)
 
-        XCTAssertEqual(1, numberOfObservers)
+        XCTAssertEqual(1, numberOfObservers1)
     }
 
     func testTwoObservsersDisposeReverseBoth() {
@@ -418,13 +418,6 @@ class MergedObserversTests: XCTestCase {
         XCTAssertNil(resultValue1)
         XCTAssertNil(resultValue2)
 
-        XCTAssertEqual(1, numberOfObservers)
-    }
-
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock {
-            // Put the code you want to measure the time of here.
-        }
+        XCTAssertEqual(1, numberOfObservers1)
     }
 }

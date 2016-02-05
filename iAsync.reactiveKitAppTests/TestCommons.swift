@@ -13,7 +13,8 @@ import iAsync_reactiveKit
 
 import ReactiveKit
 
-var numberOfObservers = 0
+var numberOfObservers1 = 0
+var numberOfObservers2 = 0
 
 typealias Event = AsyncEvent<String, Int, NSError>
 
@@ -21,7 +22,7 @@ func testStream() -> AsyncStream<String, Int, NSError> {
 
     let stream = AsyncStream(producer: { (observer: Event -> ()) -> DisposableType? in
 
-        numberOfObservers += 1
+        numberOfObservers1 += 1
 
         var next = 0
 
@@ -52,6 +53,7 @@ func testStreamWithValue<Value, Next>(value: Value, next: Next) -> AsyncStream<V
 
     let stream = AsyncStream(producer: { (observer: AsyncEvent<Value, Next, NSError> -> ()) -> DisposableType? in
 
+        numberOfObservers2 += 1
         var nextCount = 0
 
         let cancel = Timer.sharedByThreadTimer().addBlock({ (cancel) -> Void in
