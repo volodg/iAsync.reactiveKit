@@ -25,46 +25,42 @@ class StreamToAsyncTests: XCTestCase {
         let stream = testStream()
         let loader = stream.mapNext { $0 as AnyObject }.streamToAsync()
 
-        var deinitTest: NSObject? = NSObject()
-        weak var weakDeinitTest = deinitTest
-
         var testPassed = false
+        weak var weakDeinitTest: NSObject? = nil
 
-        let handler = loader(progressCallback: { (progressInfo) -> () in
+        autoreleasepool {
 
-            if deinitTest != nil {
-                XCTFail()
-            } else {
-                XCTFail()
-            }
-        }, stateCallback: { (state) -> () in
+            let deinitTest = NSObject()
+            weakDeinitTest = deinitTest
 
-            if deinitTest != nil {
-                XCTFail()
-            } else {
-                XCTFail()
-            }
-        }) { (result) -> Void in
+            let handler = loader(progressCallback: { (progressInfo) -> () in
 
-            switch result {
-            case .Success:
+                deinitTest.description
                 XCTFail()
-            case .Failure:
+            }, stateCallback: { (state) -> () in
+
+                deinitTest.description
                 XCTFail()
-            case .Interrupted:
-                if deinitTest != nil {
+            }) { (result) -> Void in
+
+                switch result {
+                case .Success:
+                    XCTFail()
+                case .Failure:
+                    XCTFail()
+                case .Interrupted:
+                    deinitTest.description
                     testPassed = true
+                case .Unsubscribed:
+                    XCTFail()
                 }
-            case .Unsubscribed:
-                XCTFail()
             }
+
+            XCTAssertNotNil(weakDeinitTest)
+
+            handler(task: .Cancel)
         }
 
-        XCTAssertNotNil(weakDeinitTest)
-
-        handler(task: .Cancel)
-
-        deinitTest = nil
         XCTAssertNil(weakDeinitTest)
 
         XCTAssertTrue(testPassed)
@@ -77,44 +73,41 @@ class StreamToAsyncTests: XCTestCase {
 
         var testPassed = false
 
-        var deinitTest: NSObject? = NSObject()
-        weak var weakDeinitTest = deinitTest
+        weak var weakDeinitTest: NSObject? = nil
 
-        let handler = loader(progressCallback: { (progressInfo) -> () in
+        autoreleasepool {
 
-            if deinitTest != nil {
-                XCTFail()
-            } else {
-                XCTFail()
-            }
-        }, stateCallback: { (state) -> () in
+            let deinitTest = NSObject()
+            weakDeinitTest = deinitTest
 
-            if deinitTest != nil {
-                XCTFail()
-            } else {
-                XCTFail()
-            }
-        }) { (result) -> Void in
+            let handler = loader(progressCallback: { (progressInfo) -> () in
 
-            switch result {
-            case .Success:
+                deinitTest.description
                 XCTFail()
-            case .Failure:
+            }, stateCallback: { (state) -> () in
+
+                deinitTest.description
                 XCTFail()
-            case .Interrupted:
-                XCTFail()
-            case .Unsubscribed:
-                if deinitTest != nil {
+            }) { (result) -> Void in
+
+                switch result {
+                case .Success:
+                    XCTFail()
+                case .Failure:
+                    XCTFail()
+                case .Interrupted:
+                    XCTFail()
+                case .Unsubscribed:
+                    deinitTest.description
                     testPassed = true
                 }
             }
+
+            XCTAssertNotNil(weakDeinitTest)
+
+            handler(task: .UnSubscribe)
         }
 
-        XCTAssertNotNil(weakDeinitTest)
-
-        handler(task: .UnSubscribe)
-
-        deinitTest = nil
         XCTAssertNil(weakDeinitTest)
 
         XCTAssertTrue(testPassed)
@@ -129,46 +122,45 @@ class StreamToAsyncTests: XCTestCase {
             var progressCalledCount = 0
             var resultValue: String?
 
-            var deinitTest: NSObject? = NSObject()
-            weak var weakDeinitTest = deinitTest
+            weak var weakDeinitTest: NSObject? = nil
 
-            let expectation = self.expectationWithDescription("")
+            autoreleasepool {
 
-            let _ = loader(progressCallback: { (next) -> () in
+                let deinitTest = NSObject()
+                weakDeinitTest = deinitTest
 
-                if deinitTest != nil {
+                let expectation = self.expectationWithDescription("")
+
+                let _ = loader(progressCallback: { (next) -> () in
+
+                    deinitTest.description
                     XCTAssertEqual(progressCalledCount, next as? Int)
                     progressCalledCount += 1
-                }
-            }, stateCallback: { (state) -> () in
+                }, stateCallback: { (state) -> () in
 
-                if deinitTest != nil {
+                    deinitTest.description
                     XCTFail()
-                } else {
-                    XCTFail()
-                }
-            }) { (result) -> Void in
+                }) { (result) -> Void in
 
-                switch result {
-                case .Success(let value):
-                    if deinitTest != nil {
+                    switch result {
+                    case .Success(let value):
+                        deinitTest.description
                         resultValue = value
                         expectation.fulfill()
+                    case .Failure:
+                        XCTFail()
+                    case .Interrupted:
+                        XCTFail()
+                    case .Unsubscribed:
+                        XCTFail()
                     }
-                case .Failure:
-                    XCTFail()
-                case .Interrupted:
-                    XCTFail()
-                case .Unsubscribed:
-                    XCTFail()
                 }
+
+                XCTAssertNotNil(weakDeinitTest)
+
+                self.waitForExpectationsWithTimeout(0.5, handler: nil)
             }
 
-            XCTAssertNotNil(weakDeinitTest)
-
-            self.waitForExpectationsWithTimeout(0.5, handler: nil)
-
-            deinitTest = nil
             XCTAssertNil(weakDeinitTest)
 
             XCTAssertEqual(5, progressCalledCount)
@@ -189,86 +181,80 @@ class StreamToAsyncTests: XCTestCase {
         var nextCalledCount1 = 0
         var resultValue1: String?
 
-        var deinitTest1: NSObject? = NSObject()
-        weak var weakDeinitTest1 = deinitTest1
-
-        let expectation1 = expectationWithDescription("")
-
-        let _ = loader(progressCallback: { (next) -> () in
-
-            if deinitTest1 != nil {
-                XCTAssertEqual(nextCalledCount1, next as? Int)
-                nextCalledCount1 += 1
-            }
-        }, stateCallback: { (state) -> () in
-
-            if deinitTest1 != nil {
-                XCTFail()
-            } else {
-                XCTFail()
-            }
-        }) { (result) -> Void in
-
-            switch result {
-            case .Success(let value):
-                if deinitTest1 != nil {
-                    resultValue1 = value
-                    expectation1.fulfill()
-                }
-            case .Failure:
-                XCTFail()
-            case .Interrupted:
-                XCTFail()
-            case .Unsubscribed:
-                XCTFail()
-            }
-        }
-
         var nextCalledCount2 = 0
         var resultValue2: String?
 
-        var deinitTest2: NSObject? = NSObject()
-        weak var weakDeinitTest2 = deinitTest2
+        weak var weakDeinitTest1: NSObject? = nil
+        weak var weakDeinitTest2: NSObject? = nil
 
-        let expectation2 = expectationWithDescription("")
+        autoreleasepool {
 
-        let _ = loader(progressCallback: { (next) -> () in
+            let deinitTest1 = NSObject()
+            weakDeinitTest1 = deinitTest1
 
-            if deinitTest2 != nil {
+            let expectation1 = expectationWithDescription("")
+
+            let _ = loader(progressCallback: { (next) -> () in
+
+                deinitTest1.description
+                XCTAssertEqual(nextCalledCount1, next as? Int)
+                nextCalledCount1 += 1
+            }, stateCallback: { (state) -> () in
+
+                deinitTest1.description
+                XCTFail()
+            }) { (result) -> Void in
+
+                switch result {
+                case .Success(let value):
+                    deinitTest1.description
+                    resultValue1 = value
+                    expectation1.fulfill()
+                case .Failure:
+                    XCTFail()
+                case .Interrupted:
+                    XCTFail()
+                case .Unsubscribed:
+                    XCTFail()
+                }
+            }
+
+            let deinitTest2 = NSObject()
+            weakDeinitTest2 = deinitTest2
+
+            let expectation2 = expectationWithDescription("")
+
+            let _ = loader(progressCallback: { (next) -> () in
+
+                deinitTest2.description
                 XCTAssertEqual(nextCalledCount2, next as? Int)
                 nextCalledCount2 += 1
-            }
-        }, stateCallback: { (state) -> () in
+            }, stateCallback: { (state) -> () in
 
-            if deinitTest2 != nil {
+                deinitTest2.description
                 XCTFail()
-            } else {
-                XCTFail()
-            }
-        }) { (result) -> Void in
+            }) { (result) -> Void in
 
-            switch result {
-            case .Success(let value):
-                if deinitTest2 != nil {
+                switch result {
+                case .Success(let value):
+                    deinitTest2.description
                     resultValue2 = value
                     expectation2.fulfill()
+                case .Failure:
+                    XCTFail()
+                case .Interrupted:
+                    XCTFail()
+                case .Unsubscribed:
+                    XCTFail()
                 }
-            case .Failure:
-                XCTFail()
-            case .Interrupted:
-                XCTFail()
-            case .Unsubscribed:
-                XCTFail()
             }
+
+            XCTAssertNotNil(weakDeinitTest1)
+            XCTAssertNotNil(weakDeinitTest2)
+
+            waitForExpectationsWithTimeout(0.5, handler: nil)
         }
 
-        XCTAssertNotNil(weakDeinitTest1)
-        XCTAssertNotNil(weakDeinitTest2)
-
-        waitForExpectationsWithTimeout(0.5, handler: nil)
-
-        deinitTest1 = nil
-        deinitTest2 = nil
         XCTAssertNil(weakDeinitTest1)
         XCTAssertNil(weakDeinitTest2)
 

@@ -83,22 +83,23 @@ class AsyncToStreamTests: XCTestCase {
         let loader = testAsync()
         let stream = asyncToStream(loader)
 
-        var deinitTest: NSObject? = NSObject()
-        weak var weakDeinitTest = deinitTest
+        weak var weakDeinitTest: NSObject? = nil
 
-        let dispose = stream.observe { result -> Void in
+        autoreleasepool {
 
-            if deinitTest != nil {
-                XCTFail()
-            } else {
+            let deinitTest = NSObject()
+            weakDeinitTest = deinitTest
+
+            let dispose = stream.observe { result -> Void in
+
+                deinitTest.description
                 XCTFail()
             }
+
+            dispose.dispose()
+
+            XCTAssertNotNil(weakDeinitTest)
         }
-
-        dispose.dispose()
-
-        XCTAssertNotNil(weakDeinitTest)
-        deinitTest = nil
 
         XCTAssertNil(weakDeinitTest)
     }
@@ -111,32 +112,35 @@ class AsyncToStreamTests: XCTestCase {
         var progressCalledCount = 0
         var resultValue: String?
 
-        var deinitTest: NSObject? = NSObject()
-        weak var weakDeinitTest = deinitTest
+        weak var weakDeinitTest: NSObject? = nil
 
-        let expectation = expectationWithDescription("")
+        autoreleasepool {
 
-        stream.observe { ev -> Void in
+            let deinitTest = NSObject()
+            weakDeinitTest = deinitTest
 
-            switch ev {
-            case .Success(let value):
-                if deinitTest != nil {
+            let expectation = expectationWithDescription("")
+
+            stream.observe { ev -> Void in
+
+                switch ev {
+                case .Success(let value):
+                    deinitTest.description
                     resultValue = value
                     expectation.fulfill()
+                case .Failure:
+                    XCTFail()
+                case .Next(let next):
+                    XCTAssertEqual(progressCalledCount, next as? Int)
+                    progressCalledCount += 1
                 }
-            case .Failure:
-                XCTFail()
-            case .Next(let next):
-                XCTAssertEqual(progressCalledCount, next as? Int)
-                progressCalledCount += 1
             }
+
+            XCTAssertNotNil(weakDeinitTest)
+
+            waitForExpectationsWithTimeout(0.5, handler: nil)
         }
 
-        XCTAssertNotNil(weakDeinitTest)
-
-        waitForExpectationsWithTimeout(0.5, handler: nil)
-
-        deinitTest = nil
         XCTAssertNil(weakDeinitTest)
 
         XCTAssertEqual(5, progressCalledCount)

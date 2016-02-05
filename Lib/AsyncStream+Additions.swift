@@ -201,10 +201,15 @@ public extension AsyncStreamType where Self.Next == AnyObject {
             stateCallback   : AsyncChangeStateCallback?,
             finishCallback  : AsyncTypes<Self.Value, Self.Error>.DidFinishAsyncCallback?) -> AsyncHandler in
 
-            var finishCallbackHolder = finishCallback
+            var progressCallbackHolder = progressCallback
+            var finishCallbackHolder   = finishCallback
+
             let finishOnce = { (result: AsyncResult<Self.Value, Self.Error>) -> Void in
+
+                progressCallbackHolder = nil
+
                 if let finishCallback = finishCallbackHolder {
-                    finishCallbackHolder = nil
+                    finishCallbackHolder   = nil
                     finishCallback(result: result)
                 }
             }
@@ -219,7 +224,7 @@ public extension AsyncStreamType where Self.Next == AnyObject {
                 case .Failure(let error):
                     finishOnce(.Failure(error))
                 case .Next(let next):
-                    progressCallback?(progressInfo: next)
+                    progressCallbackHolder?(progressInfo: next)
                 }
             })
 
