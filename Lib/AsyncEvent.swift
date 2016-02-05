@@ -196,26 +196,26 @@ public extension AsyncStreamType {
         return lift { $0.map { $0.map(transform) } }
     }
 
-//    @warn_unused_result
-//    public func tryMap<U>(transform: Value -> Result<U, Error>) -> Operation<U, Error> {
-//        return lift { $0.map { operationEvent in
-//            switch operationEvent {
-//            case .Next(let value):
-//                switch transform(value) {
-//                case let .Success(value):
-//                    return .Next(value)
-//                case let .Failure(error):
-//                    return .Failure(error)
-//                }
-//            case .Failure(let error):
-//                return .Failure(error)
-//            case .Success:
-//                return .Success
-//            }
-//            }
-//        }
-//    }
-//    
+    @warn_unused_result
+    public func tryMap<U>(transform: Value -> Result<U, Error>) -> AsyncStream<U, Next, Error> {
+        return lift { $0.map { operationEvent in
+            switch operationEvent {
+            case .Success(let value):
+                switch transform(value) {
+                case let .Success(value):
+                    return .Success(value)
+                case let .Failure(error):
+                    return .Failure(error)
+                }
+            case .Failure(let error):
+                return .Failure(error)
+            case .Next(let event):
+                return .Next(event)
+            }
+            }
+        }
+    }
+
 //    @warn_unused_result
 //    public func mapError<F>(transform: Error -> F) -> Operation<Value, F> {
 //        return lift { $0.map { $0.mapError(transform) } }
