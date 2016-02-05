@@ -206,47 +206,50 @@ public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Err
     return result
 }
 
-public func streamToAsync<Input: AsyncStreamType where Input.Progress == AnyObject>(input: Input) -> AsyncTypes<Input.Value, Input.Error>.Async {
+public extension AsyncStreamType where Self.Progress == AnyObject {
 
-    return { (
-        progressCallback: AsyncProgressCallback?,
-        stateCallback   : AsyncChangeStateCallback?,
-        finishCallback  : AsyncTypes<Input.Value, Input.Error>.DidFinishAsyncCallback?) -> AsyncHandler in
+    public func streamToAsync() -> AsyncTypes<Self.Value, Self.Error>.Async {
 
-        var finishCallbackHolder = finishCallback
-        let finishOnce = { (result: AsyncResult<Input.Value, Input.Error>) -> Void in
-            if let finishCallback = finishCallbackHolder {
-                finishCallbackHolder = nil
-                finishCallback(result: result)
+        return { (
+            progressCallback: AsyncProgressCallback?,
+            stateCallback   : AsyncChangeStateCallback?,
+            finishCallback  : AsyncTypes<Self.Value, Self.Error>.DidFinishAsyncCallback?) -> AsyncHandler in
+
+            var finishCallbackHolder = finishCallback
+            let finishOnce = { (result: AsyncResult<Self.Value, Self.Error>) -> Void in
+                if let finishCallback = finishCallbackHolder {
+                    finishCallbackHolder = nil
+                    finishCallback(result: result)
+                }
             }
-        }
 
-        let dispose = input.observe(on: nil, observer: { event -> () in
+            let dispose = self.observe(on: nil, observer: { event -> () in
 
-            if finishCallbackHolder == nil { return }
+                if finishCallbackHolder == nil { return }
 
-            switch event {
-            case .Success(let value):
-                finishOnce(.Success(value))
-            case .Failure(let error):
-                finishOnce(.Failure(error))
-            case .Progress(let progress):
-                progressCallback?(progressInfo: progress)
-            }
-        })
+                switch event {
+                case .Success(let value):
+                    finishOnce(.Success(value))
+                case .Failure(let error):
+                    finishOnce(.Failure(error))
+                case .Progress(let progress):
+                    progressCallback?(progressInfo: progress)
+                }
+            })
 
-        return { (task: AsyncHandlerTask) -> Void in
+            return { (task: AsyncHandlerTask) -> Void in
 
-            switch task {
-            case .Cancel:
-                dispose.dispose()
-                finishOnce(.Interrupted)
-            case .UnSubscribe:
-                finishOnce(.Unsubscribed)
-            case .Resume:
-                fatalError()
-            case .Suspend:
-                fatalError()
+                switch task {
+                case .Cancel:
+                    dispose.dispose()
+                    finishOnce(.Interrupted)
+                case .UnSubscribe:
+                    finishOnce(.Unsubscribed)
+                case .Resume:
+                    fatalError()
+                case .Suspend:
+                    fatalError()
+                }
             }
         }
     }
