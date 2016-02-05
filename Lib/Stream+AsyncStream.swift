@@ -106,17 +106,17 @@ public extension StreamType where Event: AsyncStreamType {
     }
 }
 
-//public extension StreamType {
-//
-//    @warn_unused_result
-//    public func flatMap<T: OperationType>(strategy: OperationFlatMapStrategy, transform: Event -> T) -> Operation<T.Value, T.Error> {
-//        switch strategy {
-//        case .Latest:
-//            return map(transform).switchToLatest()
-//        case .Merge:
-//            return map(transform).merge()
-//        case .Concat:
-//            return map(transform).concat()
-//        }
-//    }
-//}
+public extension StreamType {
+
+    @warn_unused_result
+    public func flatMap<T: AsyncStreamType>(strategy: AsyncStreamFlatMapStrategy, transform: Event -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
+        switch strategy {
+        case .Latest:
+            return map(transform).switchToLatest()
+        case .Merge:
+            return map(transform).merge()
+        case .Concat:
+            return map(transform).concat()
+        }
+    }
+}
