@@ -106,52 +106,57 @@ class StreamToAsyncTests: XCTestCase {
 
     func testNormalFinishAsync() {
 
-        let stream = testStream()
-        let loader = stream.mapNext { $0 as AnyObject }.streamToAsync()
+        let loader = testStream().mapNext { $0 as AnyObject }.streamToAsync()
 
-        var progressCalledCount = 0
-        var resultValue: String?
+        let testFunc = { (numberOfCalls: Int) -> Void in
 
-        var deinitTest: NSObject? = NSObject()
-        weak var weakDeinitTest = deinitTest
+            var progressCalledCount = 0
+            var resultValue: String?
 
-        let expectation = expectationWithDescription("")
+            var deinitTest: NSObject? = NSObject()
+            weak var weakDeinitTest = deinitTest
 
-        let _ = loader(progressCallback: { (next) -> () in
+            let expectation = self.expectationWithDescription("")
 
-            XCTAssertEqual(progressCalledCount, next as? Int)
-            progressCalledCount += 1
-        }, stateCallback: { (state) -> () in
+            let _ = loader(progressCallback: { (next) -> () in
 
-            XCTFail()
-        }) { (result) -> Void in
+                XCTAssertEqual(progressCalledCount, next as? Int)
+                progressCalledCount += 1
+            }, stateCallback: { (state) -> () in
 
-            switch result {
-            case .Success(let value):
-                if deinitTest != nil {
-                    deinitTest = nil
-                    resultValue = value
-                    expectation.fulfill()
+                XCTFail()
+            }) { (result) -> Void in
+
+                switch result {
+                case .Success(let value):
+                    if deinitTest != nil {
+                        deinitTest = nil
+                        resultValue = value
+                        expectation.fulfill()
+                    }
+                case .Failure:
+                    XCTFail()
+                case .Interrupted:
+                    XCTFail()
+                case .Unsubscribed:
+                    XCTFail()
                 }
-            case .Failure:
-                XCTFail()
-            case .Interrupted:
-                XCTFail()
-            case .Unsubscribed:
-                XCTFail()
             }
+
+            XCTAssertNotNil(weakDeinitTest)
+
+            self.waitForExpectationsWithTimeout(0.5, handler: nil)
+
+            XCTAssertNil(weakDeinitTest)
+
+            XCTAssertEqual(5, progressCalledCount)
+            XCTAssertEqual("ok", resultValue)
+
+            XCTAssertEqual(numberOfCalls, numberOfObservers1)
         }
 
-        XCTAssertNotNil(weakDeinitTest)
-
-        waitForExpectationsWithTimeout(0.5, handler: nil)
-
-        XCTAssertNil(weakDeinitTest)
-
-        XCTAssertEqual(5, progressCalledCount)
-        XCTAssertEqual("ok", resultValue)
-
-        XCTAssertEqual(1, numberOfObservers1)
+        testFunc(1)
+        testFunc(2)
     }
 
     func testNumberOfObservers() {

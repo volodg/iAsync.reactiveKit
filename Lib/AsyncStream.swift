@@ -48,11 +48,13 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
 
     public init(producer: (Observer -> DisposableType?)) {
         stream = Stream  { observer in
-            var completed: Bool = false
+            var observerHolder: Observer? = observer
 
             return producer { event in
-                if !completed {
-                    completed = event.isTerminal
+                if let observer = observerHolder {
+                    if event.isTerminal {
+                        observerHolder = nil
+                    }
                     observer(event)
                 }
             }
