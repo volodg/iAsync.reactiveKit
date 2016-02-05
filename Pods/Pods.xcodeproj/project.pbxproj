@@ -92,6 +92,7 @@
 		BE18CC5950C1359A4CBD697BC90649AF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3961F270C55AF57C3925F7804EA81868 /* Foundation.framework */; };
 		BEC9FD518E85FC2F25D1E61E49718B8B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3961F270C55AF57C3925F7804EA81868 /* Foundation.framework */; };
 		BF7189B8ADC0D7EA350D0DEEE2F6F1A5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3961F270C55AF57C3925F7804EA81868 /* Foundation.framework */; };
+		C374B6881C6487BF0060DBCD /* AsyncEvent+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C374B6871C6487BF0060DBCD /* AsyncEvent+Additions.swift */; };
 		C46B46FECF9645C419C80CBECA844F80 /* WeakBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44974E31404C7A46C0F4E9BDF08D50CB /* WeakBox.swift */; };
 		C61E41C23ED884FD420F02D9F1B73DA2 /* NoError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59E6025DC3FC20EDC2804F6E828A8289 /* NoError.swift */; };
 		C9C2168662FF5496CC4F1D45EFC5F56A /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4C386F97998FCFEDFF1E687D647265 /* Helpers.swift */; };
@@ -340,6 +341,7 @@
 		C20A4FD2E79426B53F224483E0B6C28D /* Result-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Result-umbrella.h"; sourceTree = "<group>"; };
 		C35082E4858AF869364C548F46564F44 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C35E4D301C63D83A00AB0981 /* iAsync.reactiveKit.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; name = iAsync.reactiveKit.podspec; path = ../iAsync.reactiveKit.podspec; sourceTree = "<group>"; };
+		C374B6871C6487BF0060DBCD /* AsyncEvent+Additions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AsyncEvent+Additions.swift"; sourceTree = "<group>"; };
 		C4139027C3957EDD844EBEF766C6565E /* ReactiveKit-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "ReactiveKit-prefix.pch"; sourceTree = "<group>"; };
 		C668D27E421B807DD1EB98EB6D701876 /* Error.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
 		C84BAC8FD25ABE0AE01EB954D58EAF4D /* AsyncState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AsyncState.swift; sourceTree = "<group>"; };
@@ -645,6 +647,7 @@
 			isa = PBXGroup;
 			children = (
 				D193EF87716515EAC1D25F01853EE98D /* AsyncEvent.swift */,
+				C374B6871C6487BF0060DBCD /* AsyncEvent+Additions.swift */,
 			);
 			path = Lib;
 			sourceTree = "<group>";
@@ -1168,6 +1171,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B11EC72493B4D35E16BB8C7E4D78F65 /* AsyncEvent.swift in Sources */,
+				C374B6881C6487BF0060DBCD /* AsyncEvent+Additions.swift in Sources */,
 				B1B74E88823BDF68F331AC9F24E9F831 /* iAsync.reactiveKit-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
