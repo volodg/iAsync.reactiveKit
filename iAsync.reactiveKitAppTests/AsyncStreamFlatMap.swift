@@ -90,25 +90,36 @@ class AsyncStreamFlatMap: XCTestCase {
 
         let stream1 = testStream()
 
+        var deinitTest1: NSObject? = NSObject()
+        weak var weakDeinitTest1 = deinitTest1
+
+        var deinitTest2: NSObject? = NSObject()
+        weak var weakDeinitTest2 = deinitTest2
+
         let stream = stream1.flatMap(.Latest) { result -> AsyncStream<Int, Int, NSError> in
 
-            XCTFail()
-            return testStreamWithValue(32, next: 16)
+            if deinitTest1 != nil {
+                XCTFail()
+                return testStreamWithValue(32, next: 16)
+            }
+            fatalError()
         }
 
         let dispose = stream.observe { event -> () in
 
-            switch event {
-            case .Success:
+            if deinitTest2 != nil {
                 XCTFail()
-            case .Next:
-                XCTFail()
-            case .Failure:
+            } else {
                 XCTFail()
             }
         }
 
         dispose.dispose()
+
+        deinitTest1 = nil
+        deinitTest2 = nil
+        XCTAssertNil(weakDeinitTest1)
+        XCTAssertNil(weakDeinitTest2)
 
         XCTAssertEqual(numberOfObservers1, 1)
         XCTAssertEqual(numberOfObservers2, 0)
