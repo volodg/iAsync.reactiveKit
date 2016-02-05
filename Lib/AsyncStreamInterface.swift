@@ -17,9 +17,9 @@ public protocol AsyncStreamInterface {
     typealias Error: ErrorType
 
     func asyncWithCallbacks(
-        success success: Value -> Void,
-        next   : Next  -> Void,
-        error  : Error -> Void)
+        success _: Value -> Void,
+        next     : Next  -> Void,
+        error    : Error -> Void)
 
     func cancel()
 }
@@ -35,9 +35,9 @@ public struct streamBuilder<T: AsyncStreamInterface> {
             let obj = factory()
 
             obj.asyncWithCallbacks(
-                success: { _ in  }, //observer(.Success($0))
-                next   : { _ in   },//observer(.Next($0))
-                error  : { _ in    })//observer(.Error($0))
+                success: { observer(.Success($0)) },
+                next   : { observer(.Next($0))    },
+                error  : { observer(.Failure($0)) })
 
             return BlockDisposable { obj.cancel() }
         })
