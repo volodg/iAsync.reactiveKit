@@ -195,38 +195,38 @@ public extension AsyncStreamType {
         return lift { $0.startWith(.Next(event)) }
     }
 
-//    @warn_unused_result
-//    public func retry(var count: Int) -> Operation<Value, Error> {
-//        return create { observer in
-//            let serialDisposable = SerialDisposable(otherDisposable: nil)
-//            
-//            var attempt: (() -> Void)?
-//            
-//            attempt = {
-//                serialDisposable.otherDisposable?.dispose()
-//                serialDisposable.otherDisposable = self.observe(on: nil) { event in
-//                    switch event {
-//                    case .Failure(let error):
-//                        if count > 0 {
-//                            count--
-//                            attempt?()
-//                        } else {
-//                            observer.failure(error)
-//                        }
-//                    default:
-//                        observer.observer(event._unbox)
-//                    }
-//                }
-//            }
-//            
-//            attempt?()
-//            return BlockDisposable {
-//                serialDisposable.dispose()
-//                attempt = nil
-//            }
-//        }
-//    }
-//    
+    @warn_unused_result
+    public func retry(var count: Int) -> AsyncStream<Value, Next, Error> {
+        return create { observer in
+            let serialDisposable = SerialDisposable(otherDisposable: nil)
+
+            var attempt: (() -> Void)?
+
+            attempt = {
+                serialDisposable.otherDisposable?.dispose()
+                serialDisposable.otherDisposable = self.observe(on: nil) { event in
+                    switch event {
+                    case .Failure(let error):
+                        if count > 0 {
+                            count--
+                            attempt?()
+                        } else {
+                            observer(.Failure(error))
+                        }
+                    default:
+                        observer(event)
+                    }
+                }
+            }
+
+            attempt?()
+            return BlockDisposable {
+                serialDisposable.dispose()
+                attempt = nil
+            }
+        }
+    }
+
 //    @warn_unused_result
 //    public func take(count: Int) -> Operation<Value, Error> {
 //        return create { observer in
@@ -636,18 +636,19 @@ public extension AsyncStreamType {
 //            return compositeDisposable
 //        }
 //    }
-//}
+}
 
-//public enum OperationFlatMapStrategy {
-//    case Latest
-//    case Merge
-//    case Concat
-//}
-//
-//public extension OperationType {
-//    
+public enum AsyncStreamFlatMapStrategy {
+    case Latest
+    case Merge
+    case Concat
+}
+
+public extension AsyncStreamType {
+
+    //TODO test
 //    @warn_unused_result
-//    public func flatMap<T: OperationType where T.Error == Error>(strategy: OperationFlatMapStrategy, transform: Value -> T) -> Operation<T.Value, T.Error> {
+//    public func flatMap<T: AsyncStreamType where T.Next == Next, T.Error == Error>(strategy: AsyncStreamFlatMapStrategy, transform: Value -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
 //        switch strategy {
 //        case .Latest:
 //            return map(transform).switchToLatest()
@@ -657,7 +658,7 @@ public extension AsyncStreamType {
 //            return map(transform).concat()
 //        }
 //    }
-//    
+
 //    @warn_unused_result
 //    public func flatMapError<T: OperationType where T.Value == Value>(recover: Error -> T) -> Operation<T.Value, T.Error> {
 //        return create { observer in
@@ -675,7 +676,7 @@ public extension AsyncStreamType {
 //                    }
 //                }
 //            }
-//            
+//
 //            return serialDisposable
 //        }
 //    }
