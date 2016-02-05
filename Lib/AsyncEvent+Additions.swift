@@ -125,7 +125,6 @@ public extension AsyncStreamType {
         }
     }
 
-    //TODO test - current
     public func mergedObservers() -> AsyncStream<Value, Progress, Error> {
 
         typealias ObserverHolder = AsyncObserverHolder<Value, Progress, Error>
