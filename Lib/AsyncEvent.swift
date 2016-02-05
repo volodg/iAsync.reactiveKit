@@ -27,6 +27,41 @@ public enum AsyncEvent<ValueT, NextT, ErrorT: ErrorType> {
             return false
         }
     }
+
+    public func map<U>(transform: ValueT -> U) -> AsyncEvent<U, NextT, ErrorT> {
+        switch self {
+        case .Next(let event):
+            return .Next(event)
+        case .Failure(let error):
+            return .Failure(error)
+        case .Success(let event):
+            return .Success(transform(event))
+        }
+    }
+
+    public func mapError<F>(transform: ErrorT -> F) -> AsyncEvent<ValueT, NextT, F> {
+        switch self {
+        case .Next(let event):
+            return .Next(event)
+        case .Failure(let error):
+            return .Failure(transform(error))
+        case .Success(let event):
+            return .Success(event)
+        }
+    }
+
+    public func filter(include: ValueT -> Bool) -> Bool {
+        switch self {
+        case .Success(let value):
+            if include(value) {
+                return true
+            } else {
+                return false
+            }
+        default:
+            return true
+        }
+    }
 }
 
 public protocol AsyncStreamType: StreamType {
@@ -129,7 +164,7 @@ public extension AsyncStreamType {
         }
     }
 
-    public func observeProgress(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Next -> ()) -> DisposableType {
+    public func observeNext(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Next -> ()) -> DisposableType {
         return self.observe(on: context) { event in
             switch event {
             case .Next(let event):
@@ -139,28 +174,28 @@ public extension AsyncStreamType {
         }
     }
 
-//    public func observeError(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Error -> ()) -> DisposableType {
-//        return self.observe(on: context) { event in
-//            switch event {
-//            case .Failure(let error):
-//                observer(error)
-//            default: break
-//            }
-//        }
-//    }
-//
-//    @warn_unused_result
-//    public func shareNext(limit: Int = Int.max, context: ExecutionContext? = nil) -> ObservableBuffer<Value> {
-//        return ObservableBuffer(limit: limit) { observer in
-//            return self.observeNext(on: context, observer: observer)
-//        }
-//    }
-//    
-//    @warn_unused_result
-//    public func map<U>(transform: Value -> U) -> Operation<U, Error> {
-//        return lift { $0.map { $0.map(transform) } }
-//    }
-//    
+    public func observeError(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Error -> ()) -> DisposableType {
+        return self.observe(on: context) { event in
+            switch event {
+            case .Failure(let error):
+                observer(error)
+            default: break
+            }
+        }
+    }
+
+    @warn_unused_result
+    public func shareNext(limit: Int = Int.max, context: ExecutionContext? = nil) -> ObservableBuffer<Next> {
+        return ObservableBuffer(limit: limit) { observer in
+            return self.observeNext(on: context, observer: observer)
+        }
+    }
+
+    @warn_unused_result
+    public func map<U>(transform: Value -> U) -> AsyncStream<U, Next, Error> {
+        return lift { $0.map { $0.map(transform) } }
+    }
+
 //    @warn_unused_result
 //    public func tryMap<U>(transform: Value -> Result<U, Error>) -> Operation<U, Error> {
 //        return lift { $0.map { operationEvent in
