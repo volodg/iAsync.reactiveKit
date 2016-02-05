@@ -1,5 +1,5 @@
 //
-//  AsyncEvent+Additions.swift
+//  AsyncStream+Additions.swift
 //  iAsync.reactiveKit
 //
 //  Created by Gorbenko Vladimir on 05/02/16.

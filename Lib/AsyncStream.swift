@@ -175,16 +175,16 @@ public extension AsyncStreamType {
         return lift { $0.filter { $0.filter(include) } }
     }
 
-//    @warn_unused_result
-//    public func switchTo(context: ExecutionContext) -> Operation<Value, Error> {
-//        return lift { $0.switchTo(context) }
-//    }
-//    
-//    @warn_unused_result
-//    public func throttle(seconds: Double, on queue: Queue) -> Operation<Value, Error> {
-//        return lift { $0.throttle(seconds, on: queue) }
-//    }
-//    
+    @warn_unused_result
+    public func switchTo(context: ExecutionContext) -> AsyncStream<Value, Next, Error> {
+        return lift { $0.switchTo(context) }
+    }
+
+    @warn_unused_result
+    public func throttle(seconds: Double, on queue: Queue) -> AsyncStream<Value, Next, Error> {
+        return lift { $0.throttle(seconds, on: queue) }
+    }
+
 //    @warn_unused_result
 //    public func skip(count: Int) -> Operation<Value, Error> {
 //        return lift { $0.skip(count) }
