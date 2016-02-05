@@ -23,7 +23,7 @@ class StreamToAsyncTests: XCTestCase {
     func testCancelAsync() {
 
         let stream = testStream()
-        let loader = stream.streamToAsync()
+        let loader = stream.mapNext { $0 as AnyObject }.streamToAsync()
 
         var deinitTest: NSObject? = NSObject()
         weak var weakDeinitTest = deinitTest
@@ -65,7 +65,7 @@ class StreamToAsyncTests: XCTestCase {
     func testUnsubscribeAsync() {
 
         let stream = testStream()
-        let loader = stream.streamToAsync()
+        let loader = stream.mapNext { $0 as AnyObject }.streamToAsync()
 
         var testPassed = false
 
@@ -107,7 +107,7 @@ class StreamToAsyncTests: XCTestCase {
     func testNormalFinishAsync() {
 
         let stream = testStream()
-        let loader = stream.streamToAsync()
+        let loader = stream.mapNext { $0 as AnyObject }.streamToAsync()
 
         var progressCalledCount = 0
         var resultValue: String?
@@ -157,7 +157,7 @@ class StreamToAsyncTests: XCTestCase {
     func testNumberOfObservers() {
 
         let stream = testStream()
-        let loader = stream.streamToAsync()
+        let loader = stream.mapNext { $0 as AnyObject }.streamToAsync()
 
         var nextCalledCount1 = 0
         var resultValue1: String?

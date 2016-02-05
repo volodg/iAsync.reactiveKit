@@ -472,7 +472,7 @@ public extension AsyncStreamType {
 //            return CompositeDisposable([selfDisposable, otherDisposable])
 //        }
 //    }
-//}
+}
 
 //public extension OperationType where Value: OptionalType {
 //    
@@ -481,17 +481,19 @@ public extension AsyncStreamType {
 //        return lift { $0.filter { $0.filter { $0._unbox != nil } }.map { $0.map { $0._unbox! } } }
 //    }
 //}
-//
-//public extension OperationType where Value: OperationType, Value.Error == Error {
-//    
-//    @warn_unused_result
-//    public func merge() -> Operation<Value.Value, Value.Error> {
+
+public extension AsyncStreamType where Value: AsyncStreamType, Value.Next == Next, Value.Error == Error {
+
+    @warn_unused_result
+    public func merge() -> AsyncStream<Value.Value, Value.Next, Value.Error> {
+
+        fatalError()
 //        return create { observer in
 //            let queue = Queue(name: "com.ReactiveKit.ReactiveKit.Operation.Merge")
-//            
+//
 //            var numberOfOperations = 1
 //            let compositeDisposable = CompositeDisposable()
-//            
+//
 //            let decrementNumberOfOperations = { () -> () in
 //                queue.sync {
 //                    numberOfOperations -= 1
@@ -500,9 +502,9 @@ public extension AsyncStreamType {
 //                    }
 //                }
 //            }
-//            
+//
 //            compositeDisposable += self.observe(on: nil) { taskEvent in
-//                
+//
 //                switch taskEvent {
 //                case .Failure(let error):
 //                    return observer.failure(error)
@@ -524,72 +526,58 @@ public extension AsyncStreamType {
 //            }
 //            return compositeDisposable
 //        }
-//    }
-//    
-//    @warn_unused_result
-//    public func switchToLatest() -> Operation<Value.Value, Value.Error>  {
-//        return create { observer in
-//            let serialDisposable = SerialDisposable(otherDisposable: nil)
-//            let compositeDisposable = CompositeDisposable([serialDisposable])
-//            
-//            var outerCompleted: Bool = false
-//            var innerCompleted: Bool = false
-//            
-//            compositeDisposable += self.observe(on: nil) { taskEvent in
-//                
-//                switch taskEvent {
-//                case .Failure(let error):
-//                    observer.failure(error)
-//                case .Success:
-//                    outerCompleted = true
-//                    if innerCompleted {
-//                        observer.success()
-//                    }
-//                case .Next(let innerOperation):
-//                    innerCompleted = false
-//                    serialDisposable.otherDisposable?.dispose()
-//                    serialDisposable.otherDisposable = innerOperation.observe(on: nil) { event in
-//                        
-//                        switch event {
-//                        case .Failure(let error):
-//                            observer.failure(error)
-//                        case .Success:
-//                            innerCompleted = true
-//                            if outerCompleted {
-//                                observer.success()
-//                            }
-//                        case .Next(let value):
-//                            observer.next(value)
-//                        }
-//                    }
-//                }
-//            }
-//            
-//            return compositeDisposable
-//        }
-//    }
-//    
-//    @warn_unused_result
-//    public func concat() -> Operation<Value.Value, Value.Error>  {
+    }
+
+    //TODO test
+    @warn_unused_result
+    public func switchToLatest() -> AsyncStream<Value.Value, Value.Next, Value.Error> {
+
+        return create { observer in
+            let serialDisposable = SerialDisposable(otherDisposable: nil)
+            let compositeDisposable = CompositeDisposable([serialDisposable])
+
+            compositeDisposable += self.observe(on: nil) { taskEvent in
+
+                switch taskEvent {
+                case .Failure(let error):
+                    observer(.Failure(error))
+                case .Success(let value):
+                    serialDisposable.otherDisposable?.dispose()
+                    serialDisposable.otherDisposable = value.observe(on: nil, observer: { (value) -> () in
+                        observer(value)
+                    })
+                case .Next(let next):
+                    observer(.Next(next))
+                }
+            }
+
+            return compositeDisposable
+        }
+    }
+
+    @warn_unused_result
+    public func concat() -> AsyncStream<Value.Value, Value.Next, Value.Error> {
+
+        fatalError()
 //        return create { observer in
 //            let queue = Queue(name: "com.ReactiveKit.ReactiveKit.Operation.Concat")
-//            
+//
 //            let serialDisposable = SerialDisposable(otherDisposable: nil)
 //            let compositeDisposable = CompositeDisposable([serialDisposable])
-//            
+//
 //            var outerCompleted: Bool = false
 //            var innerCompleted: Bool = true
-//            
+//
 //            var taskQueue: [Value] = []
-//            
+//
 //            var startNextOperation: (() -> ())! = nil
 //            startNextOperation = {
 //                innerCompleted = false
-//                
+//
 //                let task: Value = queue.sync {
 //                    return taskQueue.removeAtIndex(0)
 //                }
-//                
+//
 //                serialDisposable.otherDisposable?.dispose()
 //                serialDisposable.otherDisposable = task.observe(on: nil) { event in
 //                    switch event {
@@ -607,19 +595,19 @@ public extension AsyncStreamType {
 //                    }
 //                }
 //            }
-//            
+//
 //            let addToQueue = { (task: Value) -> () in
 //                queue.sync {
 //                    taskQueue.append(task)
 //                }
-//                
+//
 //                if innerCompleted {
 //                    startNextOperation()
 //                }
 //            }
-//            
+//
 //            compositeDisposable += self.observe(on: nil) { taskEvent in
-//                
+//
 //                switch taskEvent {
 //                case .Failure(let error):
 //                    observer.failure(error)
@@ -635,7 +623,7 @@ public extension AsyncStreamType {
 //
 //            return compositeDisposable
 //        }
-//    }
+    }
 }
 
 public enum AsyncStreamFlatMapStrategy {
@@ -647,17 +635,17 @@ public enum AsyncStreamFlatMapStrategy {
 public extension AsyncStreamType {
 
     //TODO test
-//    @warn_unused_result
-//    public func flatMap<T: AsyncStreamType where T.Next == Next, T.Error == Error>(strategy: AsyncStreamFlatMapStrategy, transform: Value -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
-//        switch strategy {
-//        case .Latest:
-//            return map(transform).switchToLatest()
-//        case .Merge:
-//            return map(transform).merge()
-//        case .Concat:
-//            return map(transform).concat()
-//        }
-//    }
+    @warn_unused_result
+    public func flatMap<T: AsyncStreamType where T.Next == Next, T.Error == Error>(strategy: AsyncStreamFlatMapStrategy, transform: Value -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
+        switch strategy {
+        case .Latest:
+            return map(transform).switchToLatest()
+        case .Merge:
+            return map(transform).merge()
+        case .Concat:
+            return map(transform).concat()
+        }
+    }
 
 //    @warn_unused_result
 //    public func flatMapError<T: OperationType where T.Value == Value>(recover: Error -> T) -> Operation<T.Value, T.Error> {

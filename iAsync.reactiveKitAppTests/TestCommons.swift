@@ -15,9 +15,9 @@ import ReactiveKit
 
 var numberOfObservers = 0
 
-typealias Event = AsyncEvent<String, AnyObject, NSError>
+typealias Event = AsyncEvent<String, Int, NSError>
 
-func testStream() -> AsyncStream<String, AnyObject, NSError> {
+func testStream() -> AsyncStream<String, Int, NSError> {
 
     let stream = AsyncStream(producer: { (observer: Event -> ()) -> DisposableType? in
 
@@ -38,6 +38,24 @@ func testStream() -> AsyncStream<String, AnyObject, NSError> {
 
             observer(.Next(next))
             next += 1
+        }, duration: 0.01)
+
+        return BlockDisposable({ () -> () in
+            cancel()
+        })
+    })
+
+    return stream
+}
+
+func testStreamWithValue<Value, Next>(value: Value, next: Next) -> AsyncStream<Value, Next, NSError> {
+
+    let stream = AsyncStream(producer: { (observer: AsyncEvent<Value, Next, NSError> -> ()) -> DisposableType? in
+
+        let cancel = Timer.sharedByThreadTimer().addBlock({ (cancel) -> Void in
+
+            observer(.Next(next))
+            observer(.Success(value))
         }, duration: 0.01)
 
         return BlockDisposable({ () -> () in
