@@ -121,7 +121,6 @@ class AsyncToStreamTests: XCTestCase {
             switch ev {
             case .Success(let value):
                 if deinitTest != nil {
-                    deinitTest = nil
                     resultValue = value
                     expectation.fulfill()
                 }
@@ -137,6 +136,7 @@ class AsyncToStreamTests: XCTestCase {
 
         waitForExpectationsWithTimeout(0.5, handler: nil)
 
+        deinitTest = nil
         XCTAssertNil(weakDeinitTest)
 
         XCTAssertEqual(5, progressCalledCount)
@@ -163,7 +163,6 @@ class AsyncToStreamTests: XCTestCase {
             switch ev {
             case .Success(let value):
                 if deinitTest1 != nil {
-                    deinitTest1 = nil
                     resultValue1 = value
                     expectation1.fulfill()
                 }
@@ -188,7 +187,6 @@ class AsyncToStreamTests: XCTestCase {
             switch ev {
             case .Success(let value):
                 if deinitTest2 != nil {
-                    deinitTest2 = nil
                     resultValue2 = value
                     expectation2.fulfill()
                 }
@@ -204,6 +202,9 @@ class AsyncToStreamTests: XCTestCase {
         XCTAssertNotNil(weakDeinitTest2)
 
         waitForExpectationsWithTimeout(0.5, handler: nil)
+
+        deinitTest1 = nil
+        deinitTest2 = nil
 
         XCTAssertNil(weakDeinitTest1)
         XCTAssertNil(weakDeinitTest2)

@@ -32,7 +32,6 @@ class MergedObserversTests: XCTestCase {
             switch ev {
             case .Success(let value):
                 if deinitTest1 != nil {
-                    deinitTest1 = nil
                     resultValue1 = value
                     expectation1.fulfill()
                 }
@@ -57,7 +56,6 @@ class MergedObserversTests: XCTestCase {
             switch ev {
             case .Success(let value):
                 if deinitTest2 != nil {
-                    deinitTest2 = nil
                     resultValue2 = value
                     expectation2.fulfill()
                 }
@@ -73,6 +71,9 @@ class MergedObserversTests: XCTestCase {
         XCTAssertNotNil(weakDeinitTest2)
 
         waitForExpectationsWithTimeout(0.5, handler: nil)
+
+        deinitTest1 = nil
+        deinitTest2 = nil
 
         XCTAssertNil(weakDeinitTest1)
         XCTAssertNil(weakDeinitTest2)
@@ -100,7 +101,6 @@ class MergedObserversTests: XCTestCase {
             switch ev {
             case .Success(let value):
                 if deinitTest1 != nil {
-                    deinitTest1 = nil
                     resultValue1 = value
                 }
             case .Failure:
@@ -124,7 +124,6 @@ class MergedObserversTests: XCTestCase {
             switch ev {
             case .Success(let value):
                 if deinitTest2 != nil {
-                    deinitTest2 = nil
                     resultValue2 = value
                     expectation2.fulfill()
                 }
@@ -141,10 +140,11 @@ class MergedObserversTests: XCTestCase {
 
         dispose1.dispose()
         deinitTest1 = nil
+        XCTAssertNil(weakDeinitTest1)
 
         waitForExpectationsWithTimeout(0.5, handler: nil)
 
-        XCTAssertNil(weakDeinitTest1)
+        deinitTest2 = nil
         XCTAssertNil(weakDeinitTest2)
 
         XCTAssertEqual(0, nextCalledCount1)
@@ -170,7 +170,6 @@ class MergedObserversTests: XCTestCase {
             switch ev {
             case .Success(let value):
                 if deinitTest1 != nil {
-                    deinitTest1 = nil
                     resultValue1 = value
                 }
             case .Failure:
@@ -197,7 +196,6 @@ class MergedObserversTests: XCTestCase {
             switch ev {
             case .Success(let value):
                 if deinitTest2 != nil {
-                    deinitTest2 = nil
                     resultValue2 = value
                     expectation2.fulfill()
                 }
@@ -209,11 +207,13 @@ class MergedObserversTests: XCTestCase {
             }
         }
 
+        deinitTest1 = nil
         XCTAssertNil(weakDeinitTest1)
         XCTAssertNotNil(weakDeinitTest2)
 
         waitForExpectationsWithTimeout(0.5, handler: nil)
 
+        deinitTest2 = nil
         XCTAssertNil(weakDeinitTest2)
 
         XCTAssertEqual(0, nextCalledCount1)
@@ -241,7 +241,6 @@ class MergedObserversTests: XCTestCase {
             switch ev {
             case .Success(let value):
                 if deinitTest1 != nil {
-                    deinitTest1 = nil
                     resultValue1 = value
                     expectation1.fulfill()
                 }
@@ -264,7 +263,6 @@ class MergedObserversTests: XCTestCase {
             switch ev {
             case .Success(let value):
                 if deinitTest2 != nil {
-                    deinitTest2 = nil
                     resultValue2 = value
                 }
             case .Failure:
@@ -283,6 +281,7 @@ class MergedObserversTests: XCTestCase {
 
         waitForExpectationsWithTimeout(0.5, handler: nil)
 
+        deinitTest1 = nil
         XCTAssertNil(weakDeinitTest1)
 
         XCTAssertEqual(5, nextCalledCount1)
@@ -308,7 +307,6 @@ class MergedObserversTests: XCTestCase {
             switch ev {
             case .Success(let value):
                 if deinitTest1 != nil {
-                    deinitTest1 = nil
                     resultValue1 = value
                 }
             case .Failure:
@@ -330,7 +328,6 @@ class MergedObserversTests: XCTestCase {
             switch ev {
             case .Success(let value):
                 if deinitTest2 != nil {
-                    deinitTest2 = nil
                     resultValue2 = value
                 }
             case .Failure:
@@ -372,7 +369,6 @@ class MergedObserversTests: XCTestCase {
             switch ev {
             case .Success(let value):
                 if deinitTest1 != nil {
-                    deinitTest1 = nil
                     resultValue1 = value
                 }
             case .Failure:
@@ -394,7 +390,6 @@ class MergedObserversTests: XCTestCase {
             switch ev {
             case .Success(let value):
                 if deinitTest2 != nil {
-                    deinitTest2 = nil
                     resultValue2 = value
                 }
             case .Failure:

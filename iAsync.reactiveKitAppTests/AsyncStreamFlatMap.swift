@@ -34,10 +34,19 @@ class AsyncStreamFlatMap: XCTestCase {
         var firstResult: String?
         var secondResult: Int?
 
+        var deinitTest1: NSObject? = NSObject()
+        weak var weakDeinitTest1 = deinitTest1
+
+        var deinitTest2: NSObject? = NSObject()
+        weak var weakDeinitTest2 = deinitTest2
+
         let stream = stream1.flatMap(.Latest) { result -> AsyncStream<Int, Int, NSError> in
 
-            firstResult = result
-            return testStreamWithValue(32, next: 16)
+            if deinitTest1 != nil {
+                firstResult = result
+                return testStreamWithValue(32, next: 16)
+            }
+            fatalError()
         }
 
         let expectation = expectationWithDescription("")
@@ -46,8 +55,10 @@ class AsyncStreamFlatMap: XCTestCase {
 
             switch event {
             case .Success(let value):
-                secondResult = value
-                expectation.fulfill()
+                if deinitTest2 != nil {
+                    secondResult = value
+                    expectation.fulfill()
+                }
             case .Next(let next):
                 nexts.append(next)
             case .Failure:
@@ -55,7 +66,15 @@ class AsyncStreamFlatMap: XCTestCase {
             }
         }
 
+        XCTAssertNotNil(weakDeinitTest1)
+        XCTAssertNotNil(weakDeinitTest2)
+
         waitForExpectationsWithTimeout(0.5, handler: nil)
+
+        deinitTest1 = nil
+        deinitTest2 = nil
+        XCTAssertNil(weakDeinitTest1)
+        XCTAssertNil(weakDeinitTest2)
 
         let expectedNexts = [0,1,2,3,4,16,16]
         XCTAssertEqual(expectedNexts, nexts)
@@ -93,5 +112,14 @@ class AsyncStreamFlatMap: XCTestCase {
 
         XCTAssertEqual(numberOfObservers1, 1)
         XCTAssertEqual(numberOfObservers2, 0)
+    }
+
+    func testCancelAfterNextOfFirst() {
+    }
+
+    func testCancelAfterFirst() {
+    }
+
+    func testCancelAfterNextOfSecond() {
     }
 }

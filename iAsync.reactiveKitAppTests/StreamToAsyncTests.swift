@@ -32,10 +32,18 @@ class StreamToAsyncTests: XCTestCase {
 
         let handler = loader(progressCallback: { (progressInfo) -> () in
 
-            XCTFail()
+            if deinitTest != nil {
+                XCTFail()
+            } else {
+                XCTFail()
+            }
         }, stateCallback: { (state) -> () in
 
-            XCTFail()
+            if deinitTest != nil {
+                XCTFail()
+            } else {
+                XCTFail()
+            }
         }) { (result) -> Void in
 
             switch result {
@@ -45,7 +53,6 @@ class StreamToAsyncTests: XCTestCase {
                 XCTFail()
             case .Interrupted:
                 if deinitTest != nil {
-                    deinitTest = nil
                     testPassed = true
                 }
             case .Unsubscribed:
@@ -57,6 +64,7 @@ class StreamToAsyncTests: XCTestCase {
 
         handler(task: .Cancel)
 
+        deinitTest = nil
         XCTAssertNil(weakDeinitTest)
 
         XCTAssertTrue(testPassed)
@@ -74,10 +82,18 @@ class StreamToAsyncTests: XCTestCase {
 
         let handler = loader(progressCallback: { (progressInfo) -> () in
 
-            XCTFail()
+            if deinitTest != nil {
+                XCTFail()
+            } else {
+                XCTFail()
+            }
         }, stateCallback: { (state) -> () in
 
-            XCTFail()
+            if deinitTest != nil {
+                XCTFail()
+            } else {
+                XCTFail()
+            }
         }) { (result) -> Void in
 
             switch result {
@@ -89,7 +105,6 @@ class StreamToAsyncTests: XCTestCase {
                 XCTFail()
             case .Unsubscribed:
                 if deinitTest != nil {
-                    deinitTest = nil
                     testPassed = true
                 }
             }
@@ -99,6 +114,7 @@ class StreamToAsyncTests: XCTestCase {
 
         handler(task: .UnSubscribe)
 
+        deinitTest = nil
         XCTAssertNil(weakDeinitTest)
 
         XCTAssertTrue(testPassed)
@@ -120,17 +136,22 @@ class StreamToAsyncTests: XCTestCase {
 
             let _ = loader(progressCallback: { (next) -> () in
 
-                XCTAssertEqual(progressCalledCount, next as? Int)
-                progressCalledCount += 1
+                if deinitTest != nil {
+                    XCTAssertEqual(progressCalledCount, next as? Int)
+                    progressCalledCount += 1
+                }
             }, stateCallback: { (state) -> () in
 
-                XCTFail()
+                if deinitTest != nil {
+                    XCTFail()
+                } else {
+                    XCTFail()
+                }
             }) { (result) -> Void in
 
                 switch result {
                 case .Success(let value):
                     if deinitTest != nil {
-                        deinitTest = nil
                         resultValue = value
                         expectation.fulfill()
                     }
@@ -147,6 +168,7 @@ class StreamToAsyncTests: XCTestCase {
 
             self.waitForExpectationsWithTimeout(0.5, handler: nil)
 
+            deinitTest = nil
             XCTAssertNil(weakDeinitTest)
 
             XCTAssertEqual(5, progressCalledCount)
@@ -174,17 +196,22 @@ class StreamToAsyncTests: XCTestCase {
 
         let _ = loader(progressCallback: { (next) -> () in
 
-            XCTAssertEqual(nextCalledCount1, next as? Int)
-            nextCalledCount1 += 1
+            if deinitTest1 != nil {
+                XCTAssertEqual(nextCalledCount1, next as? Int)
+                nextCalledCount1 += 1
+            }
         }, stateCallback: { (state) -> () in
 
-            XCTFail()
+            if deinitTest1 != nil {
+                XCTFail()
+            } else {
+                XCTFail()
+            }
         }) { (result) -> Void in
 
             switch result {
             case .Success(let value):
                 if deinitTest1 != nil {
-                    deinitTest1 = nil
                     resultValue1 = value
                     expectation1.fulfill()
                 }
@@ -207,17 +234,22 @@ class StreamToAsyncTests: XCTestCase {
 
         let _ = loader(progressCallback: { (next) -> () in
 
-            XCTAssertEqual(nextCalledCount2, next as? Int)
-            nextCalledCount2 += 1
+            if deinitTest2 != nil {
+                XCTAssertEqual(nextCalledCount2, next as? Int)
+                nextCalledCount2 += 1
+            }
         }, stateCallback: { (state) -> () in
 
-            XCTFail()
+            if deinitTest2 != nil {
+                XCTFail()
+            } else {
+                XCTFail()
+            }
         }) { (result) -> Void in
 
             switch result {
             case .Success(let value):
                 if deinitTest2 != nil {
-                    deinitTest2 = nil
                     resultValue2 = value
                     expectation2.fulfill()
                 }
@@ -235,6 +267,8 @@ class StreamToAsyncTests: XCTestCase {
 
         waitForExpectationsWithTimeout(0.5, handler: nil)
 
+        deinitTest1 = nil
+        deinitTest2 = nil
         XCTAssertNil(weakDeinitTest1)
         XCTAssertNil(weakDeinitTest2)
 
