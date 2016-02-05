@@ -185,16 +185,16 @@ public extension AsyncStreamType {
         return lift { $0.throttle(seconds, on: queue) }
     }
 
-//    @warn_unused_result
-//    public func skip(count: Int) -> Operation<Value, Error> {
-//        return lift { $0.skip(count) }
-//    }
-//    
-//    @warn_unused_result
-//    public func startWith(event: Value) -> Operation<Value, Error> {
-//        return lift { $0.startWith(.Next(event)) }
-//    }
-//    
+    @warn_unused_result
+    public func skip(count: Int) -> AsyncStream<Value, Next, Error> {
+        return lift { $0.skip(count) }
+    }
+
+    @warn_unused_result
+    public func startWith(event: Next) -> AsyncStream<Value, Next, Error> {
+        return lift { $0.startWith(.Next(event)) }
+    }
+
 //    @warn_unused_result
 //    public func retry(var count: Int) -> Operation<Value, Error> {
 //        return create { observer in
