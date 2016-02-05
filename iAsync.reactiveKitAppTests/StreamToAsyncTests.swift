@@ -18,9 +18,9 @@ var numberOfObservers = 0
 
 typealias Event = AsyncEvent<String, AnyObject, NSError>
 
-private func testStream() -> Stream<AsyncEvent<String, AnyObject, NSError>> {
+private func testStream() -> AsyncStream<String, AnyObject, NSError> {
 
-    let stream = Stream(producer: { (observer: Event -> ()) -> DisposableType? in
+    let stream = AsyncStream(producer: { (observer: Event -> ()) -> DisposableType? in
 
         numberOfObservers += 1
 

@@ -11,10 +11,3 @@ import Foundation
 import iAsync_reactiveKit
 
 import ReactiveKit
-
-extension Stream : AsyncStreamType {
-
-    public typealias Value    = String
-    public typealias Progress = AnyObject
-    public typealias Error    = NSError
-}
