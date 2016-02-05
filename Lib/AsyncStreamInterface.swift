@@ -24,22 +24,17 @@ public protocol AsyncStreamInterface {
     func cancel()
 }
 
-public struct streamBuilder<T: AsyncStreamInterface> {
+public func createStream<T: AsyncStreamInterface>(factory: () -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
 
-    public typealias Factory = () -> T
+    return create(producer: { observer -> DisposableType? in
 
-    static public func createStream(factory: Factory) -> AsyncStream<T.Value, T.Next, T.Error> {
+        let obj = factory()
 
-        return create(producer: { observer -> DisposableType? in
+        obj.asyncWithCallbacks(
+            success: { observer(.Success($0)) },
+            next   : { observer(.Next($0))    },
+            error  : { observer(.Failure($0)) })
 
-            let obj = factory()
-
-            obj.asyncWithCallbacks(
-                success: { observer(.Success($0)) },
-                next   : { observer(.Next($0))    },
-                error  : { observer(.Failure($0)) })
-
-            return BlockDisposable { obj.cancel() }
-        })
-    }
+        return BlockDisposable { obj.cancel() }
+    })
 }
