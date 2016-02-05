@@ -84,6 +84,7 @@ strip_invalid_archs() {
 
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
+  install_framework "Pods-iAsync.reactiveKitAppTests/ReactiveCocoa.framework"
   install_framework "Pods-iAsync.reactiveKitAppTests/ReactiveKit.framework"
   install_framework "Pods-iAsync.reactiveKitAppTests/Result.framework"
   install_framework "Pods-iAsync.reactiveKitAppTests/iAsync_async.framework"
@@ -91,6 +92,7 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "Pods-iAsync.reactiveKitAppTests/iAsync_utils.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
+  install_framework "Pods-iAsync.reactiveKitAppTests/ReactiveCocoa.framework"
   install_framework "Pods-iAsync.reactiveKitAppTests/ReactiveKit.framework"
   install_framework "Pods-iAsync.reactiveKitAppTests/Result.framework"
   install_framework "Pods-iAsync.reactiveKitAppTests/iAsync_async.framework"
