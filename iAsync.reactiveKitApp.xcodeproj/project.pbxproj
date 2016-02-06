@@ -19,7 +19,7 @@
 		C363040A1C64A1BB00521989 /* StreamToAsyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35E4D2E1C63D7F100AB0981 /* StreamToAsyncTests.swift */; };
 		C363040B1C64A1BB00521989 /* AsyncToStreamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F933341C63DF1200F42309 /* AsyncToStreamTests.swift */; };
 		C374B6861C6405990060DBCD /* TestCommons.swift in Sources */ = {isa = PBXBuildFile; fileRef = C374B6851C6405990060DBCD /* TestCommons.swift */; };
-		C390FBAD1C6529E800147280 /* AsyncStreamFlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = C390FBAC1C6529E800147280 /* AsyncStreamFlatMap.swift */; };
+		C390FBAD1C6529E800147280 /* AsyncStreamFlatMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C390FBAC1C6529E800147280 /* AsyncStreamFlatMapTests.swift */; };
 		C3B0C7D11C662CCB0043D5CC /* AsyncStreamWithJobTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3B0C7D01C662CCB0043D5CC /* AsyncStreamWithJobTests.swift */; };
 		C3D519581C66015600628BAC /* MergedAsyncStreamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D519571C66015600628BAC /* MergedAsyncStreamTests.swift */; };
 /* End PBXBuildFile section */
@@ -61,7 +61,7 @@
 		C35E4D311C63D84100AB0981 /* iAsync.reactiveKit.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; name = iAsync.reactiveKit.podspec; path = Pods/../iAsync.reactiveKit.podspec; sourceTree = "<group>"; };
 		C36304081C649FC200521989 /* MergedObserversTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MergedObserversTests.swift; sourceTree = "<group>"; };
 		C374B6851C6405990060DBCD /* TestCommons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestCommons.swift; sourceTree = "<group>"; };
-		C390FBAC1C6529E800147280 /* AsyncStreamFlatMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncStreamFlatMap.swift; sourceTree = "<group>"; };
+		C390FBAC1C6529E800147280 /* AsyncStreamFlatMapTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncStreamFlatMapTests.swift; sourceTree = "<group>"; };
 		C3B0C7D01C662CCB0043D5CC /* AsyncStreamWithJobTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncStreamWithJobTests.swift; sourceTree = "<group>"; };
 		C3D519571C66015600628BAC /* MergedAsyncStreamTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MergedAsyncStreamTests.swift; sourceTree = "<group>"; };
 		C3F933341C63DF1200F42309 /* AsyncToStreamTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncToStreamTests.swift; sourceTree = "<group>"; };
@@ -140,7 +140,7 @@
 				C35E4D2E1C63D7F100AB0981 /* StreamToAsyncTests.swift */,
 				C3F933341C63DF1200F42309 /* AsyncToStreamTests.swift */,
 				C36304081C649FC200521989 /* MergedObserversTests.swift */,
-				C390FBAC1C6529E800147280 /* AsyncStreamFlatMap.swift */,
+				C390FBAC1C6529E800147280 /* AsyncStreamFlatMapTests.swift */,
 				C3D519571C66015600628BAC /* MergedAsyncStreamTests.swift */,
 				C3B0C7D01C662CCB0043D5CC /* AsyncStreamWithJobTests.swift */,
 				C35E4D171C63D76300AB0981 /* Info.plist */,
@@ -420,7 +420,7 @@
 				C363040A1C64A1BB00521989 /* StreamToAsyncTests.swift in Sources */,
 				C3B0C7D11C662CCB0043D5CC /* AsyncStreamWithJobTests.swift in Sources */,
 				C3D519581C66015600628BAC /* MergedAsyncStreamTests.swift in Sources */,
-				C390FBAD1C6529E800147280 /* AsyncStreamFlatMap.swift in Sources */,
+				C390FBAD1C6529E800147280 /* AsyncStreamFlatMapTests.swift in Sources */,
 				C36304091C649FC200521989 /* MergedObserversTests.swift in Sources */,
 				C363040B1C64A1BB00521989 /* AsyncToStreamTests.swift in Sources */,
 			);

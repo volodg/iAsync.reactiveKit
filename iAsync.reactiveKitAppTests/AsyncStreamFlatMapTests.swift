@@ -1,5 +1,5 @@
 //
-//  AsyncStreamFlatMap.swift
+//  AsyncStreamFlatMapTests.swift
 //  iAsync.reactiveKitApp
 //
 //  Created by Gorbenko Vladimir on 05/02/16.
@@ -12,18 +12,13 @@ import iAsync_reactiveKit
 
 import ReactiveKit
 
-class AsyncStreamFlatMap: XCTestCase {
+class AsyncStreamFlatMapTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
 
         numberOfObservers1 = 0
         numberOfObservers2 = 0
-    }
-
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
     }
 
     func testNormalBehaviour() {

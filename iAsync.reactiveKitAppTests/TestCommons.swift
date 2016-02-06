@@ -26,7 +26,7 @@ func testStream() -> AsyncStream<String, Int, NSError> {
 
         var next = 0
 
-        let cancel = Timer.sharedByThreadTimer().addBlock({ (cancel) -> Void in
+        let cancel = Timer.sharedByThreadTimer().addBlock({ cancel -> Void in
 
             if next == 5 {
                 cancel()
@@ -41,9 +41,7 @@ func testStream() -> AsyncStream<String, Int, NSError> {
             next += 1
         }, duration: 0.01)
 
-        return BlockDisposable({ () -> () in
-            cancel()
-        })
+        return BlockDisposable(cancel)
     })
 
     return stream

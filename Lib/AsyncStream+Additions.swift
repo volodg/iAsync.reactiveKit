@@ -235,7 +235,7 @@ public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Err
 
 public extension AsyncStreamType where Self.Next == AnyObject {
 
-    public func streamToAsync() -> AsyncTypes<Self.Value, Self.Error>.Async {
+    public func toAsync() -> AsyncTypes<Self.Value, Self.Error>.Async {
 
         return { (
             progressCallback: AsyncProgressCallback?,

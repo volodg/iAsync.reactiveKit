@@ -70,17 +70,28 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         return stream.observe(on: context, observer: observer)
     }
 
-    public static func succeeded(with value: Value) -> Operation<Value, Error> {
+    public static func succeeded(with value: Value) -> AsyncStream<Value, Next, Error> {
         return create { observer in
-            observer.next(value)
-            observer.success()
+            observer(.Success(value))
             return nil
         }
     }
 
-    public static func failed(with error: Error) -> Operation<Value, Error> {
+    public static func succeededAfter(delay delay: NSTimeInterval, with value: Value) -> AsyncStream<Value, Next, Error> {
         return create { observer in
-            observer.failure(error)
+
+            let cancel = Timer.sharedByThreadTimer().addBlock({ cancel -> Void in
+                cancel()
+                observer(.Success(value))
+            }, duration: delay)
+
+            return BlockDisposable(cancel)
+        }
+    }
+
+    public static func failed(with error: Error) -> AsyncStream<Value, Next, Error> {
+        return create { observer in
+            observer(.Failure(error))
             return nil
         }
     }
@@ -202,36 +213,74 @@ public extension AsyncStreamType {
         return lift { $0.startWith(.Next(event)) }
     }
 
+    //TODO test
     @warn_unused_result
-    public func retry(var count: Int) -> AsyncStream<Value, Next, Error> {
+    public func retry(var count: Int, delay: NSTimeInterval? = nil, until: Result<Value, Error> -> Bool) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             let serialDisposable = SerialDisposable(otherDisposable: nil)
 
             var attempt: (() -> Void)?
 
-            attempt = {
-                serialDisposable.otherDisposable?.dispose()
-                serialDisposable.otherDisposable = self.observe(on: nil) { event in
-                    switch event {
-                    case .Failure(let error):
-                        if count > 0 {
-                            count -= 1
-                            attempt?()
-                        } else {
-                            observer(.Failure(error))
-                        }
-                    default:
+            let observer = { (event: AsyncEvent<Value, Next, Error>) -> Void in
+
+                let rertyOrFinish = { (result: Result<Value, Error>) in
+                    if !until(result) && count > 0 {
+                        count -= 1
+                        attempt?()
+                    } else {
+                        attempt = nil
                         observer(event)
                     }
                 }
+
+                switch event {
+                case .Failure(let error):
+                    rertyOrFinish(.Failure(error))
+                case .Success(let value):
+                    rertyOrFinish(.Success(value))
+                case .Next:
+                    observer(event)
+                }
             }
 
-            attempt?()
+            attempt = {
+                let delayStream: AsyncStream<Void, Next, Error>
+                if let delay = delay {
+                    delayStream = AsyncStream<Void, Next, Error>.succeededAfter(delay: delay, with: ())
+                } else {
+                    delayStream = AsyncStream<Void, Next, Error>.succeeded(with: ())
+                }
+
+                serialDisposable.otherDisposable?.dispose()
+                serialDisposable.otherDisposable = nil
+                let dispose = delayStream.flatMap(.Latest) { self }.observe(on: nil, observer: observer)
+                if serialDisposable.otherDisposable == nil {
+                    serialDisposable.otherDisposable = dispose
+                }
+            }
+
+            let dispose = self.observe(on: nil, observer: observer)
+            if serialDisposable.otherDisposable == nil {
+                serialDisposable.otherDisposable = dispose
+            }
+
             return BlockDisposable {
                 serialDisposable.dispose()
                 attempt = nil
             }
         }
+    }
+
+    public func retry(count: Int) -> AsyncStream<Value, Next, Error> {
+
+        return retry(count, until: { result -> Bool in
+            switch result {
+            case .Failure:
+                return false
+            default:
+                return true
+            }
+        })
     }
 
 //    @warn_unused_result
@@ -338,11 +387,11 @@ public extension AsyncStreamType {
 //                observer.observer(event.map { value in
 //                    scanned = combine(scanned, value)
 //                    return scanned
-//                    })
+//                })
 //            }
 //        }
 //    }
-//    
+//
 //    @warn_unused_result
 //    public func reduce<U>(initial: U, _ combine: (U, Value) -> U) -> Operation<U, Error> {
 //        return Operation<U, Error> { observer in
@@ -362,20 +411,11 @@ public extension AsyncStreamType {
         return create { observer in
             let queue = Queue(name: "com.ReactiveKit.ReactiveKit.Operation.CombineLatestWith")
 
-            var latestSelfValue : Value! = nil
-            var latestOtherValue: S.Value! = nil
-
             var latestSelfNext : Next? = nil
             var latestOtherNext: S.Next? = nil
 
             var latestSelfEvent : AsyncEvent<Value, Next, Error>! = nil
             var latestOtherEvent: AsyncEvent<S.Value, S.Next, S.Error>! = nil
-
-            let dispatchSuccessIfPossible = { () -> () in
-                if let latestSelfValue = latestSelfValue, latestOtherValue = latestOtherValue {
-                    observer(.Success(latestSelfValue, latestOtherValue))
-                }
-            }
 
             let dispatchNextIfPossible = { () -> () in
                 if latestSelfNext != nil || latestOtherNext != nil {
@@ -430,7 +470,7 @@ public extension AsyncStreamType {
             return CompositeDisposable([selfDisposable, otherDisposable])
         }
     }
-    
+
 //    @warn_unused_result
 //    public func zipWith<S: OperationType where S.Error == Error>(other: S) -> Operation<(Value, S.Value), Error> {
 //        return create { observer in
@@ -668,7 +708,7 @@ public extension AsyncStreamType {
 //    public func flatMapError<T: OperationType where T.Value == Value>(recover: Error -> T) -> Operation<T.Value, T.Error> {
 //        return create { observer in
 //            let serialDisposable = SerialDisposable(otherDisposable: nil)
-//            
+//
 //            serialDisposable.otherDisposable = self.observe(on: nil) { taskEvent in
 //                switch taskEvent {
 //                case .Next(let value):

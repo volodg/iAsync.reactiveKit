@@ -39,9 +39,9 @@ public func createStream<T: AsyncStreamInterface>(factory: () -> T) -> AsyncStre
         let obj = factory()
 
         obj.asyncWithCallbacks(
-            success: { notifyOnce(.Success($0)) },
-            next   : { observerHolder?(.Next($0))    },
-            error  : { notifyOnce(.Failure($0)) })
+            success: { notifyOnce(.Success($0))   },
+            next   : { observerHolder?(.Next($0)) },
+            error  : { notifyOnce(.Failure($0))   })
 
         return BlockDisposable { observerHolder = nil; obj.cancel() }
     })

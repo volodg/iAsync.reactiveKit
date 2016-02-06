@@ -36,6 +36,11 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
 
             let dispose = SerialDisposable(otherDisposable: resultStream.observe(observer: observer))
 
+            //TODO test - when immediately finished
+            if self.streamsByKey[key] == nil {
+                return nil
+            }
+
             var disposes: [SerialDisposable]
             if let disposes_ = self.disposesByKey[key] {
                 disposes = disposes_ + [dispose]
