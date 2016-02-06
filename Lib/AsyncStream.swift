@@ -741,16 +741,16 @@ public func zip<A: AsyncStreamType, B: AsyncStreamType where A.Error == B.Error>
     return a.zipWith(b)
 }
 
-//@warn_unused_result
-//public func combineLatest<A: OperationType, B: OperationType, C: OperationType where A.Error == B.Error, A.Error == C.Error>(a: A, _ b: B, _ c: C) -> Operation<(A.Value, B.Value, C.Value), A.Error> {
-//    return combineLatest(a, b).combineLatestWith(c).map { ($0.0, $0.1, $1) }
-//}
-//
-//@warn_unused_result
-//public func zip<A: OperationType, B: OperationType, C: OperationType where A.Error == B.Error, A.Error == C.Error>(a: A, _ b: B, _ c: C) -> Operation<(A.Value, B.Value, C.Value), A.Error> {
-//    return zip(a, b).zipWith(c).map { ($0.0, $0.1, $1) }
-//}
-//
+@warn_unused_result
+public func combineLatest<A: AsyncStreamType, B: AsyncStreamType, C: AsyncStreamType where A.Error == B.Error, A.Error == C.Error>(a: A, _ b: B, _ c: C) -> AsyncStream<(A.Value, B.Value, C.Value), (A.Next?, B.Next?, C.Next?), A.Error> {
+    return combineLatest(a, b).combineLatestWith(c).mapNext { ($0?.0, $0?.1, $1) }.map { ($0.0, $0.1, $1) }
+}
+
+@warn_unused_result
+public func zip<A: AsyncStreamType, B: AsyncStreamType, C: AsyncStreamType where A.Error == B.Error, A.Error == C.Error>(a: A, _ b: B, _ c: C) -> AsyncStream<(A.Value, B.Value, C.Value), (A.Next?, B.Next?, C.Next?), A.Error> {
+    return zip(a, b).zipWith(c).mapNext { ($0.0, $0.1, $1) }.map { ($0.0, $0.1, $1) }
+}
+
 //@warn_unused_result
 //public func combineLatest<A: OperationType, B: OperationType, C: OperationType, D: OperationType where A.Error == B.Error, A.Error == C.Error, A.Error == D.Error>(a: A, _ b: B, _ c: C, _ d: D) -> Operation<(A.Value, B.Value, C.Value, D.Value), A.Error> {
 //    return combineLatest(a, b, c).combineLatestWith(d).map { ($0.0, $0.1, $0.2, $1) }
