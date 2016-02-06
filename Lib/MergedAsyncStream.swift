@@ -14,7 +14,8 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
 
     public init() {}
 
-    private var streamsByKey = [Key:AsyncStream<Value, Next, Error>]()
+    private var streamsByKey  = [Key:AsyncStream<Value, Next, Error>]()
+    private var disposesByKey = [Key:[SerialDisposable]]()
 
     public func mergedStream<T: AsyncStreamType where T.Value == Value, T.Next == Next, T.Error == Error>
         (factory: () -> T, key: Key) -> AsyncStream<Value, Next, Error> {
@@ -28,11 +29,39 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
             } else {
                 resultStream = factory().on(completed: { () -> Void in
                     self.streamsByKey.removeValueForKey(key)
+                    self.disposesByKey.removeValueForKey(key)
                 }).mergedObservers()
                 self.streamsByKey[key] = resultStream
             }
 
-            return resultStream.observe(observer: observer)
+            let dispose = SerialDisposable(otherDisposable: resultStream.observe(observer: observer))
+
+            var disposes: [SerialDisposable]
+            if let disposes_ = self.disposesByKey[key] {
+                disposes = disposes_ + [dispose]
+            } else {
+                disposes = [dispose]
+            }
+            self.disposesByKey[key] = disposes
+
+            return BlockDisposable { () -> Void in
+
+                self.streamsByKey.removeValueForKey(key)
+
+                if var disposes_ = self.disposesByKey[key] {
+                    for (index, dispose_) in disposes_.enumerate() {
+                        if dispose_ === dispose {
+                            disposes_.removeAtIndex(index)
+                            if disposes_.isEmpty {
+                                self.disposesByKey.removeValueForKey(key)
+                            }
+                            break
+                        }
+                    }
+                }
+
+                dispose.dispose()
+            }
         })
     }
 }

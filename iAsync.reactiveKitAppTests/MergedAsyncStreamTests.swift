@@ -8,6 +8,12 @@
 
 import XCTest
 
+import iAsync_reactiveKit
+
+import ReactiveKit
+
+typealias MergerType = MergedAsyncStream<String, String, Int, NSError>
+
 class MergedAsyncStreamTests: XCTestCase {
 
     override func setUp() {
@@ -15,16 +21,21 @@ class MergedAsyncStreamTests: XCTestCase {
         numberOfObservers1 = 0
     }
 
+    //TODO use merger
     func testDisposeStream() {
 
-        let stream = testStream()
-
-        weak var weakDeinitTest: NSObject? = nil
+        weak var weakDeinitTest: NSObject?
+        weak var weakMerger: MergerType?
 
         autoreleasepool {
 
             let deinitTest = NSObject()
             weakDeinitTest = deinitTest
+
+            let merger = MergerType()
+            weakMerger = merger
+
+            let stream = merger.mergedStream({ testStream() }, key: "1")
 
             let dispose = stream.observe { result -> Void in
 
@@ -37,9 +48,11 @@ class MergedAsyncStreamTests: XCTestCase {
             XCTAssertNotNil(weakDeinitTest)
         }
 
+        XCTAssertNil(weakMerger)
         XCTAssertNil(weakDeinitTest)
     }
-    
+
+    //TODO use merger
     func testNormalFinishStream() {
 
         let stream = testStream()
@@ -89,7 +102,8 @@ class MergedAsyncStreamTests: XCTestCase {
         testFunc(1)
         testFunc(2)
     }
-    
+
+    //TODO use merger
     func testNumberOfStream() {
 
         let stream = testStream()
