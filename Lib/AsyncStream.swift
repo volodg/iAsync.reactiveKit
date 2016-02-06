@@ -60,7 +60,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
             }
 
             return BlockDisposable { () -> Void in
-                observerHolder = nil
+                //observerHolder = nil
                 dispose?.dispose()
             }
         }
