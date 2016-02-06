@@ -1,87 +1,23 @@
 //
-//  AsyncToStreamTests.swift
+//  MergedAsyncStreamTests.swift
 //  iAsync.reactiveKitApp
 //
-//  Created by Gorbenko Vladimir on 04/02/16.
+//  Created by Gorbenko Vladimir on 06/02/16.
 //  Copyright © 2016 EmbeddedSystems. All rights reserved.
 //
 
 import XCTest
 
-import iAsync_async
-import iAsync_utils
-import iAsync_reactiveKit
-
-import ReactiveKit
-
-var numberOfAsyncs = 0
-
-private func testAsync() -> AsyncTypes<String, NSError>.Async {
-
-    return { (
-        progressCallback: AsyncProgressCallback?,
-        stateCallback   : AsyncChangeStateCallback?,
-        finishCallback  : AsyncTypes<String, NSError>.DidFinishAsyncCallback?) -> AsyncHandler in
-
-        numberOfAsyncs += 1
-
-        var next = 0
-
-        var progressCallbackHolder = progressCallback
-        var finishCallbackHolder   = finishCallback
-
-        let cancel = Timer.sharedByThreadTimer().addBlock({ (cancel) -> Void in
-
-            if next == 5 {
-                cancel()
-                if let finishCallback = finishCallbackHolder {
-                    progressCallbackHolder = nil
-                    finishCallbackHolder   = nil
-                    finishCallback(result: .Success("ok"))
-                }
-            }
-
-            progressCallbackHolder?(progressInfo: next)
-            next += 1
-        }, duration: 0.01)
-
-        return { (task: AsyncHandlerTask) -> Void in
-
-            switch task {
-            case .Cancel:
-                cancel()
-                if let finishCallback = finishCallbackHolder {
-                    progressCallbackHolder = nil
-                    finishCallbackHolder   = nil
-                    finishCallback(result: .Interrupted)
-                }
-            case .UnSubscribe:
-                cancel()
-                if let finishCallback = finishCallbackHolder {
-                    progressCallbackHolder = nil
-                    finishCallbackHolder   = nil
-                    finishCallback(result: .Unsubscribed)
-                }
-            case .Resume:
-                fatalError()
-            case .Suspend:
-                fatalError()
-            }
-        }
-    }
-}
-
-class AsyncToStreamTests: XCTestCase {
+class MergedAsyncStreamTests: XCTestCase {
 
     override func setUp() {
 
-        numberOfAsyncs = 0
+        numberOfObservers1 = 0
     }
 
     func testDisposeStream() {
 
-        let loader = testAsync()
-        let stream = asyncToStream(loader)
+        let stream = testStream()
 
         weak var weakDeinitTest: NSObject? = nil
 
@@ -103,11 +39,10 @@ class AsyncToStreamTests: XCTestCase {
 
         XCTAssertNil(weakDeinitTest)
     }
-
+    
     func testNormalFinishStream() {
 
-        let loader = testAsync()
-        let stream = asyncToStream(loader)
+        let stream = testStream()
 
         let testFunc = { (numberOfCalls: Int) -> Void in
 
@@ -133,7 +68,7 @@ class AsyncToStreamTests: XCTestCase {
                     case .Failure:
                         XCTFail()
                     case .Next(let next):
-                        XCTAssertEqual(progressCalledCount, next as? Int)
+                        XCTAssertEqual(progressCalledCount, next)
                         progressCalledCount += 1
                     }
                 }
@@ -148,17 +83,16 @@ class AsyncToStreamTests: XCTestCase {
             XCTAssertEqual(5, progressCalledCount)
             XCTAssertEqual("ok", resultValue)
 
-            XCTAssertEqual(numberOfCalls, numberOfAsyncs)
+            XCTAssertEqual(numberOfCalls, numberOfObservers1)
         }
 
         testFunc(1)
         testFunc(2)
     }
-
+    
     func testNumberOfStream() {
 
-        let loader = testAsync()
-        let stream = asyncToStream(loader)
+        let stream = testStream()
 
         var nextCalledCount1 = 0
         var resultValue1: String?
@@ -186,7 +120,7 @@ class AsyncToStreamTests: XCTestCase {
                 case .Failure:
                     XCTFail()
                 case .Next(let next):
-                    XCTAssertEqual(nextCalledCount1, next as? Int)
+                    XCTAssertEqual(nextCalledCount1, next)
                     nextCalledCount1 += 1
                 }
             }
@@ -206,7 +140,7 @@ class AsyncToStreamTests: XCTestCase {
                 case .Failure:
                     XCTFail()
                 case .Next(let next):
-                    XCTAssertEqual(nextCalledCount2, next as? Int)
+                    XCTAssertEqual(nextCalledCount2, next)
                     nextCalledCount2 += 1
                 }
             }
@@ -225,6 +159,6 @@ class AsyncToStreamTests: XCTestCase {
         XCTAssertEqual("ok", resultValue1)
         XCTAssertEqual("ok", resultValue2)
 
-        XCTAssertEqual(2, numberOfAsyncs)
+        XCTAssertEqual(2, numberOfObservers1)
     }
 }
