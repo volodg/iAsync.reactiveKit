@@ -215,7 +215,7 @@ public extension AsyncStreamType {
                     switch event {
                     case .Failure(let error):
                         if count > 0 {
-                            count--
+                            count -= 1
                             attempt?()
                         } else {
                             observer(.Failure(error))
@@ -355,71 +355,81 @@ public extension AsyncStreamType {
 //    public func collect() -> Operation<[Value], Error> {
 //        return reduce([], { memo, new in memo + [new] })
 //    }
-//    
-//    @warn_unused_result
-//    public func combineLatestWith<S: OperationType where S.Error == Error>(other: S) -> Operation<(Value, S.Value), Error> {
-//        return create { observer in
-//            let queue = Queue(name: "com.ReactiveKit.ReactiveKit.Operation.CombineLatestWith")
-//            
-//            var latestSelfValue: Value! = nil
-//            var latestOtherValue: S.Value! = nil
-//            
-//            var latestSelfEvent: OperationEvent<Value, Error>! = nil
-//            var latestOtherEvent: OperationEvent<S.Value, S.Error>! = nil
-//            
-//            let dispatchNextIfPossible = { () -> () in
-//                if let latestSelfValue = latestSelfValue, latestOtherValue = latestOtherValue {
-//                    observer.next(latestSelfValue, latestOtherValue)
-//                }
-//            }
-//            
-//            let onBoth = { () -> () in
-//                if let latestSelfEvent = latestSelfEvent, let latestOtherEvent = latestOtherEvent {
-//                    switch (latestSelfEvent, latestOtherEvent) {
-//                    case (.Success, .Success):
-//                        observer.success()
-//                    case (.Next(let selfValue), .Next(let otherValue)):
-//                        latestSelfValue = selfValue
-//                        latestOtherValue = otherValue
-//                        dispatchNextIfPossible()
-//                    case (.Next(let selfValue), .Success):
-//                        latestSelfValue = selfValue
-//                        dispatchNextIfPossible()
-//                    case (.Success, .Next(let otherValue)):
-//                        latestOtherValue = otherValue
-//                        dispatchNextIfPossible()
-//                    default:
-//                        dispatchNextIfPossible()
-//                    }
-//                }
-//            }
-//            
-//            let selfDisposable = self.observe(on: nil) { event in
-//                if case .Failure(let error) = event {
-//                    observer.failure(error)
-//                } else {
-//                    queue.sync {
-//                        latestSelfEvent = event
-//                        onBoth()
-//                    }
-//                }
-//            }
-//            
-//            let otherDisposable = other.observe(on: nil) { event in
-//                if case .Failure(let error) = event {
-//                    observer.failure(error)
-//                } else {
-//                    queue.sync {
-//                        latestOtherEvent = event
-//                        onBoth()
-//                    }
-//                }
-//            }
-//            
-//            return CompositeDisposable([selfDisposable, otherDisposable])
-//        }
-//    }
-//    
+
+    @warn_unused_result
+    public func combineLatestWith<S: AsyncStreamType where S.Error == Error>(other: S) -> AsyncStream<(Value, S.Value), (Next?, S.Next?), Error> {
+        return create { observer in
+            let queue = Queue(name: "com.ReactiveKit.ReactiveKit.Operation.CombineLatestWith")
+
+            var latestSelfValue : Value! = nil
+            var latestOtherValue: S.Value! = nil
+
+            var latestSelfNext : Next? = nil
+            var latestOtherNext: S.Next? = nil
+
+            var latestSelfEvent : AsyncEvent<Value, Next, Error>! = nil
+            var latestOtherEvent: AsyncEvent<S.Value, S.Next, S.Error>! = nil
+
+            let dispatchSuccessIfPossible = { () -> () in
+                if let latestSelfValue = latestSelfValue, latestOtherValue = latestOtherValue {
+                    observer(.Success(latestSelfValue, latestOtherValue))
+                }
+            }
+
+            let dispatchNextIfPossible = { () -> () in
+                if latestSelfNext != nil || latestOtherNext != nil {
+                    let next = (latestSelfNext, latestOtherNext)
+                    observer(.Next(next))
+                }
+            }
+
+            let onBoth = { () -> () in
+                if latestSelfEvent != nil || latestOtherEvent != nil {
+                    switch (latestSelfEvent, latestOtherEvent) {
+                    case (.Some(.Success(let selfValue)), .Some(.Success(let otherValue))):
+                        observer(.Success(selfValue, otherValue))
+                    case (.Some(.Next(let selfNext)), .Some(.Next(let otherNext))):
+                        latestSelfNext  = selfNext
+                        latestOtherNext = otherNext
+                        dispatchNextIfPossible()
+                    case (.Some(.Next(let selfNext)), _):
+                        latestSelfNext = selfNext
+                        dispatchNextIfPossible()
+                    case (_, .Some(.Next(let otherNext))):
+                        latestOtherNext = otherNext
+                        dispatchNextIfPossible()
+                    default:
+                        dispatchNextIfPossible()
+                    }
+                }
+            }
+
+            let selfDisposable = self.observe(on: nil) { event in
+                if case .Failure(let error) = event {
+                    observer(.Failure(error))
+                } else {
+                    queue.sync {
+                        latestSelfEvent = event
+                        onBoth()
+                    }
+                }
+            }
+
+            let otherDisposable = other.observe(on: nil) { event in
+                if case .Failure(let error) = event {
+                    observer(.Failure(error))
+                } else {
+                    queue.sync {
+                        latestOtherEvent = event
+                        onBoth()
+                    }
+                }
+            }
+
+            return CompositeDisposable([selfDisposable, otherDisposable])
+        }
+    }
+    
 //    @warn_unused_result
 //    public func zipWith<S: OperationType where S.Error == Error>(other: S) -> Operation<(Value, S.Value), Error> {
 //        return create { observer in
@@ -676,11 +686,11 @@ public extension AsyncStreamType {
 //    }
 }
 
-//@warn_unused_result
-//public func combineLatest<A: OperationType, B: OperationType where A.Error == B.Error>(a: A, _ b: B) -> Operation<(A.Value, B.Value), A.Error> {
-//    return a.combineLatestWith(b)
-//}
-//
+@warn_unused_result
+public func combineLatest<A: AsyncStreamType, B: AsyncStreamType where A.Error == B.Error>(a: A, _ b: B) -> AsyncStream<(A.Value, B.Value), (A.Next?, B.Next?), A.Error> {
+    return a.combineLatestWith(b)
+}
+
 //@warn_unused_result
 //public func zip<A: OperationType, B: OperationType where A.Error == B.Error>(a: A, _ b: B) -> Operation<(A.Value, B.Value), A.Error> {
 //    return a.zipWith(b)
