@@ -21,10 +21,13 @@ class MergedAsyncStreamTests: XCTestCase {
         numberOfObservers1 = 0
     }
 
-    func testDisposeStream() {
+    func testDisposeBothStream() {
 
         weak var weakDeinitTest: NSObject?
         weak var weakMerger: MergerType?
+
+        var disposeCount1 = 0
+        var disposeCount2 = 0
 
         autoreleasepool {
 
@@ -34,8 +37,24 @@ class MergedAsyncStreamTests: XCTestCase {
             let merger = MergerType()
             weakMerger = merger
 
-            let stream1 = merger.mergedStream({ testStream() }, key: "1")
-            let stream2 = merger.mergedStream({ testStream() }, key: "2")
+            let stream1 = merger.mergedStream({ () -> AsyncStream<String, Int, NSError> in
+                return create(producer: { observer -> DisposableType? in
+                    let dispose = testStream().observe(observer: observer)
+                    return BlockDisposable {
+                        disposeCount1 += 1
+                        dispose.dispose()
+                    }
+                })
+            }, key: "1")
+            let stream2 = merger.mergedStream({ () -> AsyncStream<String, Int, NSError> in
+                return create(producer: { observer -> DisposableType? in
+                    let dispose = testStream().observe(observer: observer)
+                    return BlockDisposable {
+                        disposeCount2 += 1
+                        dispose.dispose()
+                    }
+                })
+            }, key: "2")
 
             let dispose1 = stream1.observe { result -> Void in
 
@@ -59,6 +78,9 @@ class MergedAsyncStreamTests: XCTestCase {
 
             XCTAssertNotNil(weakDeinitTest)
         }
+
+        XCTAssertEqual(1, disposeCount1)
+        XCTAssertEqual(1, disposeCount2)
 
         XCTAssertNil(weakMerger)
         XCTAssertNil(weakDeinitTest)
@@ -103,7 +125,7 @@ class MergedAsyncStreamTests: XCTestCase {
                 }
             }
             stream.observe { ev -> Void in
-                
+
                 switch ev {
                 case .Success(let value):
                     deinitTest.description
@@ -137,6 +159,7 @@ class MergedAsyncStreamTests: XCTestCase {
     func testDisposeFirstStreamImmediately() {
 
         var progressCalledCount2 = 0
+        var disposeCount = 0
         var resultValue2: String?
 
         weak var weakDeinitTest: NSObject? = nil
@@ -150,7 +173,15 @@ class MergedAsyncStreamTests: XCTestCase {
             let merger = MergerType()
             weakMerger = merger
 
-            let stream = merger.mergedStream({ testStream() }, key: "1")
+            let stream = merger.mergedStream({ () -> AsyncStream<String, Int, NSError> in
+                return create(producer: { observer -> DisposableType? in
+                    let dispose = testStream().observe(observer: observer)
+                    return BlockDisposable {
+                        disposeCount += 1
+                        dispose.dispose()
+                    }
+                })
+            }, key: "1")
 
             let expectation2 = self.expectationWithDescription("")
 
@@ -186,18 +217,19 @@ class MergedAsyncStreamTests: XCTestCase {
         XCTAssertNil(weakMerger)
 
         XCTAssertEqual(5, progressCalledCount2)
+        XCTAssertEqual(1, disposeCount)
         XCTAssertEqual("ok", resultValue2)
 
         XCTAssertEqual(numberOfObservers1, 2)
     }
 
     func testDisposeFirstStreamOnNext() {
-    }
-
-    func testDisposeSecondStreamImmediately() {
 
         var progressCalledCount1 = 0
-        var resultValue1: String?
+
+        var progressCalledCount2 = 0
+        var resultValue2: String?
+        var disposeCount = 0
 
         weak var weakDeinitTest: NSObject? = nil
         weak var weakMerger: MergerType?
@@ -210,7 +242,100 @@ class MergedAsyncStreamTests: XCTestCase {
             let merger = MergerType()
             weakMerger = merger
 
-            let stream = merger.mergedStream({ testStream() }, key: "1")
+            let stream = merger.mergedStream({ () -> AsyncStream<String, Int, NSError> in
+                return create(producer: { observer -> DisposableType? in
+                    let dispose = testStream().observe(observer: observer)
+                    return BlockDisposable {
+                        disposeCount += 1
+                        dispose.dispose()
+                    }
+                })
+            }, key: "1")
+
+            let expectation1 = self.expectationWithDescription("")
+            let expectation2 = self.expectationWithDescription("")
+
+            var dispose: DisposableType?
+
+            dispose = stream.observe { ev -> Void in
+
+                deinitTest.description
+
+                switch ev {
+                case .Success:
+                    XCTFail()
+                case .Failure:
+                    XCTFail()
+                case .Next(let next):
+                    XCTAssertEqual(progressCalledCount1, next)
+                    progressCalledCount1 += 1
+
+                    if next == 2 {
+                        dispose?.dispose()
+                        expectation1.fulfill()
+                        return
+                    }
+                }
+            }
+            stream.observe { ev -> Void in
+
+                switch ev {
+                case .Success(let value):
+                    deinitTest.description
+                    resultValue2 = value
+                    expectation2.fulfill()
+                case .Failure:
+                    XCTFail()
+                case .Next(let next):
+                    XCTAssertEqual(progressCalledCount2, next)
+                    progressCalledCount2 += 1
+                }
+            }
+
+            XCTAssertNotNil(weakDeinitTest)
+
+            self.waitForExpectationsWithTimeout(0.5, handler: nil)
+        }
+
+        XCTAssertNil(weakDeinitTest)
+        XCTAssertNil(weakMerger)
+
+        XCTAssertEqual(3, progressCalledCount1)
+        XCTAssertEqual(0, disposeCount)
+
+        XCTAssertEqual(5, progressCalledCount2)
+        XCTAssertEqual("ok", resultValue2)
+
+        XCTAssertEqual(numberOfObservers1, 1)
+    }
+
+    func testDisposeSecondStreamImmediately() {
+
+        var progressCalledCount1 = 0
+        var resultValue1: String?
+
+        weak var weakDeinitTest: NSObject? = nil
+        weak var weakMerger: MergerType?
+
+        var disposeCount = 0
+
+        autoreleasepool {
+
+            let deinitTest = NSObject()
+            weakDeinitTest = deinitTest
+
+            let merger = MergerType()
+            weakMerger = merger
+
+            let stream = merger.mergedStream({ () -> AsyncStream<String, Int, NSError> in
+                return create(producer: { observer -> DisposableType? in
+                    let dispose = testStream().observe(observer: observer)
+                    return BlockDisposable {
+                        disposeCount += 1
+                        dispose.dispose()
+                    }
+                })
+            }, key: "1")
 
             let expectation1 = self.expectationWithDescription("")
 
@@ -246,83 +371,232 @@ class MergedAsyncStreamTests: XCTestCase {
         XCTAssertNil(weakMerger)
 
         XCTAssertEqual(5, progressCalledCount1)
+        XCTAssertEqual(0, disposeCount)
         XCTAssertEqual("ok", resultValue1)
 
         XCTAssertEqual(numberOfObservers1, 1)
     }
 
     func testDisposeSecondStreamOnNext() {
-    }
 
-    //TODO use merger
-    func testNumberOfStream() {
+        var progressCalledCount2 = 0
 
-        let stream = testStream()
-
-        var nextCalledCount1 = 0
+        var progressCalledCount1 = 0
         var resultValue1: String?
 
-        var nextCalledCount2 = 0
-        var resultValue2: String?
+        weak var weakDeinitTest: NSObject? = nil
+        weak var weakMerger: MergerType?
 
-        weak var weakDeinitTest1: NSObject? = nil
-        weak var weakDeinitTest2: NSObject? = nil
+        var disposeCount = 0
 
         autoreleasepool {
 
-            let deinitTest1 = NSObject()
-            weakDeinitTest1 = deinitTest1
+            let deinitTest = NSObject()
+            weakDeinitTest = deinitTest
 
-            let expectation1 = expectationWithDescription("")
+            let merger = MergerType()
+            weakMerger = merger
+
+            let stream = merger.mergedStream({ () -> AsyncStream<String, Int, NSError> in
+                return create(producer: { observer -> DisposableType? in
+                    let dispose = testStream().observe(observer: observer)
+                    return BlockDisposable {
+                        disposeCount += 1
+                        dispose.dispose()
+                    }
+                })
+            }, key: "1")
+
+            let expectation1 = self.expectationWithDescription("")
+            let expectation2 = self.expectationWithDescription("")
+
+            var dispose: DisposableType?
 
             stream.observe { ev -> Void in
 
+                deinitTest.description
+
                 switch ev {
                 case .Success(let value):
-                    deinitTest1.description
                     resultValue1 = value
                     expectation1.fulfill()
                 case .Failure:
                     XCTFail()
                 case .Next(let next):
-                    XCTAssertEqual(nextCalledCount1, next)
-                    nextCalledCount1 += 1
+                    XCTAssertEqual(progressCalledCount1, next)
+                    progressCalledCount1 += 1
                 }
             }
+            dispose = stream.observe { ev -> Void in
 
-            let deinitTest2 = NSObject()
-            weakDeinitTest2 = deinitTest2
-
-            let expectation2 = expectationWithDescription("")
-
-            stream.observe { ev -> Void in
+                deinitTest.description
 
                 switch ev {
-                case .Success(let value):
-                    deinitTest2.description
-                    resultValue2 = value
-                    expectation2.fulfill()
+                case .Success:
+                    XCTFail()
                 case .Failure:
                     XCTFail()
                 case .Next(let next):
-                    XCTAssertEqual(nextCalledCount2, next)
-                    nextCalledCount2 += 1
+                    XCTAssertEqual(progressCalledCount2, next)
+                    progressCalledCount2 += 1
+
+                    if next == 2 {
+                        dispose?.dispose()
+                        expectation2.fulfill()
+                        return
+                    }
                 }
             }
 
-            XCTAssertNotNil(weakDeinitTest1)
-            XCTAssertNotNil(weakDeinitTest2)
+            XCTAssertNotNil(weakDeinitTest)
 
-            waitForExpectationsWithTimeout(0.5, handler: nil)
+            self.waitForExpectationsWithTimeout(0.5, handler: nil)
         }
 
-        XCTAssertNil(weakDeinitTest1)
-        XCTAssertNil(weakDeinitTest2)
+        XCTAssertNil(weakDeinitTest)
+        XCTAssertNil(weakMerger)
 
-        XCTAssertEqual(5, nextCalledCount1)
-        XCTAssertEqual(5, nextCalledCount2)
+        XCTAssertEqual(3, progressCalledCount2)
+        XCTAssertEqual(0, disposeCount)
+
+        XCTAssertEqual(5, progressCalledCount1)
         XCTAssertEqual("ok", resultValue1)
-        XCTAssertEqual("ok", resultValue2)
+
+        XCTAssertEqual(numberOfObservers1, 1)
+    }
+
+    func testDisposeBothFirstImmediately() {
+
+        weak var weakDeinitTest: NSObject?
+        weak var weakMerger: MergerType?
+
+        var disposeCount1 = 0
+        var disposeCount2 = 0
+
+        autoreleasepool {
+
+            let deinitTest = NSObject()
+            weakDeinitTest = deinitTest
+
+            let merger = MergerType()
+            weakMerger = merger
+
+            let stream1 = merger.mergedStream({ () -> AsyncStream<String, Int, NSError> in
+                return create(producer: { observer -> DisposableType? in
+                    let dispose = testStream().observe(observer: observer)
+                    return BlockDisposable {
+                        disposeCount1 += 1
+                        dispose.dispose()
+                    }
+                })
+            }, key: "1")
+            let stream2 = merger.mergedStream({ () -> AsyncStream<String, Int, NSError> in
+                return create(producer: { observer -> DisposableType? in
+                    let dispose = testStream().observe(observer: observer)
+                    return BlockDisposable {
+                        disposeCount2 += 1
+                        dispose.dispose()
+                    }
+                })
+            }, key: "2")
+
+            let dispose1 = stream1.observe { result -> Void in
+
+                deinitTest.description
+                XCTFail()
+            }
+            dispose1.dispose()
+
+            let dispose2 = stream1.observe { result -> Void in
+
+                deinitTest.description
+                XCTFail()
+            }
+            dispose2.dispose()
+
+            let dispose3 = stream2.observe { result -> Void in
+
+                deinitTest.description
+                XCTFail()
+            }
+            dispose3.dispose()
+
+            XCTAssertNotNil(weakDeinitTest)
+        }
+
+        XCTAssertEqual(2, disposeCount1)
+        XCTAssertEqual(1, disposeCount2)
+
+        XCTAssertNil(weakMerger)
+        XCTAssertNil(weakDeinitTest)
+
+        XCTAssertEqual(3, numberOfObservers1)
+    }
+
+    func testDisposeBothSecondImmediately() {
+
+        weak var weakDeinitTest: NSObject?
+        weak var weakMerger: MergerType?
+
+        var disposeCount1 = 0
+        var disposeCount2 = 0
+
+        autoreleasepool {
+
+            let deinitTest = NSObject()
+            weakDeinitTest = deinitTest
+
+            let merger = MergerType()
+            weakMerger = merger
+
+            let stream1 = merger.mergedStream({ () -> AsyncStream<String, Int, NSError> in
+                return create(producer: { observer -> DisposableType? in
+                    let dispose = testStream().observe(observer: observer)
+                    return BlockDisposable {
+                        disposeCount1 += 1
+                        dispose.dispose()
+                    }
+                })
+            }, key: "1")
+            let stream2 = merger.mergedStream({ () -> AsyncStream<String, Int, NSError> in
+                return create(producer: { observer -> DisposableType? in
+                    let dispose = testStream().observe(observer: observer)
+                    return BlockDisposable {
+                        disposeCount2 += 1
+                        dispose.dispose()
+                    }
+                })
+            }, key: "2")
+
+            let dispose1 = stream1.observe { result -> Void in
+
+                deinitTest.description
+                XCTFail()
+            }
+
+            let dispose2 = stream1.observe { result -> Void in
+
+                deinitTest.description
+                XCTFail()
+            }
+            dispose2.dispose()
+            dispose1.dispose()
+
+            let dispose3 = stream2.observe { result -> Void in
+
+                deinitTest.description
+                XCTFail()
+            }
+            dispose3.dispose()
+
+            XCTAssertNotNil(weakDeinitTest)
+        }
+
+        XCTAssertEqual(1, disposeCount1)
+        XCTAssertEqual(1, disposeCount2)
+
+        XCTAssertNil(weakMerger)
+        XCTAssertNil(weakDeinitTest)
 
         XCTAssertEqual(2, numberOfObservers1)
     }
