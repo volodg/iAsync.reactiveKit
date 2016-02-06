@@ -64,55 +64,194 @@ class MergedAsyncStreamTests: XCTestCase {
         XCTAssertNil(weakDeinitTest)
     }
 
-    //TODO use merger
     func testNormalFinishStream() {
 
-        let stream = testStream()
+        var progressCalledCount1 = 0
+        var resultValue1: String?
 
-        let testFunc = { (numberOfCalls: Int) -> Void in
+        var progressCalledCount2 = 0
+        var resultValue2: String?
 
-            var progressCalledCount = 0
-            var resultValue: String?
+        weak var weakDeinitTest: NSObject? = nil
+        weak var weakMerger: MergerType?
 
-            weak var weakDeinitTest: NSObject? = nil
+        autoreleasepool {
 
-            autoreleasepool {
+            let deinitTest = NSObject()
+            weakDeinitTest = deinitTest
 
-                let deinitTest = NSObject()
-                weakDeinitTest = deinitTest
+            let merger = MergerType()
+            weakMerger = merger
 
-                let expectation = self.expectationWithDescription("")
+            let stream = merger.mergedStream({ testStream() }, key: "1")
 
-                stream.observe { ev -> Void in
+            let expectation1 = self.expectationWithDescription("")
+            let expectation2 = self.expectationWithDescription("")
 
-                    switch ev {
-                    case .Success(let value):
-                        deinitTest.description
-                        resultValue = value
-                        expectation.fulfill()
-                    case .Failure:
-                        XCTFail()
-                    case .Next(let next):
-                        XCTAssertEqual(progressCalledCount, next)
-                        progressCalledCount += 1
-                    }
+            stream.observe { ev -> Void in
+
+                switch ev {
+                case .Success(let value):
+                    deinitTest.description
+                    resultValue1 = value
+                    expectation1.fulfill()
+                case .Failure:
+                    XCTFail()
+                case .Next(let next):
+                    XCTAssertEqual(progressCalledCount1, next)
+                    progressCalledCount1 += 1
                 }
-
-                XCTAssertNotNil(weakDeinitTest)
-
-                self.waitForExpectationsWithTimeout(0.5, handler: nil)
+            }
+            stream.observe { ev -> Void in
+                
+                switch ev {
+                case .Success(let value):
+                    deinitTest.description
+                    resultValue2 = value
+                    expectation2.fulfill()
+                case .Failure:
+                    XCTFail()
+                case .Next(let next):
+                    XCTAssertEqual(progressCalledCount2, next)
+                    progressCalledCount2 += 1
+                }
             }
 
-            XCTAssertNil(weakDeinitTest)
+            XCTAssertNotNil(weakDeinitTest)
 
-            XCTAssertEqual(5, progressCalledCount)
-            XCTAssertEqual("ok", resultValue)
-
-            XCTAssertEqual(numberOfCalls, numberOfObservers1)
+            self.waitForExpectationsWithTimeout(0.5, handler: nil)
         }
 
-        testFunc(1)
-        testFunc(2)
+        XCTAssertNil(weakDeinitTest)
+        XCTAssertNil(weakMerger)
+
+        XCTAssertEqual(5, progressCalledCount1)
+        XCTAssertEqual("ok", resultValue1)
+
+        XCTAssertEqual(5, progressCalledCount2)
+        XCTAssertEqual("ok", resultValue2)
+
+        XCTAssertEqual(numberOfObservers1, 1)
+    }
+
+    func testDisposeFirstStreamImmediately() {
+
+        var progressCalledCount2 = 0
+        var resultValue2: String?
+
+        weak var weakDeinitTest: NSObject? = nil
+        weak var weakMerger: MergerType?
+
+        autoreleasepool {
+
+            let deinitTest = NSObject()
+            weakDeinitTest = deinitTest
+
+            let merger = MergerType()
+            weakMerger = merger
+
+            let stream = merger.mergedStream({ testStream() }, key: "1")
+
+            let expectation2 = self.expectationWithDescription("")
+
+            let dispose1 = stream.observe { ev -> Void in
+
+                deinitTest.description
+                XCTFail()
+            }
+
+            dispose1.dispose()
+
+            stream.observe { ev -> Void in
+
+                switch ev {
+                case .Success(let value):
+                    deinitTest.description
+                    resultValue2 = value
+                    expectation2.fulfill()
+                case .Failure:
+                    XCTFail()
+                case .Next(let next):
+                    XCTAssertEqual(progressCalledCount2, next)
+                    progressCalledCount2 += 1
+                }
+            }
+
+            XCTAssertNotNil(weakDeinitTest)
+
+            self.waitForExpectationsWithTimeout(0.5, handler: nil)
+        }
+
+        XCTAssertNil(weakDeinitTest)
+        XCTAssertNil(weakMerger)
+
+        XCTAssertEqual(5, progressCalledCount2)
+        XCTAssertEqual("ok", resultValue2)
+
+        XCTAssertEqual(numberOfObservers1, 2)
+    }
+
+    func testDisposeFirstStreamOnNext() {
+    }
+
+    func testDisposeSecondStreamImmediately() {
+
+        var progressCalledCount1 = 0
+        var resultValue1: String?
+
+        weak var weakDeinitTest: NSObject? = nil
+        weak var weakMerger: MergerType?
+
+        autoreleasepool {
+
+            let deinitTest = NSObject()
+            weakDeinitTest = deinitTest
+
+            let merger = MergerType()
+            weakMerger = merger
+
+            let stream = merger.mergedStream({ testStream() }, key: "1")
+
+            let expectation1 = self.expectationWithDescription("")
+
+            stream.observe { ev -> Void in
+
+                switch ev {
+                case .Success(let value):
+                    deinitTest.description
+                    resultValue1 = value
+                    expectation1.fulfill()
+                case .Failure:
+                    XCTFail()
+                case .Next(let next):
+                    XCTAssertEqual(progressCalledCount1, next)
+                    progressCalledCount1 += 1
+                }
+            }
+
+            let dispose2 = stream.observe { ev -> Void in
+
+                deinitTest.description
+                XCTFail()
+            }
+
+            dispose2.dispose()
+
+            XCTAssertNotNil(weakDeinitTest)
+
+            self.waitForExpectationsWithTimeout(0.5, handler: nil)
+        }
+
+        XCTAssertNil(weakDeinitTest)
+        XCTAssertNil(weakMerger)
+
+        XCTAssertEqual(5, progressCalledCount1)
+        XCTAssertEqual("ok", resultValue1)
+
+        XCTAssertEqual(numberOfObservers1, 1)
+    }
+
+    func testDisposeSecondStreamOnNext() {
     }
 
     //TODO use merger
