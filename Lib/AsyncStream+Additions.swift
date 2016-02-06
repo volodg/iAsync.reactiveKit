@@ -157,6 +157,35 @@ public extension AsyncStreamType {
     }
 }
 
+public func asyncStreamWithSameThreadJob<Value, Next, Error: ErrorType>(job: (Next -> Void) -> Result<Value, Error>) -> AsyncStream<Value, Next, Error> {
+
+    typealias Event = AsyncEvent<Value, Next, Error>
+
+    return AsyncStream { (observer: Event -> ()) -> DisposableType? in
+
+        var observerHolder: (Event -> ())? = observer
+
+        Queue.global.async({
+
+            let result = job { next -> Void in
+                observerHolder?(.Next(next))
+            }
+
+            switch result {
+            case .Success(let value):
+                observerHolder?(.Success(value))
+            case .Failure(let error):
+                observerHolder?(.Failure(error))
+            }
+        })
+
+        return BlockDisposable {
+
+            observerHolder = nil
+        }
+    }
+}
+
 public func asyncStreamWithJob<Value, Next, Error: ErrorType>(
     queueName: String? = nil,
     job: (Next -> Void) -> Result<Value, Error>) -> AsyncStream<Value, Next, Error> {
@@ -165,22 +194,17 @@ public func asyncStreamWithJob<Value, Next, Error: ErrorType>(
 
     return AsyncStream { (observer: Event -> ()) -> DisposableType? in
 
-        var finished = false
-
-        let queue = Queue(name: queueName ?? "com.ReactiveKit.ReactiveKit.AsyncStreamJob")
-
         var observerHolder: (Event -> ())? = observer
 
         Queue.global.async({ 
 
             let result = job { next -> Void in
-                queue.sync {
-                    if finished { return }
+                Queue.main.sync {
                     observerHolder?(.Next(next))
                 }
             }
 
-            queue.sync {
+            Queue.main.sync {
                 switch result {
                 case .Success(let value):
                     observerHolder?(.Success(value))
@@ -191,10 +215,7 @@ public func asyncStreamWithJob<Value, Next, Error: ErrorType>(
         })
 
         return BlockDisposable {
-            queue.sync {
-                observerHolder = nil
-                finished = true
-            }
+            observerHolder = nil
         }
     }
 }
