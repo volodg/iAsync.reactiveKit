@@ -35,6 +35,7 @@ public extension StreamType where Event: AsyncStreamType {
     @warn_unused_result
     public func switchToLatest() -> AsyncStream<Event.Value, Event.Next, Event.Error>  {
         return create { observer in
+
             let serialDisposable = SerialDisposable(otherDisposable: nil)
             let compositeDisposable = CompositeDisposable([serialDisposable])
 
