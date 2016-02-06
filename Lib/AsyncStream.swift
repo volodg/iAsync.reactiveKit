@@ -471,65 +471,69 @@ public extension AsyncStreamType {
         }
     }
 
-//    @warn_unused_result
-//    public func zipWith<S: OperationType where S.Error == Error>(other: S) -> Operation<(Value, S.Value), Error> {
-//        return create { observer in
-//            let queue = Queue(name: "com.ReactiveKit.ReactiveKit.ZipWith")
-//
-//            var selfBuffer = Array<Value>()
-//            var selfCompleted = false
-//            var otherBuffer = Array<S.Value>()
-//            var otherCompleted = false
-//
-//            let dispatchIfPossible = {
-//                while selfBuffer.count > 0 && otherBuffer.count > 0 {
-//                    observer.next((selfBuffer[0], otherBuffer[0]))
-//                    selfBuffer.removeAtIndex(0)
-//                    otherBuffer.removeAtIndex(0)
-//                }
-//
-//                if (selfCompleted && selfBuffer.isEmpty) || (otherCompleted && otherBuffer.isEmpty) {
-//                    observer.success()
-//                }
-//            }
-//
-//            let selfDisposable = self.observe(on: nil) { event in
-//                switch event {
-//                case .Failure(let error):
-//                    observer.failure(error)
-//                case .Success:
-//                    queue.sync {
-//                        selfCompleted = true
-//                        dispatchIfPossible()
-//                    }
-//                case .Next(let value):
-//                    queue.sync {
-//                        selfBuffer.append(value)
-//                        dispatchIfPossible()
-//                    }
-//                }
-//            }
-//
-//            let otherDisposable = other.observe(on: nil) { event in
-//                switch event {
-//                case .Failure(let error):
-//                    observer.failure(error)
-//                case .Success:
-//                    queue.sync {
-//                        otherCompleted = true
-//                        dispatchIfPossible()
-//                    }
-//                case .Next(let value):
-//                    queue.sync {
-//                        otherBuffer.append(value)
-//                        dispatchIfPossible()
-//                    }
-//                }
-//            }
-//
-//            return CompositeDisposable([selfDisposable, otherDisposable])
-//        }
-//    }
+    @warn_unused_result
+    public func zipWith<S: AsyncStreamType where S.Error == Error>(other: S) -> AsyncStream<(Value, S.Value), (Next, S.Next), Error> {
+        return create { observer in
+            let queue = Queue(name: "com.ReactiveKit.ReactiveKit.ZipWith")
+
+            var selfNextBuffer = Array<Next>()
+            var selfValue: Value?
+
+            var otherNextBuffer = Array<S.Next>()
+            var otherValue: S.Value?
+
+            let dispatchNextIfPossible = {
+                while selfNextBuffer.count > 0 && otherNextBuffer.count > 0 {
+                    let next = (selfNextBuffer[0], otherNextBuffer[0])
+                    selfNextBuffer.removeAtIndex(0)
+                    otherNextBuffer.removeAtIndex(0)
+                    observer(.Next(next))
+                }
+            }
+
+            let dispatchValueIfPossible = {
+                if let selfValue = selfValue, otherValue = otherValue {
+                    observer(.Success(selfValue, otherValue))
+                }
+            }
+
+            let selfDisposable = self.observe(on: nil) { event in
+                switch event {
+                case .Failure(let error):
+                    observer(.Failure(error))
+                case .Success(let value):
+                    queue.sync {
+                        selfValue = value
+                        dispatchValueIfPossible()
+                    }
+                case .Next(let value):
+                    queue.sync {
+                        selfNextBuffer.append(value)
+                        dispatchNextIfPossible()
+                    }
+                }
+            }
+
+            let otherDisposable = other.observe(on: nil) { event in
+                switch event {
+                case .Failure(let error):
+                    observer(.Failure(error))
+                case .Success(let value):
+                    queue.sync {
+                        otherValue = value
+                        dispatchValueIfPossible()
+                    }
+                case .Next(let value):
+                    queue.sync {
+                        otherNextBuffer.append(value)
+                        dispatchNextIfPossible()
+                    }
+                }
+            }
+
+            return CompositeDisposable([selfDisposable, otherDisposable])
+        }
+    }
 }
 
 //public extension OperationType where Value: OptionalType {
@@ -732,11 +736,11 @@ public func combineLatest<A: AsyncStreamType, B: AsyncStreamType where A.Error =
     return a.combineLatestWith(b)
 }
 
-//@warn_unused_result
-//public func zip<A: OperationType, B: OperationType where A.Error == B.Error>(a: A, _ b: B) -> Operation<(A.Value, B.Value), A.Error> {
-//    return a.zipWith(b)
-//}
-//
+@warn_unused_result
+public func zip<A: AsyncStreamType, B: AsyncStreamType where A.Error == B.Error>(a: A, _ b: B) -> AsyncStream<(A.Value, B.Value), (A.Next, B.Next), A.Error> {
+    return a.zipWith(b)
+}
+
 //@warn_unused_result
 //public func combineLatest<A: OperationType, B: OperationType, C: OperationType where A.Error == B.Error, A.Error == C.Error>(a: A, _ b: B, _ c: C) -> Operation<(A.Value, B.Value, C.Value), A.Error> {
 //    return combineLatest(a, b).combineLatestWith(c).map { ($0.0, $0.1, $1) }
