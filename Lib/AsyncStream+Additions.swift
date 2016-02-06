@@ -157,6 +157,46 @@ public extension AsyncStreamType {
     }
 }
 
+public func asyncStreamWithJob<Value, Next, Error: ErrorType>(job: (Next -> Void) -> Result<Value, Error>) -> AsyncStream<Value, Next, Error> {
+
+    typealias Event = AsyncEvent<Value, Next, Error>
+
+    return AsyncStream { (observer: Event -> ()) -> DisposableType? in
+
+        var finished = false
+
+        let queue = Queue(name: "com.ReactiveKit.ReactiveKit.AsyncStreamJob")
+
+        var observerHolder: (Event -> ())? = observer
+
+        Queue.global.async({ 
+
+            let result = job { next -> Void in
+                queue.sync {
+                    if finished { return }
+                    observerHolder?(.Next(next))
+                }
+            }
+
+            queue.sync {
+                switch result {
+                case .Success(let value):
+                    observerHolder?(.Success(value))
+                case .Failure(let error):
+                    observerHolder?(.Failure(error))
+                }
+            }
+        })
+
+        return BlockDisposable {
+            queue.sync {
+                observerHolder = nil
+                finished = true
+            }
+        }
+    }
+}
+
 public func asyncToStream<Value, Error: ErrorType>(loader: AsyncTypes<Value, Error>.Async) -> AsyncStream<Value, AnyObject, Error> {
 
     typealias Event = AsyncEvent<Value, AnyObject, Error>
