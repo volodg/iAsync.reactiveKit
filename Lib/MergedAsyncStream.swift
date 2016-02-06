@@ -46,17 +46,16 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
 
             return BlockDisposable { () -> Void in
 
-                self.streamsByKey.removeValueForKey(key)
-
                 if var disposes_ = self.disposesByKey[key] {
                     for (index, dispose_) in disposes_.enumerate() {
-                        if dispose_ === dispose {
-                            disposes_.removeAtIndex(index)
-                            if disposes_.isEmpty {
-                                self.disposesByKey.removeValueForKey(key)
-                            }
-                            break
+                        guard dispose_ === dispose else { continue }
+                        disposes_.removeAtIndex(index)
+                        self.disposesByKey[key] = disposes_
+                        if disposes_.isEmpty {
+                            self.disposesByKey.removeValueForKey(key)
+                            self.streamsByKey.removeValueForKey(key)
                         }
+                        break
                     }
                 }
 

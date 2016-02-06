@@ -356,6 +356,7 @@ public extension AsyncStreamType {
 //        return reduce([], { memo, new in memo + [new] })
 //    }
 
+    //TODO test
     @warn_unused_result
     public func combineLatestWith<S: AsyncStreamType where S.Error == Error>(other: S) -> AsyncStream<(Value, S.Value), (Next?, S.Next?), Error> {
         return create { observer in
@@ -434,24 +435,24 @@ public extension AsyncStreamType {
 //    public func zipWith<S: OperationType where S.Error == Error>(other: S) -> Operation<(Value, S.Value), Error> {
 //        return create { observer in
 //            let queue = Queue(name: "com.ReactiveKit.ReactiveKit.ZipWith")
-//            
+//
 //            var selfBuffer = Array<Value>()
 //            var selfCompleted = false
 //            var otherBuffer = Array<S.Value>()
 //            var otherCompleted = false
-//            
+//
 //            let dispatchIfPossible = {
 //                while selfBuffer.count > 0 && otherBuffer.count > 0 {
 //                    observer.next((selfBuffer[0], otherBuffer[0]))
 //                    selfBuffer.removeAtIndex(0)
 //                    otherBuffer.removeAtIndex(0)
 //                }
-//                
+//
 //                if (selfCompleted && selfBuffer.isEmpty) || (otherCompleted && otherBuffer.isEmpty) {
 //                    observer.success()
 //                }
 //            }
-//            
+//
 //            let selfDisposable = self.observe(on: nil) { event in
 //                switch event {
 //                case .Failure(let error):
@@ -468,7 +469,7 @@ public extension AsyncStreamType {
 //                    }
 //                }
 //            }
-//            
+//
 //            let otherDisposable = other.observe(on: nil) { event in
 //                switch event {
 //                case .Failure(let error):
@@ -485,7 +486,7 @@ public extension AsyncStreamType {
 //                    }
 //                }
 //            }
-//            
+//
 //            return CompositeDisposable([selfDisposable, otherDisposable])
 //        }
 //    }

@@ -103,6 +103,7 @@ public extension AsyncStreamType {
 
         typealias ObserverHolder = AsyncObserverHolder<Value, Next, Error>
         var observers: [ObserverHolder] = []
+        var dispose: DisposableType?
 
         return create { observer in
 
@@ -116,6 +117,12 @@ public extension AsyncStreamType {
                     if observer === observerHolder {
                         observers.removeAtIndex(index)
                         break
+                    }
+                }
+                if observers.isEmpty {
+                    if let dispose_ = dispose {
+                        dispose = nil
+                        dispose_.dispose()
                     }
                 }
             }
@@ -133,7 +140,7 @@ public extension AsyncStreamType {
                 notify(observers_, event)
             }
 
-            let dispose = self.observe(on: nil) { event in
+            dispose = self.observe(on: nil) { event in
 
                 switch event {
                 case .Success:
@@ -145,13 +152,7 @@ public extension AsyncStreamType {
                 }
             }
 
-            return BlockDisposable({ () -> () in
-
-                removeObserver()
-                if observers.isEmpty {
-                    dispose.dispose()
-                }
-            })
+            return BlockDisposable( removeObserver )
         }
     }
 }

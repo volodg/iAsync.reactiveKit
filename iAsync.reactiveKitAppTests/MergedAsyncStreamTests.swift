@@ -21,7 +21,6 @@ class MergedAsyncStreamTests: XCTestCase {
         numberOfObservers1 = 0
     }
 
-    //TODO use merger
     func testDisposeStream() {
 
         weak var weakDeinitTest: NSObject?
@@ -35,15 +34,28 @@ class MergedAsyncStreamTests: XCTestCase {
             let merger = MergerType()
             weakMerger = merger
 
-            let stream = merger.mergedStream({ testStream() }, key: "1")
+            let stream1 = merger.mergedStream({ testStream() }, key: "1")
+            let stream2 = merger.mergedStream({ testStream() }, key: "2")
 
-            let dispose = stream.observe { result -> Void in
+            let dispose1 = stream1.observe { result -> Void in
+
+                deinitTest.description
+                XCTFail()
+            }
+            let dispose2 = stream1.observe { result -> Void in
+
+                deinitTest.description
+                XCTFail()
+            }
+            let dispose3 = stream2.observe { result -> Void in
 
                 deinitTest.description
                 XCTFail()
             }
 
-            dispose.dispose()
+            dispose1.dispose()
+            dispose2.dispose()
+            dispose3.dispose()
 
             XCTAssertNotNil(weakDeinitTest)
         }
