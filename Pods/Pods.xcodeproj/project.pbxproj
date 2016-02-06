@@ -272,6 +272,7 @@
 		C0AD3E7B202E12FC4BE86E5476DDE13B /* NSObject+RACPropertySubscribing.h in Headers */ = {isa = PBXBuildFile; fileRef = B015DB6FFAAD2D29DF407926C0739458 /* NSObject+RACPropertySubscribing.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C1F1AE5041B922CF0A2D983E1589A67C /* UIRefreshControl+RACCommandSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 6158DB694BD2650B7A7873A8B820623D /* UIRefreshControl+RACCommandSupport.m */; };
 		C34DD7CF4E2E829A76FC5FFE4A97E06E /* ArrayDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDEBFDA2DF6B9185F73D8E88A8D316AB /* ArrayDiff.swift */; };
+		C390FBAF1C65F38E00147280 /* MergedAsyncStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = C390FBAE1C65F38E00147280 /* MergedAsyncStream.swift */; };
 		C46B46FECF9645C419C80CBECA844F80 /* WeakBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44974E31404C7A46C0F4E9BDF08D50CB /* WeakBox.swift */; };
 		C51434EBB8B19CEE123AC4FA2B6A999C /* Optional.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9345E863479729847FE03A4AEEF43D /* Optional.swift */; };
 		C9C2168662FF5496CC4F1D45EFC5F56A /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4C386F97998FCFEDFF1E687D647265 /* Helpers.swift */; };
@@ -746,6 +747,7 @@
 		C0E419C79B8B69EAD26826BAA28070D0 /* RACMulticastConnection.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RACMulticastConnection.m; path = "ReactiveCocoa/Objective-C/RACMulticastConnection.m"; sourceTree = "<group>"; };
 		C1440C38060C39C51B421241F6606BDE /* RACEmptySequence.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RACEmptySequence.m; path = "ReactiveCocoa/Objective-C/RACEmptySequence.m"; sourceTree = "<group>"; };
 		C2927EEC0FC7E33E3D96266B207BD590 /* Result-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Result-prefix.pch"; sourceTree = "<group>"; };
+		C390FBAE1C65F38E00147280 /* MergedAsyncStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MergedAsyncStream.swift; sourceTree = "<group>"; };
 		C4890C5CA471A96DBB0D62A22B3ACFA8 /* RACSequence.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RACSequence.m; path = "ReactiveCocoa/Objective-C/RACSequence.m"; sourceTree = "<group>"; };
 		C4AA34103338BFD41F68E5AE8C2C35B0 /* RACCommand.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RACCommand.m; path = "ReactiveCocoa/Objective-C/RACCommand.m"; sourceTree = "<group>"; };
 		C5A7528BDAF51A5CC60700AC63EBBAF6 /* ReactiveKit-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "ReactiveKit-prefix.pch"; sourceTree = "<group>"; };
@@ -1427,6 +1429,7 @@
 				92CAA844F84C8278C446CD1F4B96FF50 /* AsyncStream.swift */,
 				9E5931E4D459B3FE8E5D49FD15B0E8B8 /* AsyncStream+Additions.swift */,
 				9C3FEB4A74FDED651B4F174D8C95C792 /* AsyncStreamInterface.swift */,
+				C390FBAE1C65F38E00147280 /* MergedAsyncStream.swift */,
 				DF5B92FA4B44CFD2DA79A27ECEF2E21E /* Stream+AsyncStream.swift */,
 				3AE5F38F0000D4CCC94DAFC723B7C3EE /* UniqueObservable.swift */,
 			);
@@ -2047,6 +2050,7 @@
 				FFCFBE3C02DC3AD1F771FCAFE1D3E7C1 /* AsyncStream+Additions.swift in Sources */,
 				65159C2FE3037B3BCD0FA71CE608A071 /* AsyncStream.swift in Sources */,
 				B44D33AD21CF67F3B948B5666977EC4B /* AsyncStreamInterface.swift in Sources */,
+				C390FBAF1C65F38E00147280 /* MergedAsyncStream.swift in Sources */,
 				6A2132DE43533D9F4BAD11AFC570C48B /* iAsync.reactiveKit-dummy.m in Sources */,
 				6A8BF8B49D1E31F9291B80B3A0C5B285 /* Stream+AsyncStream.swift in Sources */,
 				6225D86731040D7ADA6B10AF4B579BD4 /* UniqueObservable.swift in Sources */,
