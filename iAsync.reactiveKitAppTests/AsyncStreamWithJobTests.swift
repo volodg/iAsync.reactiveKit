@@ -16,7 +16,7 @@ private var numberOfJobs = 0
 
 private func testJobStream() -> AsyncStream<String, Int, NSError> {
 
-    return asyncStreamWithJob({ (next: Int -> Void) -> Result<String, NSError> in
+    return asyncStreamWithJob(job: { (next: Int -> Void) -> Result<String, NSError> in
 
         numberOfJobs += 1
 

@@ -157,7 +157,9 @@ public extension AsyncStreamType {
     }
 }
 
-public func asyncStreamWithJob<Value, Next, Error: ErrorType>(job: (Next -> Void) -> Result<Value, Error>) -> AsyncStream<Value, Next, Error> {
+public func asyncStreamWithJob<Value, Next, Error: ErrorType>(
+    queueName: String? = nil,
+    job: (Next -> Void) -> Result<Value, Error>) -> AsyncStream<Value, Next, Error> {
 
     typealias Event = AsyncEvent<Value, Next, Error>
 
@@ -165,7 +167,7 @@ public func asyncStreamWithJob<Value, Next, Error: ErrorType>(job: (Next -> Void
 
         var finished = false
 
-        let queue = Queue(name: "com.ReactiveKit.ReactiveKit.AsyncStreamJob")
+        let queue = Queue(name: queueName ?? "com.ReactiveKit.ReactiveKit.AsyncStreamJob")
 
         var observerHolder: (Event -> ())? = observer
 
