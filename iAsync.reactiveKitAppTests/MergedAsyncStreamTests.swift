@@ -90,13 +90,16 @@ class MergedAsyncStreamTests: XCTestCase {
 
         var progressCalledCount1 = 0
         var resultValue1: String?
+        var nextValues1 = [Int]()
 
         var progressCalledCount2 = 0
         var resultValue2: String?
+        var nextValues2 = [Int]()
 
         weak var weakDeinitTest: NSObject? = nil
         weak var weakMerger: MergerType?
 
+        var getterCallsCount = 0
         var setterResult: String?
         var setterEventCallsCount = 0
         var setterValueCallsCount = 0
@@ -113,8 +116,9 @@ class MergedAsyncStreamTests: XCTestCase {
 
                 let stream = testStream().withEventValue({ () -> AsyncEvent<String, Int, NSError>? in
 
+                    getterCallsCount += 1
                     deinitTest.description
-                    return nil
+                    return .Next(-1)
                 }, setter: { event -> Void in
 
                     deinitTest.description
@@ -146,7 +150,12 @@ class MergedAsyncStreamTests: XCTestCase {
                 case .Failure:
                     XCTFail()
                 case .Next(let next):
-                    XCTAssertEqual(progressCalledCount1, next)
+                    nextValues1.append(next)
+                    if progressCalledCount1 == 0 {
+                        XCTAssertEqual(-1, next)
+                    } else {
+                        XCTAssertEqual(progressCalledCount1, next + 1)
+                    }
                     progressCalledCount1 += 1
                 }
             }
@@ -161,7 +170,12 @@ class MergedAsyncStreamTests: XCTestCase {
                 case .Failure:
                     XCTFail()
                 case .Next(let next):
-                    XCTAssertEqual(progressCalledCount2, next)
+                    nextValues2.append(next)
+                    if progressCalledCount2 == 0 {
+                        XCTAssertEqual(-1, next)
+                    } else {
+                        XCTAssertEqual(progressCalledCount2, next + 1)
+                    }
                     progressCalledCount2 += 1
                 }
             }
@@ -174,14 +188,17 @@ class MergedAsyncStreamTests: XCTestCase {
         XCTAssertNil(weakDeinitTest)
         XCTAssertNil(weakMerger)
 
+        XCTAssertEqual(1, getterCallsCount)
         XCTAssertEqual(setterResult, "ok")
         XCTAssertEqual(6, setterEventCallsCount)
         XCTAssertEqual(1, setterValueCallsCount)
 
-        XCTAssertEqual(5, progressCalledCount1)
+        XCTAssertEqual(6, progressCalledCount1)
+        XCTAssertEqual([-1, 0, 1, 2, 3, 4], nextValues1)
         XCTAssertEqual("ok", resultValue1)
 
-        XCTAssertEqual(5, progressCalledCount2)
+        XCTAssertEqual(6, progressCalledCount2)
+        XCTAssertEqual([-1, 0, 1, 2, 3, 4], nextValues2)
         XCTAssertEqual("ok", resultValue2)
 
         XCTAssertEqual(numberOfObservers1, 1)
@@ -198,9 +215,7 @@ class MergedAsyncStreamTests: XCTestCase {
         weak var weakDeinitTest: NSObject? = nil
         weak var weakMerger: MergerType?
 
-        var setterResult: String?
-        var setterEventCallsCount = 0
-        var setterValueCallsCount = 0
+        var getterCallsCount = 0
 
         autoreleasepool {
 
@@ -213,16 +228,14 @@ class MergedAsyncStreamTests: XCTestCase {
             let stream = merger.mergedStream({ () -> AsyncStream<String, Int, NSError> in
 
                 let stream = testStream().withEventValue({ () -> AsyncEvent<String, Int, NSError>? in
-                    return nil
+
+                    getterCallsCount += 1
+                    deinitTest.description
+                    return .Success("ok1")
                 }, setter: { event -> Void in
-                    setterEventCallsCount += 1
-                    switch event {
-                    case .Success(let value):
-                        setterResult = value
-                        setterValueCallsCount += 1
-                    default:
-                        break
-                    }
+
+                    deinitTest.description
+                    XCTFail()
                 })
 
                 return stream
@@ -270,17 +283,15 @@ class MergedAsyncStreamTests: XCTestCase {
         XCTAssertNil(weakDeinitTest)
         XCTAssertNil(weakMerger)
 
-        XCTAssertEqual(setterResult, "ok")
-        XCTAssertEqual(6, setterEventCallsCount)
-        XCTAssertEqual(1, setterValueCallsCount)
+        XCTAssertEqual(2, getterCallsCount)
 
-        XCTAssertEqual(5, progressCalledCount1)
-        XCTAssertEqual("ok", resultValue1)
+        XCTAssertEqual(0, progressCalledCount1)
+        XCTAssertEqual("ok1", resultValue1)
 
-        XCTAssertEqual(5, progressCalledCount2)
-        XCTAssertEqual("ok", resultValue2)
+        XCTAssertEqual(0, progressCalledCount2)
+        XCTAssertEqual("ok1", resultValue2)
 
-        XCTAssertEqual(numberOfObservers1, 1)
+        XCTAssertEqual(numberOfObservers1, 0)
     }
 
     func testDisposeFirstStreamImmediately() {

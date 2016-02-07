@@ -65,11 +65,13 @@ public extension AsyncStreamType {
         }
     }
 
-    public func mergedObservers() -> AsyncStream<Value, Next, Error> {
+    public func mergedObservers(limit: Int = Int.max) -> AsyncStream<Value, Next, Error> {
 
         typealias ObserverHolder = AsyncObserverHolder<Value, Next, Error>
         var observers: [ObserverHolder] = []
         var dispose: DisposableType?
+
+        var buffer = [Next]()
 
         return create { observer in
 
@@ -94,6 +96,7 @@ public extension AsyncStreamType {
             }
 
             if observers.count > 1 {
+                buffer.forEach { observer(.Next($0)) }
                 return BlockDisposable( removeObserver )
             }
 
@@ -113,7 +116,11 @@ public extension AsyncStreamType {
                     finishNotify(event)
                 case .Failure:
                     finishNotify(event)
-                case .Next:
+                case .Next(let next):
+                    buffer.append(next)
+                    if buffer.count > limit {
+                        buffer = Array(buffer.suffixFrom(1))
+                    }
                     notify(observers, event)
                 }
             }
