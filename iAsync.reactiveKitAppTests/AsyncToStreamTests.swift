@@ -20,7 +20,6 @@ private func testAsync() -> AsyncTypes<String, NSError>.Async {
 
     return { (
         progressCallback: AsyncProgressCallback?,
-        stateCallback   : AsyncChangeStateCallback?,
         finishCallback  : AsyncTypes<String, NSError>.DidFinishAsyncCallback?) -> AsyncHandler in
 
         numberOfAsyncs += 1
@@ -62,10 +61,6 @@ private func testAsync() -> AsyncTypes<String, NSError>.Async {
                     finishCallbackHolder   = nil
                     finishCallback(result: .Unsubscribed)
                 }
-            case .Resume:
-                fatalError()
-            case .Suspend:
-                fatalError()
             }
         }
     }
@@ -106,9 +101,6 @@ class AsyncToStreamTests: XCTestCase {
 
     func testNormalFinishStream() {
 
-        let loader = testAsync()
-        let stream = asyncToStream(loader)
-
         let testFunc = { (numberOfCalls: Int) -> Void in
 
             var progressCalledCount = 0
@@ -120,6 +112,9 @@ class AsyncToStreamTests: XCTestCase {
 
                 let deinitTest = NSObject()
                 weakDeinitTest = deinitTest
+
+                let loader = testAsync()
+                let stream = asyncToStream(loader)
 
                 let expectation = self.expectationWithDescription("")
 
@@ -139,9 +134,8 @@ class AsyncToStreamTests: XCTestCase {
                 }
 
                 XCTAssertNotNil(weakDeinitTest)
-
-                self.waitForExpectationsWithTimeout(0.5, handler: nil)
             }
+            self.waitForExpectationsWithTimeout(0.5, handler: nil)
 
             XCTAssertNil(weakDeinitTest)
 

@@ -37,10 +37,6 @@ class StreamToAsyncTests: XCTestCase {
 
                 deinitTest.description
                 XCTFail()
-            }, stateCallback: { (state) -> () in
-
-                deinitTest.description
-                XCTFail()
             }) { (result) -> Void in
 
                 switch result {
@@ -81,10 +77,6 @@ class StreamToAsyncTests: XCTestCase {
             weakDeinitTest = deinitTest
 
             let handler = loader(progressCallback: { (progressInfo) -> () in
-
-                deinitTest.description
-                XCTFail()
-            }, stateCallback: { (state) -> () in
 
                 deinitTest.description
                 XCTFail()
@@ -136,10 +128,6 @@ class StreamToAsyncTests: XCTestCase {
                     deinitTest.description
                     XCTAssertEqual(progressCalledCount, next as? Int)
                     progressCalledCount += 1
-                }, stateCallback: { (state) -> () in
-
-                    deinitTest.description
-                    XCTFail()
                 }) { (result) -> Void in
 
                     switch result {
@@ -199,10 +187,6 @@ class StreamToAsyncTests: XCTestCase {
                 deinitTest1.description
                 XCTAssertEqual(nextCalledCount1, next as? Int)
                 nextCalledCount1 += 1
-            }, stateCallback: { (state) -> () in
-
-                deinitTest1.description
-                XCTFail()
             }) { (result) -> Void in
 
                 switch result {
@@ -229,10 +213,6 @@ class StreamToAsyncTests: XCTestCase {
                 deinitTest2.description
                 XCTAssertEqual(nextCalledCount2, next as? Int)
                 nextCalledCount2 += 1
-            }, stateCallback: { (state) -> () in
-
-                deinitTest2.description
-                XCTFail()
             }) { (result) -> Void in
 
                 switch result {

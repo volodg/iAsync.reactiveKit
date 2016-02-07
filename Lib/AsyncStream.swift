@@ -69,6 +69,10 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         return stream.observe(on: context, observer: observer)
     }
 
+    public func run() {
+        stream.observe(observer: {_ in})
+    }
+
     public static func succeeded(with value: Value) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             observer(.Success(value))
