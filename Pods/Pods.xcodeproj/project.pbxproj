@@ -258,6 +258,13 @@
 		C0AD3E7B202E12FC4BE86E5476DDE13B /* NSObject+RACPropertySubscribing.h in Headers */ = {isa = PBXBuildFile; fileRef = B015DB6FFAAD2D29DF407926C0739458 /* NSObject+RACPropertySubscribing.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C1F1AE5041B922CF0A2D983E1589A67C /* UIRefreshControl+RACCommandSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 6158DB694BD2650B7A7873A8B820623D /* UIRefreshControl+RACCommandSupport.m */; };
 		C352EFF9AEE99B32788C7F2446A2E9C9 /* AsyncBlockDefinitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F02D552FBABE5FA61FA9AD79B2992F6 /* AsyncBlockDefinitions.swift */; };
+		C3CB995B1C67993300C95F1A /* StreamOwner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CB99591C67991800C95F1A /* StreamOwner.swift */; };
+		C3CB995C1C679C8B00C95F1A /* QueueState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CB994D1C6796C800C95F1A /* QueueState.swift */; };
+		C3CB995D1C679C9000C95F1A /* QueueStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CB994E1C6796C800C95F1A /* QueueStrategy.swift */; };
+		C3CB995F1C679C9700C95F1A /* StrategyFifo.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CB994F1C6796C800C95F1A /* StrategyFifo.swift */; };
+		C3CB99601C679C9B00C95F1A /* StrategyRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CB99501C6796C800C95F1A /* StrategyRandom.swift */; };
+		C3CB99611C679C9E00C95F1A /* StrategyStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CB99511C6796C800C95F1A /* StrategyStack.swift */; };
+		C3CB99621C679EE600C95F1A /* LimitedAsyncStreamsQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CB994A1C6796C800C95F1A /* LimitedAsyncStreamsQueue.swift */; };
 		C42AE3116B9F8DCEDDD362E47B983DA3 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7D2483B04CE26C3A2C8C29FE600F27 /* Operation.swift */; };
 		C51434EBB8B19CEE123AC4FA2B6A999C /* Optional.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9345E863479729847FE03A4AEEF43D /* Optional.swift */; };
 		C7B5AD280B177501A284D9FA4489D3ED /* CompositeDisposable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2DACFD417C5F3C533A82ED2B50306F7 /* CompositeDisposable.swift */; };
@@ -300,7 +307,7 @@
 		E659EFECB10A114D3A0797FAF50F040B /* ObservableCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6AFC9FFD823D4D549C08FB77CA208D /* ObservableCollection.swift */; };
 		E72BA7E3B076A9444512D188A8A83908 /* RACCompoundDisposable.h in Headers */ = {isa = PBXBuildFile; fileRef = 596A409F264ABACC5EED37DC94A1C538 /* RACCompoundDisposable.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E7B81EB960A99C46C12E07194BF6D742 /* AsyncStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FA959A50AB3DE8C5D12E8CE6D4E0B1E /* AsyncStream.swift */; };
-		E9CFF0057B8492C8A60C56FDC839541B /* JQueueState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF311656E84A33909FC4DE3AAEC37CD /* JQueueState.swift */; };
+		E9CFF0057B8492C8A60C56FDC839541B /* QueueState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF311656E84A33909FC4DE3AAEC37CD /* QueueState.swift */; };
 		EB10A3310D210BAA8525BEBC9844CC22 /* RACSubscriptionScheduler.h in Headers */ = {isa = PBXBuildFile; fileRef = 850B6300929F6BE04C22DAF0869CDC94 /* RACSubscriptionScheduler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		EB482EBF507B7A8A0B31203B79F5D308 /* RACErrorSignal.m in Sources */ = {isa = PBXBuildFile; fileRef = 58453AA67B2F8D425E7ADF15EA355E22 /* RACErrorSignal.m */; };
 		EBDBD75305B5FA8B51364E2729F53C2E /* RACValueTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = 33AC6B41017BFEF6F98E6525997ED349 /* RACValueTransformer.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -650,7 +657,7 @@
 		7AB98CB1892590E84F5DC1382DAE37E7 /* RACSubject.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RACSubject.m; path = "ReactiveCocoa/Objective-C/RACSubject.m"; sourceTree = "<group>"; };
 		7B739189C0A20DF3CFADC08A612603DD /* Result.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Result.swift; path = Result/Result.swift; sourceTree = "<group>"; };
 		7BE56088E44F2485D3F5D9E350B7DF61 /* StrategyRandom.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StrategyRandom.swift; sourceTree = "<group>"; };
-		7BF311656E84A33909FC4DE3AAEC37CD /* JQueueState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = JQueueState.swift; sourceTree = "<group>"; };
+		7BF311656E84A33909FC4DE3AAEC37CD /* QueueState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QueueState.swift; sourceTree = "<group>"; };
 		7E4775B8977409BD0364B31A08DD99D9 /* UISwitch+RACSignalSupport.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UISwitch+RACSignalSupport.m"; path = "ReactiveCocoa/Objective-C/UISwitch+RACSignalSupport.m"; sourceTree = "<group>"; };
 		7F24B537861D2D68DABEB15CEAA0F91B /* RACSignalSequence.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RACSignalSequence.m; path = "ReactiveCocoa/Objective-C/RACSignalSequence.m"; sourceTree = "<group>"; };
 		818988229C5B0919810519791C7B0CE7 /* RACStream.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RACStream.m; path = "ReactiveCocoa/Objective-C/RACStream.m"; sourceTree = "<group>"; };
@@ -742,6 +749,13 @@
 		C0E419C79B8B69EAD26826BAA28070D0 /* RACMulticastConnection.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RACMulticastConnection.m; path = "ReactiveCocoa/Objective-C/RACMulticastConnection.m"; sourceTree = "<group>"; };
 		C1440C38060C39C51B421241F6606BDE /* RACEmptySequence.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RACEmptySequence.m; path = "ReactiveCocoa/Objective-C/RACEmptySequence.m"; sourceTree = "<group>"; };
 		C2927EEC0FC7E33E3D96266B207BD590 /* Result-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Result-prefix.pch"; sourceTree = "<group>"; };
+		C3CB994A1C6796C800C95F1A /* LimitedAsyncStreamsQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LimitedAsyncStreamsQueue.swift; sourceTree = "<group>"; };
+		C3CB994D1C6796C800C95F1A /* QueueState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QueueState.swift; sourceTree = "<group>"; };
+		C3CB994E1C6796C800C95F1A /* QueueStrategy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QueueStrategy.swift; sourceTree = "<group>"; };
+		C3CB994F1C6796C800C95F1A /* StrategyFifo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StrategyFifo.swift; sourceTree = "<group>"; };
+		C3CB99501C6796C800C95F1A /* StrategyRandom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StrategyRandom.swift; sourceTree = "<group>"; };
+		C3CB99511C6796C800C95F1A /* StrategyStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StrategyStack.swift; sourceTree = "<group>"; };
+		C3CB99591C67991800C95F1A /* StreamOwner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamOwner.swift; sourceTree = "<group>"; };
 		C440603F3107C150CA4FFBDCAC47F334 /* AsyncStream+Additions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AsyncStream+Additions.swift"; sourceTree = "<group>"; };
 		C4890C5CA471A96DBB0D62A22B3ACFA8 /* RACSequence.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RACSequence.m; path = "ReactiveCocoa/Objective-C/RACSequence.m"; sourceTree = "<group>"; };
 		C4AA34103338BFD41F68E5AE8C2C35B0 /* RACCommand.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RACCommand.m; path = "ReactiveCocoa/Objective-C/RACCommand.m"; sourceTree = "<group>"; };
@@ -1347,6 +1361,8 @@
 				864D162F37A3EC4BE2D8C5012C08FEC3 /* MergedAsyncStream.swift */,
 				215B5778EEAAFA1585604DF440724CB2 /* Stream+AsyncStream.swift */,
 				C00B34DD4FC8B91ED3AC2669DAE20DD8 /* UniqueObservable.swift */,
+				C3CB994A1C6796C800C95F1A /* LimitedAsyncStreamsQueue.swift */,
+				C3CB994B1C6796C800C95F1A /* QueueStrategies */,
 			);
 			path = Lib;
 			sourceTree = "<group>";
@@ -1365,7 +1381,7 @@
 			isa = PBXGroup;
 			children = (
 				2288A9EC8852F4A18CB2A761DE60CF43 /* BaseStrategy.swift */,
-				7BF311656E84A33909FC4DE3AAEC37CD /* JQueueState.swift */,
+				7BF311656E84A33909FC4DE3AAEC37CD /* QueueState.swift */,
 				A717CC6605774F7F1FC1CD90A43BEDB1 /* QueueStrategy.swift */,
 				DEE103ECC7A7A28AC7E1D269FB2C7839 /* StrategyFifo.swift */,
 				7BE56088E44F2485D3F5D9E350B7DF61 /* StrategyRandom.swift */,
@@ -1500,6 +1516,19 @@
 			);
 			name = "Support Files";
 			path = "../Target Support Files/ReactiveKit";
+			sourceTree = "<group>";
+		};
+		C3CB994B1C6796C800C95F1A /* QueueStrategies */ = {
+			isa = PBXGroup;
+			children = (
+				C3CB99591C67991800C95F1A /* StreamOwner.swift */,
+				C3CB994D1C6796C800C95F1A /* QueueState.swift */,
+				C3CB994E1C6796C800C95F1A /* QueueStrategy.swift */,
+				C3CB994F1C6796C800C95F1A /* StrategyFifo.swift */,
+				C3CB99501C6796C800C95F1A /* StrategyRandom.swift */,
+				C3CB99511C6796C800C95F1A /* StrategyStack.swift */,
+			);
+			path = QueueStrategies;
 			sourceTree = "<group>";
 		};
 		D001121965D43AA3F687A04F6C755794 /* Support Files */ = {
@@ -1996,7 +2025,7 @@
 				0351E54A621C4957A0F067B10F3C7244 /* BaseStrategy.swift in Sources */,
 				D3C0D70084A87C40BAEC9DB85F133A0C /* CachedAsync.swift in Sources */,
 				1987C7B3EC27F0A548472BA64AD1F082 /* iAsync.async-dummy.m in Sources */,
-				E9CFF0057B8492C8A60C56FDC839541B /* JQueueState.swift in Sources */,
+				E9CFF0057B8492C8A60C56FDC839541B /* QueueState.swift in Sources */,
 				160F0436B1E522E5B73B2EF40A0B9D50 /* LimitedLoadersQueue.swift in Sources */,
 				7FBC3DDD236A33C353B5B6DEE3F089E0 /* NSURL+LocalDataLoader.swift in Sources */,
 				074404FCE031C1485E119D3FBCD12D22 /* QueueStrategy.swift in Sources */,
@@ -2210,13 +2239,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				73AACB4304981B4E8058A98924F1C0CB /* AsyncEvent.swift in Sources */,
+				C3CB995D1C679C9000C95F1A /* QueueStrategy.swift in Sources */,
 				412E57A95932DD5D8C6ABA873364D07C /* AsyncStream+Additions.swift in Sources */,
+				C3CB99621C679EE600C95F1A /* LimitedAsyncStreamsQueue.swift in Sources */,
+				C3CB99611C679C9E00C95F1A /* StrategyStack.swift in Sources */,
+				C3CB99601C679C9B00C95F1A /* StrategyRandom.swift in Sources */,
 				E7B81EB960A99C46C12E07194BF6D742 /* AsyncStream.swift in Sources */,
+				C3CB995B1C67993300C95F1A /* StreamOwner.swift in Sources */,
 				0200024FC0B1E4E40F1B7918D14B847A /* AsyncStreamInterface.swift in Sources */,
 				D5E7F70352DF2FE67CE2CD0685006C60 /* iAsync.reactiveKit-dummy.m in Sources */,
 				CCAD7812F6BD8A9881B3E0BD81F0CAB0 /* MergedAsyncStream.swift in Sources */,
+				C3CB995F1C679C9700C95F1A /* StrategyFifo.swift in Sources */,
 				231F02491B0F1121428BD66418AACD28 /* Stream+AsyncStream.swift in Sources */,
 				5B1E6385027B345986757C2D9905DDA8 /* UniqueObservable.swift in Sources */,
+				C3CB995C1C679C8B00C95F1A /* QueueState.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

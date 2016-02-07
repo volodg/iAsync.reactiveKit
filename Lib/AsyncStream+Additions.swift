@@ -1,6 +1,6 @@
 //
 //  AsyncStream+Additions.swift
-//  iAsync.reactiveKit
+//  iAsync_reactiveKit
 //
 //  Created by Gorbenko Vladimir on 05/02/16.
 //  Copyright © 2016 EmbeddedSystems. All rights reserved.
