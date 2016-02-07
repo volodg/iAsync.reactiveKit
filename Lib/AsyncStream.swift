@@ -73,6 +73,12 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         stream.observe(observer: {_ in})
     }
 
+    public func after(delay: NSTimeInterval) -> AsyncStream<Value, Next, Error> {
+
+        let delayStream = AsyncStream<Void, Next, Error>.succeededAfter(delay: delay, with: ())
+        return delayStream.flatMap(.Latest) { _ in self }
+    }
+
     public static func succeeded(with value: Value) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             observer(.Success(value))
