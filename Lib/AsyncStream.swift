@@ -193,6 +193,22 @@ public extension AsyncStreamType {
     }
 
     @warn_unused_result
+    public func mapNext<F>(transform: Next -> F) -> AsyncStream<Value, F, Error> {
+        return create { observer in
+            return self.observe(on: nil, observer: { event -> () in
+                switch event {
+                case .Next(let next):
+                    observer(.Next(transform(next)))
+                case .Failure(let error):
+                    observer(.Failure(error))
+                case .Success(let value):
+                    observer(.Success(value))
+                }
+            })
+        }
+    }
+
+    @warn_unused_result
     public func mapError<F>(transform: Error -> F) -> AsyncStream<Value, Next, F> {
         return lift { $0.map { $0.mapError(transform) } }
     }

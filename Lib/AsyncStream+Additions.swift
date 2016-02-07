@@ -23,40 +23,6 @@ public extension AsyncStreamType {
 
     typealias Event = AsyncEvent<Value, Next, Error>
 
-    public func mapValue<U>(transform: Value -> U) -> AsyncStream<U, Next, Error> {
-        return create { observer in
-            return self.observe(on: nil) { event in
-
-                switch event {
-                case .Success(let value):
-                    observer(.Success(transform(value)))
-                case .Failure(let error):
-                    observer(.Failure(error))
-                case .Next(let next):
-                    observer(.Next(next))
-                }
-            }
-        }
-    }
-
-    public func mapNext<U>(transform: Next -> U?) -> AsyncStream<Value, U, Error> {
-        return create { observer in
-            return self.observe(on: nil) { event in
-
-                switch event {
-                case .Success(let value):
-                    observer(.Success(value))
-                case .Failure(let error):
-                    observer(.Failure(error))
-                case .Next(let next):
-                    if let next = transform(next) {
-                        observer(.Next(next))
-                    }
-                }
-            }
-        }
-    }
-
     public func unsubscribe() -> AsyncStream<Value, Next, Error> {
 
         return create { observer in
