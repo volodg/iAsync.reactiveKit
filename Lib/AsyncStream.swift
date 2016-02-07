@@ -8,7 +8,6 @@
 
 import Foundation
 
-import iAsync_async
 import iAsync_utils
 
 import ReactiveKit

@@ -117,7 +117,6 @@ Pod::Spec.new do |s|
 
   s.xcconfig = { "CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES" => "YES" }
   
-  s.dependency "iAsync.async"#, "~> 1.0.1"
   s.dependency "iAsync.utils"#, "~> 1.0.1"
   s.dependency "ReactiveKit" #, "~> 1.1.2"
 
