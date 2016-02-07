@@ -53,9 +53,8 @@ public extension AsyncStreamType {
             let event = getter()
 
             if let event = event {
-
                 observer(event)
-                return nil
+                if event.isTerminal { return nil }
             }
 
             return self.observe(on: nil) { event in

@@ -97,6 +97,10 @@ class MergedAsyncStreamTests: XCTestCase {
         weak var weakDeinitTest: NSObject? = nil
         weak var weakMerger: MergerType?
 
+        var setterResult: String?
+        var setterEventCallsCount = 0
+        var setterValueCallsCount = 0
+
         autoreleasepool {
 
             let deinitTest = NSObject()
@@ -105,16 +109,38 @@ class MergedAsyncStreamTests: XCTestCase {
             let merger = MergerType()
             weakMerger = merger
 
-            let stream = merger.mergedStream({ testStream() }, key: "1")
+            let stream = merger.mergedStream({ () -> AsyncStream<String, Int, NSError> in
+
+                let stream = testStream().withEventValue({ () -> AsyncEvent<String, Int, NSError>? in
+
+                    deinitTest.description
+                    return nil
+                }, setter: { event -> Void in
+
+                    deinitTest.description
+
+                    setterEventCallsCount += 1
+                    switch event {
+                    case .Success(let value):
+                        setterResult = value
+                        setterValueCallsCount += 1
+                    default:
+                        break
+                    }
+                })
+
+                return stream
+            }, key: "1")
 
             let expectation1 = self.expectationWithDescription("")
             let expectation2 = self.expectationWithDescription("")
 
             stream.observe { ev -> Void in
 
+                deinitTest.description
+
                 switch ev {
                 case .Success(let value):
-                    deinitTest.description
                     resultValue1 = value
                     expectation1.fulfill()
                 case .Failure:
@@ -126,9 +152,10 @@ class MergedAsyncStreamTests: XCTestCase {
             }
             stream.observe { ev -> Void in
 
+                deinitTest.description
+
                 switch ev {
                 case .Success(let value):
-                    deinitTest.description
                     resultValue2 = value
                     expectation2.fulfill()
                 case .Failure:
@@ -146,6 +173,106 @@ class MergedAsyncStreamTests: XCTestCase {
 
         XCTAssertNil(weakDeinitTest)
         XCTAssertNil(weakMerger)
+
+        XCTAssertEqual(setterResult, "ok")
+        XCTAssertEqual(6, setterEventCallsCount)
+        XCTAssertEqual(1, setterValueCallsCount)
+
+        XCTAssertEqual(5, progressCalledCount1)
+        XCTAssertEqual("ok", resultValue1)
+
+        XCTAssertEqual(5, progressCalledCount2)
+        XCTAssertEqual("ok", resultValue2)
+
+        XCTAssertEqual(numberOfObservers1, 1)
+    }
+
+    func testNormalImmediatelyFinishStream() {
+
+        var progressCalledCount1 = 0
+        var resultValue1: String?
+
+        var progressCalledCount2 = 0
+        var resultValue2: String?
+
+        weak var weakDeinitTest: NSObject? = nil
+        weak var weakMerger: MergerType?
+
+        var setterResult: String?
+        var setterEventCallsCount = 0
+        var setterValueCallsCount = 0
+
+        autoreleasepool {
+
+            let deinitTest = NSObject()
+            weakDeinitTest = deinitTest
+
+            let merger = MergerType()
+            weakMerger = merger
+
+            let stream = merger.mergedStream({ () -> AsyncStream<String, Int, NSError> in
+
+                let stream = testStream().withEventValue({ () -> AsyncEvent<String, Int, NSError>? in
+                    return nil
+                }, setter: { event -> Void in
+                    setterEventCallsCount += 1
+                    switch event {
+                    case .Success(let value):
+                        setterResult = value
+                        setterValueCallsCount += 1
+                    default:
+                        break
+                    }
+                })
+
+                return stream
+            }, key: "1")
+
+            let expectation1 = self.expectationWithDescription("")
+            let expectation2 = self.expectationWithDescription("")
+
+            stream.observe { ev -> Void in
+
+                deinitTest.description
+
+                switch ev {
+                case .Success(let value):
+                    resultValue1 = value
+                    expectation1.fulfill()
+                case .Failure:
+                    XCTFail()
+                case .Next(let next):
+                    XCTAssertEqual(progressCalledCount1, next)
+                    progressCalledCount1 += 1
+                }
+            }
+            stream.observe { ev -> Void in
+
+                deinitTest.description
+
+                switch ev {
+                case .Success(let value):
+                    resultValue2 = value
+                    expectation2.fulfill()
+                case .Failure:
+                    XCTFail()
+                case .Next(let next):
+                    XCTAssertEqual(progressCalledCount2, next)
+                    progressCalledCount2 += 1
+                }
+            }
+
+            XCTAssertNotNil(weakDeinitTest)
+
+            self.waitForExpectationsWithTimeout(0.5, handler: nil)
+        }
+
+        XCTAssertNil(weakDeinitTest)
+        XCTAssertNil(weakMerger)
+
+        XCTAssertEqual(setterResult, "ok")
+        XCTAssertEqual(6, setterEventCallsCount)
+        XCTAssertEqual(1, setterValueCallsCount)
 
         XCTAssertEqual(5, progressCalledCount1)
         XCTAssertEqual("ok", resultValue1)
