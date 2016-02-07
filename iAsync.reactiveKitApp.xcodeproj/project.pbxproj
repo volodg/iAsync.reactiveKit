@@ -23,6 +23,7 @@
 		C3B0C7D11C662CCB0043D5CC /* AsyncStreamWithJobTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3B0C7D01C662CCB0043D5CC /* AsyncStreamWithJobTests.swift */; };
 		C3CB99451C675E4100C95F1A /* AsyncStreamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CB99441C675E4100C95F1A /* AsyncStreamTests.swift */; };
 		C3D519581C66015600628BAC /* MergedAsyncStreamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D519571C66015600628BAC /* MergedAsyncStreamTests.swift */; };
+		C3EB36BD1C67B70800213655 /* LimitedAsyncStreamsQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3EB36BC1C67B70800213655 /* LimitedAsyncStreamsQueueTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +67,7 @@
 		C3B0C7D01C662CCB0043D5CC /* AsyncStreamWithJobTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncStreamWithJobTests.swift; sourceTree = "<group>"; };
 		C3CB99441C675E4100C95F1A /* AsyncStreamTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncStreamTests.swift; sourceTree = "<group>"; };
 		C3D519571C66015600628BAC /* MergedAsyncStreamTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MergedAsyncStreamTests.swift; sourceTree = "<group>"; };
+		C3EB36BC1C67B70800213655 /* LimitedAsyncStreamsQueueTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LimitedAsyncStreamsQueueTests.swift; sourceTree = "<group>"; };
 		C3F933341C63DF1200F42309 /* AsyncToStreamTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncToStreamTests.swift; sourceTree = "<group>"; };
 		D9166822A41C7023CA716E8B /* Pods-iAsync.reactiveKitApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iAsync.reactiveKitApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-iAsync.reactiveKitApp/Pods-iAsync.reactiveKitApp.release.xcconfig"; sourceTree = "<group>"; };
 		E65A5E0E06693EE042313292 /* Pods-iAsync.reactiveKitAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iAsync.reactiveKitAppTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-iAsync.reactiveKitAppTests/Pods-iAsync.reactiveKitAppTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 				C3D519571C66015600628BAC /* MergedAsyncStreamTests.swift */,
 				C3B0C7D01C662CCB0043D5CC /* AsyncStreamWithJobTests.swift */,
 				C3CB99441C675E4100C95F1A /* AsyncStreamTests.swift */,
+				C3EB36BC1C67B70800213655 /* LimitedAsyncStreamsQueueTests.swift */,
 				C35E4D171C63D76300AB0981 /* Info.plist */,
 			);
 			path = iAsync.reactiveKitAppTests;
@@ -422,6 +425,7 @@
 				C374B6861C6405990060DBCD /* TestCommons.swift in Sources */,
 				C363040A1C64A1BB00521989 /* StreamToAsyncTests.swift in Sources */,
 				C3B0C7D11C662CCB0043D5CC /* AsyncStreamWithJobTests.swift in Sources */,
+				C3EB36BD1C67B70800213655 /* LimitedAsyncStreamsQueueTests.swift in Sources */,
 				C3D519581C66015600628BAC /* MergedAsyncStreamTests.swift in Sources */,
 				C390FBAD1C6529E800147280 /* AsyncStreamFlatMapTests.swift in Sources */,
 				C36304091C649FC200521989 /* MergedObserversTests.swift in Sources */,
