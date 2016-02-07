@@ -259,6 +259,7 @@
 		C3CB99611C679C9E00C95F1A /* StrategyStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CB99511C6796C800C95F1A /* StrategyStack.swift */; };
 		C3CB99621C679EE600C95F1A /* LimitedAsyncStreamsQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CB994A1C6796C800C95F1A /* LimitedAsyncStreamsQueue.swift */; };
 		C3EB36C21C67C8B700213655 /* AsyncStreamTypesTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3EB36C01C67C8A500213655 /* AsyncStreamTypesTransform.swift */; };
+		C3EB36C41C67DA0A00213655 /* ActiveAsyncStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3EB36C31C67DA0A00213655 /* ActiveAsyncStream.swift */; };
 		C42AE3116B9F8DCEDDD362E47B983DA3 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7D2483B04CE26C3A2C8C29FE600F27 /* Operation.swift */; };
 		C51434EBB8B19CEE123AC4FA2B6A999C /* Optional.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9345E863479729847FE03A4AEEF43D /* Optional.swift */; };
 		C7B5AD280B177501A284D9FA4489D3ED /* CompositeDisposable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2DACFD417C5F3C533A82ED2B50306F7 /* CompositeDisposable.swift */; };
@@ -742,6 +743,7 @@
 		C3CB99511C6796C800C95F1A /* StrategyStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StrategyStack.swift; sourceTree = "<group>"; };
 		C3CB99591C67991800C95F1A /* StreamOwner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamOwner.swift; sourceTree = "<group>"; };
 		C3EB36C01C67C8A500213655 /* AsyncStreamTypesTransform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncStreamTypesTransform.swift; sourceTree = "<group>"; };
+		C3EB36C31C67DA0A00213655 /* ActiveAsyncStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActiveAsyncStream.swift; sourceTree = "<group>"; };
 		C440603F3107C150CA4FFBDCAC47F334 /* AsyncStream+Additions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AsyncStream+Additions.swift"; sourceTree = "<group>"; };
 		C4890C5CA471A96DBB0D62A22B3ACFA8 /* RACSequence.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RACSequence.m; path = "ReactiveCocoa/Objective-C/RACSequence.m"; sourceTree = "<group>"; };
 		C4AA34103338BFD41F68E5AE8C2C35B0 /* RACCommand.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RACCommand.m; path = "ReactiveCocoa/Objective-C/RACCommand.m"; sourceTree = "<group>"; };
@@ -1328,6 +1330,7 @@
 		985CBA73ABD9B35357809DD148F601AF /* Lib */ = {
 			isa = PBXGroup;
 			children = (
+				C3EB36C31C67DA0A00213655 /* ActiveAsyncStream.swift */,
 				F8DC60C8BA8F57D576E0122177A5E529 /* AsyncEvent.swift */,
 				1FA959A50AB3DE8C5D12E8CE6D4E0B1E /* AsyncStream.swift */,
 				44658CEFA11D6D114D301333D1EC2DF2 /* AsyncStream+Additions.swift */,
@@ -2191,6 +2194,7 @@
 				E7B81EB960A99C46C12E07194BF6D742 /* AsyncStream.swift in Sources */,
 				C3CB995B1C67993300C95F1A /* StreamOwner.swift in Sources */,
 				0200024FC0B1E4E40F1B7918D14B847A /* AsyncStreamInterface.swift in Sources */,
+				C3EB36C41C67DA0A00213655 /* ActiveAsyncStream.swift in Sources */,
 				D5E7F70352DF2FE67CE2CD0685006C60 /* iAsync.reactiveKit-dummy.m in Sources */,
 				CCAD7812F6BD8A9881B3E0BD81F0CAB0 /* MergedAsyncStream.swift in Sources */,
 				C3CB995F1C679C9700C95F1A /* StrategyFifo.swift in Sources */,

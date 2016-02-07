@@ -23,6 +23,10 @@ public extension AsyncStreamType {
 
     typealias Event = AsyncEvent<Value, Next, Error>
 
+    public func run() {
+        observe(on: nil, observer: {_ in})
+    }
+
     public func unsubscribe() -> AsyncStream<Value, Next, Error> {
 
         return create { observer in

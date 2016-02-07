@@ -45,7 +45,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
 
     public typealias Observer = Event -> ()
 
-    public init(producer: (Observer -> DisposableType?)) {
+    public init(producer: Observer -> DisposableType?) {
         stream = Stream  { observer in
             var observerHolder: Observer? = observer
 
@@ -67,10 +67,6 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
 
     public func observe(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Observer) -> DisposableType {
         return stream.observe(on: context, observer: observer)
-    }
-
-    public func run() {
-        stream.observe(observer: {_ in})
     }
 
     public func after(delay: NSTimeInterval) -> AsyncStream<Value, Next, Error> {

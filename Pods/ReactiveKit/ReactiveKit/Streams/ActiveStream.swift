@@ -99,7 +99,7 @@ public class ActiveStream<Event>: StreamType {
     lock.unlock()
   }
 
-  internal func registerDisposable(disposable: DisposableType) {
+  public/* internal */func registerDisposable(disposable: DisposableType) {
     deinitDisposable.addDisposable(disposable)
   }
 

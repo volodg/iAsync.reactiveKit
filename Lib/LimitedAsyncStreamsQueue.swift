@@ -51,17 +51,13 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
     private func hasStreamsReadyToStartForPendingStream(pendingStream: OwnerT) -> Bool {
 
         if pendingStream.barrier {
-
             return state.activeStreams.count == 0
         }
 
         let result = limitCount > state.activeStreams.count && state.pendingStreams.count > 0
 
         if result {
-
-            return state.activeStreams.all { (activeStream: OwnerT) -> Bool in
-                return !activeStream.barrier
-            }
+            return state.activeStreams.all { !$0.barrier }
         }
 
         return result
