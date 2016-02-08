@@ -272,7 +272,6 @@
 		CE61B583465674B9BEAF16BBA8F074BB /* UISlider+RACSignalSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 5F90B5FEF55BE473B3C60696876F2BFD /* UISlider+RACSignalSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CEAE88DE329125382E7071AFF1186C44 /* iAsync_reactiveKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F9243651CB2FB1709F1FF6C3203B9B6 /* iAsync_reactiveKit.framework */; };
 		D1E046C8CCF7504B2C808A19289E27F4 /* RACDynamicPropertySuperclass.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E770200B241FF55901A6113E5FFFCCC /* RACDynamicPropertySuperclass.m */; };
-		D3C0D70084A87C40BAEC9DB85F133A0C /* CachedAsync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6673FCF91CD1D23245B30360D5CBE825 /* CachedAsync.swift */; };
 		D42FEADECBDFB42CBE352206F94B9110 /* SerialDisposable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F181DED13282227CC33B36628B8B94 /* SerialDisposable.swift */; };
 		D48AA996B59D961216975839C15CC4C6 /* ReactiveKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = E463173BD9A0D06C79DC790BD486606B /* ReactiveKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D4D883212D458F6017D1F1F0C5517B98 /* Atomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FD609D361F51585C0087EB8BBEBDD4 /* Atomic.swift */; };
@@ -612,7 +611,6 @@
 		653DF2BDBA404D8279BE29BA63E0196D /* Pods_iAsync_reactiveKitAppTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iAsync_reactiveKitAppTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6610BB504995788183B750791E3B2EBF /* UIRefreshControl+RACCommandSupport.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIRefreshControl+RACCommandSupport.h"; path = "ReactiveCocoa/Objective-C/UIRefreshControl+RACCommandSupport.h"; sourceTree = "<group>"; };
 		66411B382DED533DB26F53771E524B6C /* AsyncStreamInterface.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AsyncStreamInterface.swift; sourceTree = "<group>"; };
-		6673FCF91CD1D23245B30360D5CBE825 /* CachedAsync.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CachedAsync.swift; sourceTree = "<group>"; };
 		687B4E0765E1B1701D0A79A2ACF05845 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		6A1569FC0E6E3305B34C551440B85F1C /* Pods-iAsync.reactiveKitAppTests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-iAsync.reactiveKitAppTests.modulemap"; sourceTree = "<group>"; };
 		6B5AEF744D8548CE17E66E49A45DA4D9 /* RACGroupedSignal.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RACGroupedSignal.m; path = "ReactiveCocoa/Objective-C/RACGroupedSignal.m"; sourceTree = "<group>"; };
@@ -1122,7 +1120,6 @@
 				4A15BDD9082175B22299BB1F68E5C804 /* AsyncsOwner.swift */,
 				89178530B5CACCF5A7953F28458A0B29 /* AsyncsPredefinedBlocks.swift */,
 				414D46CCE26DE9F09CF715E0C7C60F5B /* ArrayLoadersMerger */,
-				A018C12F28AC8E298EF306ACCBBFADEF /* CachedAsyncOperations */,
 				AB62DC7B7445365CBA58CB0502166B3D /* React */,
 			);
 			path = Lib;
@@ -1336,21 +1333,13 @@
 				44658CEFA11D6D114D301333D1EC2DF2 /* AsyncStream+Additions.swift */,
 				66411B382DED533DB26F53771E524B6C /* AsyncStreamInterface.swift */,
 				C3EB36C01C67C8A500213655 /* AsyncStreamTypesTransform.swift */,
-				864D162F37A3EC4BE2D8C5012C08FEC3 /* MergedAsyncStream.swift */,
 				215B5778EEAAFA1585604DF440724CB2 /* Stream+AsyncStream.swift */,
 				C00B34DD4FC8B91ED3AC2669DAE20DD8 /* UniqueObservable.swift */,
 				C3CB994A1C6796C800C95F1A /* LimitedAsyncStreamsQueue.swift */,
+				864D162F37A3EC4BE2D8C5012C08FEC3 /* MergedAsyncStream.swift */,
 				C3CB994B1C6796C800C95F1A /* QueueStrategies */,
 			);
 			path = Lib;
-			sourceTree = "<group>";
-		};
-		A018C12F28AC8E298EF306ACCBBFADEF /* CachedAsyncOperations */ = {
-			isa = PBXGroup;
-			children = (
-				6673FCF91CD1D23245B30360D5CBE825 /* CachedAsync.swift */,
-			);
-			path = CachedAsyncOperations;
 			sourceTree = "<group>";
 		};
 		A555BA56B409B0E1712663FEF041E871 /* Errors */ = {
@@ -1975,7 +1964,6 @@
 				D9E8A88F6A1AE90801C4A4A774C39C9E /* AsyncsOwner.swift in Sources */,
 				82B6C4C695957D05971CACF1D2D1B6D8 /* AsyncsPredefinedBlocks.swift in Sources */,
 				DD53A1FEAC63427772517109E1120486 /* AsyncStream+Additions.swift in Sources */,
-				D3C0D70084A87C40BAEC9DB85F133A0C /* CachedAsync.swift in Sources */,
 				1987C7B3EC27F0A548472BA64AD1F082 /* iAsync.async-dummy.m in Sources */,
 				7FBC3DDD236A33C353B5B6DEE3F089E0 /* NSURL+LocalDataLoader.swift in Sources */,
 			);

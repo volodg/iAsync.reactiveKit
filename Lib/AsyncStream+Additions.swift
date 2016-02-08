@@ -46,7 +46,7 @@ public extension AsyncStreamType {
         }
     }
 
-    public func withEventValue(getter: () -> AsyncEvent<Value, Next, Error>?, setter: AsyncEvent<Value, Next, Error> -> Void) -> AsyncStream<Value, Next, Error> {
+    public func withEventValueGetter(getter: () -> AsyncEvent<Value, Next, Error>?) -> AsyncStream<Value, Next, Error> {
 
         return create { observer in
 
@@ -56,6 +56,14 @@ public extension AsyncStreamType {
                 observer(event)
                 if event.isTerminal { return nil }
             }
+
+            return self.observe(on: nil, observer: observer)
+        }
+    }
+
+    public func withEventValueSetter(setter: AsyncEvent<Value, Next, Error> -> Void) -> AsyncStream<Value, Next, Error> {
+
+        return create { observer in
 
             return self.observe(on: nil) { event in
 
@@ -117,7 +125,9 @@ public extension AsyncStreamType {
                 case .Failure:
                     finishNotify(event)
                 case .Next(let next):
-                    buffer.append(next)
+                    if buffer.count < limit {
+                        buffer.append(next)
+                    }
                     if buffer.count > limit {
                         buffer = Array(buffer.suffixFrom(1))
                     }

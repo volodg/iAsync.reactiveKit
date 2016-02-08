@@ -145,10 +145,10 @@
 				C3F933341C63DF1200F42309 /* AsyncToStreamTests.swift */,
 				C36304081C649FC200521989 /* MergedObserversTests.swift */,
 				C390FBAC1C6529E800147280 /* AsyncStreamFlatMapTests.swift */,
-				C3D519571C66015600628BAC /* MergedAsyncStreamTests.swift */,
 				C3B0C7D01C662CCB0043D5CC /* AsyncStreamWithJobTests.swift */,
 				C3CB99441C675E4100C95F1A /* AsyncStreamTests.swift */,
 				C3EB36BC1C67B70800213655 /* LimitedAsyncStreamsQueueTests.swift */,
+				C3D519571C66015600628BAC /* MergedAsyncStreamTests.swift */,
 				C35E4D171C63D76300AB0981 /* Info.plist */,
 			);
 			path = iAsync.reactiveKitAppTests;

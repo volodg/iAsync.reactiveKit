@@ -8,29 +8,48 @@
 
 import Foundation
 
+import iAsync_utils
+
 import ReactiveKit
 
 final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorType> {
 
-    public init() {}
+    private let sharedNextLimit: Int
+
+    public init(sharedNextLimit: Int = 0) {
+        self.sharedNextLimit = sharedNextLimit
+    }
+
+    public typealias StreamT = AsyncStream<Value, Next, Error>
 
     private var streamsByKey  = [Key:AsyncStream<Value, Next, Error>]()
     private var disposesByKey = [Key:[SerialDisposable]]()
 
-    public func mergedStream<T: AsyncStreamType where T.Value == Value, T.Next == Next, T.Error == Error>
-        (factory: () -> T, key: Key) -> AsyncStream<Value, Next, Error> {
+    public func mergedStream<T: AsyncStreamType where T.Value == Value, T.Next == Next, T.Error == Error>(
+        factory: () -> T,
+        key    : Key,
+        getter : (() -> StreamT.Event?)? = nil,
+        setter : (StreamT.Event -> Void)? = nil
+        ) -> StreamT {
 
-        return create(producer: { observer -> DisposableType? in
+        let result: StreamT = create(producer: { observer -> DisposableType? in
 
-            let resultStream: AsyncStream<Value, Next, Error>
+            let resultStream: StreamT
 
             if let stream = self.streamsByKey[key] {
                 resultStream = stream
             } else {
-                resultStream = factory().on(completed: { () -> Void in
+                let stream: StreamT
+                if let setter = setter {
+                    stream = factory().withEventValueSetter(setter)
+                } else {
+                    stream = factory().map(id)
+                }
+
+                resultStream = stream.on(completed: { () -> Void in
                     self.streamsByKey.removeValueForKey(key)
                     self.disposesByKey.removeValueForKey(key)
-                }).mergedObservers()
+                }).mergedObservers(self.sharedNextLimit)
                 self.streamsByKey[key] = resultStream
             }
 
@@ -67,5 +86,11 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
                 dispose.dispose()
             }
         })
+
+        if let getter = getter {
+            return result.withEventValueGetter(getter)
+        }
+
+        return result
     }
 }

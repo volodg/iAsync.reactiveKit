@@ -109,18 +109,12 @@ class MergedAsyncStreamTests: XCTestCase {
             let deinitTest = NSObject()
             weakDeinitTest = deinitTest
 
-            let merger = MergerType()
+            let merger = MergerType(sharedNextLimit: 1)
             weakMerger = merger
 
             let stream = merger.mergedStream({ () -> AsyncStream<String, Int, NSError> in
 
-                let stream = testStream().withEventValue({ () -> AsyncEvent<String, Int, NSError>? in
-
-                    getterCallsCount += 1
-                    deinitTest.description
-                    return .Next(-1)
-                }, setter: { event -> Void in
-
+                let stream = testStream().withEventValueSetter({ event -> Void in
                     deinitTest.description
 
                     setterEventCallsCount += 1
@@ -131,6 +125,11 @@ class MergedAsyncStreamTests: XCTestCase {
                     default:
                         break
                     }
+                }).withEventValueGetter({ () -> AsyncEvent<String, Int, NSError>? in
+
+                    getterCallsCount += 1
+                    deinitTest.description
+                    return .Next(-1)
                 })
 
                 return stream
@@ -227,15 +226,13 @@ class MergedAsyncStreamTests: XCTestCase {
 
             let stream = merger.mergedStream({ () -> AsyncStream<String, Int, NSError> in
 
-                let stream = testStream().withEventValue({ () -> AsyncEvent<String, Int, NSError>? in
-
+                let stream = testStream().withEventValueSetter({ _ -> Void in
+                    deinitTest.description
+                    XCTFail()
+                }).withEventValueGetter({ () -> AsyncEvent<String, Int, NSError>? in
                     getterCallsCount += 1
                     deinitTest.description
                     return .Success("ok1")
-                }, setter: { event -> Void in
-
-                    deinitTest.description
-                    XCTFail()
                 })
 
                 return stream
