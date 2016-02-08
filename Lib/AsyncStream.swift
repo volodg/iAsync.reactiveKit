@@ -169,6 +169,11 @@ public extension AsyncStreamType {
     }
 
     @warn_unused_result
+    public func mapValue<U>(transform: Value -> U) -> AsyncStream<U, Next, Error> {
+        return lift { $0.map { $0.map(transform) } }
+    }
+
+    @warn_unused_result
     public func tryMap<U>(transform: Value -> Result<U, Error>) -> AsyncStream<U, Next, Error> {
         return lift { $0.map { operationEvent in
             switch operationEvent {
@@ -181,6 +186,27 @@ public extension AsyncStreamType {
                 }
             case .Failure(let error):
                 return .Failure(error)
+            case .Next(let event):
+                return .Next(event)
+            }
+            }
+        }
+    }
+
+    //tryMapError
+    @warn_unused_result
+    public func tryMapError<F>(transform: Error -> Result<Value, F>) -> AsyncStream<Value, Next, F> {
+        return lift { $0.map { operationEvent in
+            switch operationEvent {
+            case .Success(let value):
+                return .Success(value)
+            case .Failure(let error):
+                switch transform(error) {
+                case let .Success(value):
+                    return .Success(value)
+                case let .Failure(error):
+                    return .Failure(error)
+                }
             case .Next(let event):
                 return .Next(event)
             }
