@@ -120,9 +120,7 @@ public extension AsyncStreamType {
             dispose = self.observe(on: nil) { event in
 
                 switch event {
-                case .Success:
-                    finishNotify(event)
-                case .Failure:
+                case .Success, .Failure:
                     finishNotify(event)
                 case .Next(let next):
                     if buffer.count < limit {
@@ -144,7 +142,7 @@ public func asyncStreamWithSameThreadJob<Value, Next, Error: ErrorType>(job: (Ne
 
     typealias Event = AsyncEvent<Value, Next, Error>
 
-    return AsyncStream { (observer: Event -> ()) -> DisposableType? in
+    return create { observer in
 
         var observerHolder: (Event -> ())? = observer
 
@@ -175,7 +173,7 @@ public func asyncStreamWithJob<Value, Next, Error: ErrorType>(
 
     typealias Event = AsyncEvent<Value, Next, Error>
 
-    return AsyncStream { (observer: Event -> ()) -> DisposableType? in
+    return create { observer in
 
         var observerHolder: (Event -> ())? = observer
 
