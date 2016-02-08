@@ -755,27 +755,27 @@ public extension AsyncStreamType {
         }
     }
 
-//    @warn_unused_result
-//    public func flatMapError<T: OperationType where T.Value == Value>(recover: Error -> T) -> Operation<T.Value, T.Error> {
-//        return create { observer in
-//            let serialDisposable = SerialDisposable(otherDisposable: nil)
-//
-//            serialDisposable.otherDisposable = self.observe(on: nil) { taskEvent in
-//                switch taskEvent {
-//                case .Next(let value):
-//                    observer.next(value)
-//                case .Success:
-//                    observer.success()
-//                case .Failure(let error):
-//                    serialDisposable.otherDisposable = recover(error).observe(on: nil) { event in
-//                        observer.observer(event)
-//                    }
-//                }
-//            }
-//
-//            return serialDisposable
-//        }
-//    }
+    @warn_unused_result
+    public func flatMapError<T: AsyncStreamType where T.Value == Value, T.Next == Next>(recover: Error -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
+        return create { observer in
+            let serialDisposable = SerialDisposable(otherDisposable: nil)
+
+            serialDisposable.otherDisposable = self.observe(on: nil) { taskEvent in
+                switch taskEvent {
+                case .Next(let value):
+                    observer(.Next(value))
+                case .Success(let value):
+                    observer(.Success(value))
+                case .Failure(let error):
+                    serialDisposable.otherDisposable = recover(error).observe(on: nil) { event in
+                        observer(event)
+                    }
+                }
+            }
+
+            return serialDisposable
+        }
+    }
 }
 
 @warn_unused_result

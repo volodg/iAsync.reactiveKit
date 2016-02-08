@@ -52,15 +52,12 @@ private func testAsync() -> AsyncTypes<String, NSError>.Async {
                 if let finishCallback = finishCallbackHolder {
                     progressCallbackHolder = nil
                     finishCallbackHolder   = nil
-                    finishCallback(result: .Interrupted)
+                    finishCallback(result: .Failure(AsyncInterruptedError()))
                 }
             case .UnSubscribe:
                 cancel()
-                if let finishCallback = finishCallbackHolder {
-                    progressCallbackHolder = nil
-                    finishCallbackHolder   = nil
-                    finishCallback(result: .Unsubscribed)
-                }
+                progressCallbackHolder = nil
+                finishCallbackHolder   = nil
             }
         }
     }

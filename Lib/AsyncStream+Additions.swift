@@ -180,12 +180,12 @@ public func asyncStreamWithJob<Value, Next, Error: ErrorType>(
         Queue.global.async({ 
 
             let result = job { next -> Void in
-                Queue.main.sync {
+                Queue.main.async {
                     observerHolder?(.Next(next))
                 }
             }
 
-            Queue.main.sync {
+            Queue.main.async {
                 switch result {
                 case .Success(let value):
                     observerHolder?(.Success(value))

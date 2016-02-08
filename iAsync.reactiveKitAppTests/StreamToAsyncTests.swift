@@ -9,6 +9,7 @@
 import XCTest
 
 import iAsync_async
+import iAsync_utils
 import iAsync_reactiveKit
 
 import ReactiveKit
@@ -39,15 +40,16 @@ class StreamToAsyncTests: XCTestCase {
                 XCTFail()
             }) { (result) -> Void in
 
+                deinitTest.description
+
                 switch result {
                 case .Success:
                     XCTFail()
-                case .Failure:
-                    XCTFail()
-                case .Interrupted:
-                    deinitTest.description
-                    testPassed = true
-                case .Unsubscribed:
+                case .Failure(let error):
+                    if error is AsyncInterruptedError {
+                        testPassed = true
+                        return
+                    }
                     XCTFail()
                 }
             }
@@ -82,22 +84,14 @@ class StreamToAsyncTests: XCTestCase {
                 XCTFail()
             }) { (result) -> Void in
 
-                switch result {
-                case .Success:
-                    XCTFail()
-                case .Failure:
-                    XCTFail()
-                case .Interrupted:
-                    XCTFail()
-                case .Unsubscribed:
-                    deinitTest.description
-                    testPassed = true
-                }
+                deinitTest.description
+                XCTFail()
             }
 
             XCTAssertNotNil(weakDeinitTest)
 
             handler(task: .UnSubscribe)
+            testPassed = true
         }
 
         XCTAssertNil(weakDeinitTest)
@@ -136,10 +130,6 @@ class StreamToAsyncTests: XCTestCase {
                         resultValue = value
                         expectation.fulfill()
                     case .Failure:
-                        XCTFail()
-                    case .Interrupted:
-                        XCTFail()
-                    case .Unsubscribed:
                         XCTFail()
                     }
                 }
@@ -196,10 +186,6 @@ class StreamToAsyncTests: XCTestCase {
                     expectation1.fulfill()
                 case .Failure:
                     XCTFail()
-                case .Interrupted:
-                    XCTFail()
-                case .Unsubscribed:
-                    XCTFail()
                 }
             }
 
@@ -221,10 +207,6 @@ class StreamToAsyncTests: XCTestCase {
                     resultValue2 = value
                     expectation2.fulfill()
                 case .Failure:
-                    XCTFail()
-                case .Interrupted:
-                    XCTFail()
-                case .Unsubscribed:
                     XCTFail()
                 }
             }
