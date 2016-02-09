@@ -72,7 +72,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
     public func after(delay: NSTimeInterval) -> AsyncStream<Value, Next, Error> {
 
         let delayStream = AsyncStream<Void, Next, Error>.succeededAfter(delay: delay, with: ())
-        return delayStream.flatMap(.Latest) { _ in self }
+        return delayStream.next { _ in self }
     }
 
     public static func succeeded(with value: Value) -> AsyncStream<Value, Next, Error> {
@@ -300,7 +300,7 @@ public extension AsyncStreamType {
 
                 serialDisposable.otherDisposable?.dispose()
                 serialDisposable.otherDisposable = nil
-                let dispose = delayStream.flatMap(.Latest) { self }.observe(on: nil, observer: observer)
+                let dispose = delayStream.next { self }.observe(on: nil, observer: observer)
                 if serialDisposable.otherDisposable == nil {
                     serialDisposable.otherDisposable = dispose
                 }
@@ -753,6 +753,11 @@ public extension AsyncStreamType {
         case .Concat:
             return map(transform).concat()
         }
+    }
+
+    @warn_unused_result
+    public func next<T: AsyncStreamType where T.Next == Next, T.Error == Error>(transform: Value -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
+        return flatMap(.Latest, transform: transform)
     }
 
     @warn_unused_result
