@@ -18,6 +18,41 @@ public struct AsyncValue<Value, Error: ErrorType> {
     public var loading: Bool = false
 
     public init() {}
+
+    public init(result: Result<Value, Error>?, loading: Bool) {
+        self.result  = result
+        self.loading = loading
+    }
+
+    public func mapStream<R>(f: Value -> Stream<R>) -> Stream<AsyncValue<R, Error>> {
+
+        switch result {
+        case .Some(.Success(let v)):
+            return f(v).map { (val: R) -> AsyncValue<R, Error> in
+                return AsyncValue<R, Error>(result: .Success(val), loading: self.loading)
+            }
+        case .Some(.Failure(let error)):
+            let value = AsyncValue<R, Error>(result: .Failure(error), loading: self.loading)
+            return Stream(value: value)
+        case .None:
+            let value = AsyncValue<R, Error>(result: .None, loading: self.loading)
+            return Stream(value: value)
+        }
+    }
+
+    public func mapStream2<R>(f: Value -> Stream<AsyncValue<R, Error>>) -> Stream<AsyncValue<R, Error>> {
+
+        switch result {
+        case .Some(.Success(let v)):
+            return f(v)
+        case .Some(.Failure(let error)):
+            let value = AsyncValue<R, Error>(result: .Failure(error), loading: self.loading)
+            return Stream(value: value)
+        case .None:
+            let value = AsyncValue<R, Error>(result: .None, loading: self.loading)
+            return Stream(value: value)
+        }
+    }
 }
 
 public extension AsyncStreamType {
