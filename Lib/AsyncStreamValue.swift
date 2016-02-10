@@ -8,6 +8,8 @@
 
 import Foundation
 
+import iAsync_utils
+
 import ReactiveKit
 
 public struct AsyncValue<Value, Error: ErrorType> {
@@ -16,63 +18,67 @@ public struct AsyncValue<Value, Error: ErrorType> {
     public var loading: Bool = false
 }
 
-//BindableType
-extension AsyncStreamType {
+public extension AsyncStreamType {
 
-    public func bindToAsyncVal<B : BindableType where B.Event == AsyncEvent<Value, Next, Error>>(bindable: B, context: ExecutionContext?) -> DisposableType! {
+    func bindedToObservableAsyncVal<B : BindableType where
+        B.Event == AsyncValue<Value, Error>, B: ObservableType, B.Value == AsyncValue<Value, Error>>
+        (bindable: B) -> AsyncStream<Value, Next, Error> {
 
-        return nil
+        return create(producer: { observer -> DisposableType? in
+
+            var result = bindable.value
+            result.loading = true
+
+            let bindObserver = bindable.observer(nil)
+            bindObserver(result)
+
+            return self.observe(on: nil, observer: { event -> () in
+
+                switch event {
+                case .Success(let value):
+                    result.result  = .Success(value)
+                    result.loading = false
+                    bindObserver(result)
+                case .Failure(let error):
+                    if bindable.value.result?.value == nil {
+                        result.result  = .Failure(error)
+                    }
+                    result.loading = false
+                    bindObserver(result)
+                default:
+                    break
+                }
+
+                observer(event)
+            })
+        })
     }
 }
 
-public class AsyncStreamValue<Value, Error: ErrorType> {
+extension MergedAsyncStream {
 
-    public private(set) var asyncValue = AsyncValue<Value, Error>()
-    private let asyncValueStreamChanged = ActiveStream<Void>()
+    public func mergedStream<T: AsyncStreamType,
+        B : BindableType where T.Value == Value, T.Next == Next, T.Error == Error,
+        B.Event == AsyncValue<Value, Error>,
+        B: ObservableType, B.Value == AsyncValue<Value, Error>>(
+        factory : () -> T,
+        key     : Key,
+        bindable: B,
+        lazy    : Bool = true
+        ) -> StreamT {
 
-    public var asyncValueStream: Stream<AsyncValue<Value, Error>> {
-        return asyncValueStreamChanged.map { [weak self] () -> AsyncValue<Value, Error> in
-            return self?.asyncValue ?? AsyncValue<Value, Error>()
-        }
-    }
-
-    init() {}
-
-    private let merged = MergedAsyncStream<Int, Value, Void, Error>()
-
-    public func valueAsyncStream(streamF: () -> AsyncStream<Value, Void, Error>, force: Bool) -> AsyncStream<Value, Void, Error> {
-
-        let streamF2 = { () -> AsyncStream<Value, Void, Error> in
-
-            let stream = streamF()
-            return stream.on(start: { [weak self] () -> Void in
-                self?.asyncValue.loading = true
-                self?.asyncValueStreamChanged.next(())
-            }, completed: { [weak self] () -> Void in
-                self?.asyncValue.loading = false
-                self?.asyncValueStreamChanged.next(())
-            })
+        let bindedFactory = { () -> AsyncStream<Value, Next, Error> in
+            let stream = factory()
+            return stream.bindedToObservableAsyncVal(bindable)
         }
 
-        return merged.mergedStream(streamF2, key: 0, getter: { [weak self] () -> AsyncEvent<Value, Void, Error>? in
-            guard let self_ = self, result = self_.asyncValue.result else { return nil }
+        return mergedStream(bindedFactory, key: key, getter: { () -> AsyncEvent<Value, Next, Error>? in
+            guard let result = bindable.value.result else { return nil }
             switch result {
-            case .Success(let value) where !force:
+            case .Success(let value) where lazy:
                 return .Success(value)
             default:
                 return nil
-            }
-        }, setter: { [weak self] event -> Void in
-            guard let self_ = self else { return }
-            switch event {
-            case .Success(let value):
-                self_.asyncValue.result = .Success(value)
-            case .Failure(let error):
-                if self_.asyncValue.result == nil || force {
-                    self_.asyncValue.result = .Failure(error)
-                }
-            case .Next:
-                break
             }
         })
     }
