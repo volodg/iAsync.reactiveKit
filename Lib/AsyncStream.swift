@@ -72,12 +72,24 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
     public func after(delay: NSTimeInterval) -> AsyncStream<Value, Next, Error> {
 
         let delayStream = AsyncStream<Void, Next, Error>.succeededAfter(delay: delay, with: ())
-        return delayStream.next { _ in self }
+        return delayStream.flatMap { self }
     }
 
     public static func succeeded(with value: Value) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             observer(.Success(value))
+            return nil
+        }
+    }
+
+    public static func value(with value: Result<Value, Error>) -> AsyncStream<Value, Next, Error> {
+        return create { observer in
+            switch value {
+            case .Success(let value):
+                observer(.Success(value))
+            case .Failure(let error):
+                observer(.Failure(error))
+            }
             return nil
         }
     }
@@ -300,7 +312,7 @@ public extension AsyncStreamType {
 
                 serialDisposable.otherDisposable?.dispose()
                 serialDisposable.otherDisposable = nil
-                let dispose = delayStream.next { self }.observe(on: nil, observer: observer)
+                let dispose = delayStream.flatMap { self }.observe(on: nil, observer: observer)
                 if serialDisposable.otherDisposable == nil {
                     serialDisposable.otherDisposable = dispose
                 }
@@ -333,17 +345,17 @@ public extension AsyncStreamType {
 //    @warn_unused_result
 //    public func take(count: Int) -> Operation<Value, Error> {
 //        return create { observer in
-//            
+//
 //            if count <= 0 {
 //                observer.success()
 //                return nil
 //            }
-//            
+//
 //            var taken = 0
-//            
+//
 //            let serialDisposable = SerialDisposable(otherDisposable: nil)
 //            serialDisposable.otherDisposable = self.observe(on: nil) { event in
-//                
+//
 //                switch event {
 //                case .Next(let value):
 //                    if taken < count {
@@ -358,25 +370,25 @@ public extension AsyncStreamType {
 //                    observer.observer(event)
 //                }
 //            }
-//            
+//
 //            return serialDisposable
 //        }
 //    }
-//    
+//
 //    @warn_unused_result
 //    public func first() -> Operation<Value, Error> {
 //        return take(1)
 //    }
-//    
+//
 //    @warn_unused_result
 //    public func takeLast(count: Int = 1) -> Operation<Value, Error> {
 //        return create { observer in
-//            
+//
 //            var values: [Value] = []
 //            values.reserveCapacity(count)
-//            
+//
 //            return self.observe(on: nil) { event in
-//                
+//
 //                switch event {
 //                case .Next(let value):
 //                    while values.count + 1 > count {
@@ -392,23 +404,23 @@ public extension AsyncStreamType {
 //            }
 //        }
 //    }
-//    
+//
 //    @warn_unused_result
 //    public func last() -> Operation<Value, Error> {
 //        return takeLast(1)
 //    }
-//    
+//
 //    @warn_unused_result
 //    public func pausable<S: StreamType where S.Event == Bool>(by: S) -> Operation<Value, Error> {
 //        return create { observer in
-//            
+//
 //            var allowed: Bool = true
-//            
+//
 //            let compositeDisposable = CompositeDisposable()
 //            compositeDisposable += by.observe(on: nil) { value in
 //                allowed = value
 //            }
-//            
+//
 //            compositeDisposable += self.observe(on: nil) { event in
 //                switch event {
 //                case .Next(let value):
@@ -419,17 +431,17 @@ public extension AsyncStreamType {
 //                    observer.observer(event)
 //                }
 //            }
-//            
+//
 //            return compositeDisposable
 //        }
 //    }
-//    
+//
 //    @warn_unused_result
 //    public func scan<U>(initial: U, _ combine: (U, Value) -> U) -> Operation<U, Error> {
 //        return create { observer in
-//            
+//
 //            var scanned = initial
-//            
+//
 //            return self.observe(on: nil) { event in
 //                observer.observer(event.map { value in
 //                    scanned = combine(scanned, value)
@@ -742,7 +754,6 @@ public enum AsyncStreamFlatMapStrategy {
 
 public extension AsyncStreamType {
 
-    //TODO test
     @warn_unused_result
     public func flatMap<T: AsyncStreamType where T.Next == Next, T.Error == Error>(strategy: AsyncStreamFlatMapStrategy, transform: Value -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
         switch strategy {
@@ -756,7 +767,7 @@ public extension AsyncStreamType {
     }
 
     @warn_unused_result
-    public func next<T: AsyncStreamType where T.Next == Next, T.Error == Error>(transform: Value -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
+    public func flatMap<T: AsyncStreamType where T.Next == Next, T.Error == Error>(transform: Value -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
         return flatMap(.Latest, transform: transform)
     }
 
