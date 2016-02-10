@@ -12,7 +12,7 @@ import ReactiveKit
 
 extension StreamType {
     @warn_unused_result
-    public func next<S : StreamType>(transform: Self.Event -> S) -> Stream<S.Event> {
+    public func flatMap<S : StreamType>(transform: Self.Event -> S) -> Stream<S.Event> {
         return flatMap(.Latest, transform: transform)
     }
 }

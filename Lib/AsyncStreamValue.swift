@@ -16,6 +16,8 @@ public struct AsyncValue<Value, Error: ErrorType> {
 
     public var result: Result<Value, Error>? = nil
     public var loading: Bool = false
+
+    public init() {}
 }
 
 public extension AsyncStreamType {
