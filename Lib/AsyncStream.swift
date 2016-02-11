@@ -128,6 +128,7 @@ public func create<Value, Next, Error: ErrorType>(producer producer: (AsyncEvent
 
 public extension AsyncStreamType {
 
+    @warn_unused_result
     public func on(next next: (Next -> ())? = nil, success: (Value -> ())? = nil, failure: (Error -> ())? = nil, start: (() -> Void)? = nil, completed: (() -> Void)? = nil, context: ExecutionContext? = ImmediateOnMainExecutionContext) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             start?()
