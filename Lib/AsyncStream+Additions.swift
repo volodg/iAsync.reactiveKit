@@ -177,7 +177,7 @@ public func asyncStreamWithJob<Value, Next, Error: ErrorType>(
 
         var observerHolder: (Event -> ())? = observer
 
-        Queue.global.async({ 
+        Queue.global.async {
 
             let result = job { next -> Void in
                 Queue.main.async {
@@ -193,10 +193,18 @@ public func asyncStreamWithJob<Value, Next, Error: ErrorType>(
                     observerHolder?(.Failure(error))
                 }
             }
-        })
+        }
 
         return BlockDisposable {
             observerHolder = nil
         }
+    }
+}
+
+public func asyncStreamJob(job: () -> Void) -> AsyncStream<Void, Void, NSError> {
+
+    return asyncStreamWithJob { _ in
+        job()
+        return .Success(())
     }
 }
