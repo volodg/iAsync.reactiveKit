@@ -820,18 +820,13 @@ public func combineLatest<A: AsyncStreamType, B: AsyncStreamType, C: AsyncStream
     return combineLatest(a, b, c).combineLatestWith(d).mapNext { ($0?.0, $0?.1, $0?.2, $1) }.map { ($0.0, $0.1, $0.2, $1) }
 }
 
-//@warn_unused_result
-//public func zip<A: OperationType, B: OperationType, C: OperationType, D: OperationType where A.Error == B.Error, A.Error == C.Error, A.Error == D.Error>(a: A, _ b: B, _ c: C, _ d: D) -> Operation<(A.Value, B.Value, C.Value, D.Value), A.Error> {
-//    return zip(a, b, c).zipWith(d).map { ($0.0, $0.1, $0.2, $1) }
-//}
-//
-//@warn_unused_result
-//public func combineLatest<A: OperationType, B: OperationType, C: OperationType, D: OperationType, E: OperationType where A.Error == B.Error, A.Error == C.Error, A.Error == D.Error, A.Error == E.Error>
-//    (a: A, _ b: B, _ c: C, _ d: D, _ e: E) -> Operation<(A.Value, B.Value, C.Value, D.Value, E.Value), A.Error>
-//{
-//    return combineLatest(a, b, c, d).combineLatestWith(e).map { ($0.0, $0.1, $0.2, $0.3, $1) }
-//}
-//
+@warn_unused_result
+public func combineLatest<A: AsyncStreamType, B: AsyncStreamType, C: AsyncStreamType, D: AsyncStreamType, E: AsyncStreamType where A.Error == B.Error, A.Error == C.Error, A.Error == D.Error, A.Error == E.Error>
+    (a: A, _ b: B, _ c: C, _ d: D, _ e: E) -> AsyncStream<(A.Value, B.Value, C.Value, D.Value, E.Value), (A.Next?, B.Next?, C.Next?, D.Next?, E.Next?), A.Error>
+{
+    return combineLatest(a, b, c, d).combineLatestWith(e).mapNext { ($0?.0, $0?.1, $0?.2, $0?.3, $1) }.map { ($0.0, $0.1, $0.2, $0.3, $1) }
+}
+
 //@warn_unused_result
 //public func zip<A: OperationType, B: OperationType, C: OperationType, D: OperationType, E: OperationType where A.Error == B.Error, A.Error == C.Error, A.Error == D.Error, A.Error == E.Error>
 //    (a: A, _ b: B, _ c: C, _ d: D, _ e: E) -> Operation<(A.Value, B.Value, C.Value, D.Value, E.Value), A.Error>
