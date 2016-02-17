@@ -469,15 +469,22 @@ public extension AsyncStreamType {
     @warn_unused_result
     public func combineLatestWith<S: AsyncStreamType where S.Error == Error>(other: S) -> AsyncStream<(Value, S.Value), (Next?, S.Next?), Error> {
         return create { observer in
-            let queue = Queue(name: "com.ReactiveKit.ReactiveKit.Operation.CombineLatestWith")
 
-            var latestSelfNext : Next? = nil
-            var latestOtherNext: S.Next? = nil
-
-            var latestSelfEvent : AsyncEvent<Value, Next, Error>! = nil
-            var latestOtherEvent: AsyncEvent<S.Value, S.Next, S.Error>! = nil
+            var latestSelfEvent : AsyncEvent<Value, Next, Error>? = nil
+            var latestOtherEvent: AsyncEvent<S.Value, S.Next, S.Error>? = nil
 
             let dispatchNextIfPossible = { () -> () in
+
+                var latestSelfNext : Next? = nil
+                var latestOtherNext: S.Next? = nil
+
+                if case .Some(.Next(let selfNext)) = latestSelfEvent {
+                    latestSelfNext = selfNext
+                }
+                if case .Some(.Next(let otherNext)) = latestOtherEvent {
+                    latestOtherNext = otherNext
+                }
+
                 if latestSelfNext != nil || latestOtherNext != nil {
                     let next = (latestSelfNext, latestOtherNext)
                     observer(.Next(next))
@@ -485,23 +492,12 @@ public extension AsyncStreamType {
             }
 
             let onBoth = { () -> () in
-                if latestSelfEvent != nil || latestOtherEvent != nil {
-                    switch (latestSelfEvent, latestOtherEvent) {
-                    case (.Some(.Success(let selfValue)), .Some(.Success(let otherValue))):
-                        observer(.Success(selfValue, otherValue))
-                    case (.Some(.Next(let selfNext)), .Some(.Next(let otherNext))):
-                        latestSelfNext  = selfNext
-                        latestOtherNext = otherNext
-                        dispatchNextIfPossible()
-                    case (.Some(.Next(let selfNext)), _):
-                        latestSelfNext = selfNext
-                        dispatchNextIfPossible()
-                    case (_, .Some(.Next(let otherNext))):
-                        latestOtherNext = otherNext
-                        dispatchNextIfPossible()
-                    default:
-                        dispatchNextIfPossible()
-                    }
+                guard latestSelfEvent != nil || latestOtherEvent != nil else { return }
+                switch (latestSelfEvent, latestOtherEvent) {
+                case (.Some(.Success(let selfValue)), .Some(.Success(let otherValue))):
+                    observer(.Success(selfValue, otherValue))
+                default:
+                    dispatchNextIfPossible()
                 }
             }
 
@@ -509,10 +505,8 @@ public extension AsyncStreamType {
                 if case .Failure(let error) = event {
                     observer(.Failure(error))
                 } else {
-                    queue.sync {
-                        latestSelfEvent = event
-                        onBoth()
-                    }
+                    latestSelfEvent = event
+                    onBoth()
                 }
             }
 
@@ -520,10 +514,8 @@ public extension AsyncStreamType {
                 if case .Failure(let error) = event {
                     observer(.Failure(error))
                 } else {
-                    queue.sync {
-                        latestOtherEvent = event
-                        onBoth()
-                    }
+                    latestOtherEvent = event
+                    onBoth()
                 }
             }
 
