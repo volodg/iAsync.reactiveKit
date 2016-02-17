@@ -10,7 +10,7 @@ import Foundation
 
 import ReactiveKit
 
-private class AsyncObserverHolder<Value, Next, Error: ErrorType> {
+private final class AsyncObserverHolder<Value, Next, Error: ErrorType> {
 
     let observer: AsyncEvent<Value, Next, Error> -> ()
 

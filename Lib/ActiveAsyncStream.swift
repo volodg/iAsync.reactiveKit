@@ -12,7 +12,7 @@ import iAsync_utils
 
 import ReactiveKit
 
-public class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStreamType {
+public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStreamType {
 
     public typealias Value = ValueT
     public typealias Next  = NextT
