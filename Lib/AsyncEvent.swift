@@ -14,6 +14,24 @@ public enum AsyncEvent<ValueT, NextT, ErrorT: ErrorType> {
     case Failure(ErrorT)
     case Next(NextT)
 
+    public var value: ValueT? {
+        switch self {
+        case .Success(let value):
+            return value
+        default:
+            return nil
+        }
+    }
+
+    public var error: ErrorT? {
+        switch self {
+        case .Failure(let error):
+            return error
+        default:
+            return nil
+        }
+    }
+
     public var isTerminal: Bool {
         switch self {
         case .Success, .Failure:
@@ -21,6 +39,14 @@ public enum AsyncEvent<ValueT, NextT, ErrorT: ErrorType> {
         case .Next:
             return false
         }
+    }
+
+    public var isSuccess: Bool {
+        return value != nil
+    }
+
+    public var isFailure: Bool {
+        return error != nil
     }
 
     public func map<U>(transform: ValueT -> U) -> AsyncEvent<U, NextT, ErrorT> {
