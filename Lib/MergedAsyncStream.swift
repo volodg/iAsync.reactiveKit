@@ -46,7 +46,7 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
                     stream = factory().map(id)
                 }
 
-                resultStream = stream.on(completed: { () -> Void in
+                resultStream = stream.on(completed: { _ in
                     self.streamsByKey.removeValueForKey(key)
                     self.disposesByKey.removeValueForKey(key)
                 }).mergedObservers(self.sharedNextLimit)
@@ -68,7 +68,7 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
             }
             self.disposesByKey[key] = disposes
 
-            return BlockDisposable { () -> Void in
+            return BlockDisposable { _ in
 
                 if var disposes_ = self.disposesByKey[key] {
                     for (index, dispose_) in disposes_.enumerate() {

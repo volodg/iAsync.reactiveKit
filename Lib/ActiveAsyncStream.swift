@@ -41,7 +41,7 @@ public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStr
                 }
             }
 
-            return BlockDisposable { () -> Void in
+            return BlockDisposable { _ in
                 //observerHolder = nil
                 dispose?.dispose()
             }

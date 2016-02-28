@@ -86,7 +86,7 @@ public extension AsyncStreamType {
             let observerHolder = ObserverHolder(observer: observer)
             observers.append(observerHolder)
 
-            let removeObserver = { () -> Void in
+            let removeObserver = { () in
 
                 let observers_ = observers
                 for (index, observer) in observers_.enumerate() {
@@ -148,7 +148,7 @@ public func asyncStreamWithSameThreadJob<Value, Next, Error: ErrorType>(job: (Ne
 
         Queue.global.async {
 
-            let result = job { next -> Void in
+            let result = job { next in
                 observerHolder?(.Next(next))
             }
 
@@ -179,7 +179,7 @@ public func asyncStreamWithJob<Value, Next, Error: ErrorType>(
 
         Queue.global.async {
 
-            let result = job { next -> Void in
+            let result = job { next in
                 Queue.main.async {
                     observerHolder?(.Next(next))
                 }

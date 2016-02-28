@@ -58,7 +58,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
                 }
             }
 
-            return BlockDisposable { () -> Void in
+            return BlockDisposable { _ in
                 //observerHolder = nil
                 dispose?.dispose()
             }
@@ -281,7 +281,7 @@ public extension AsyncStreamType {
 
             var attempt: (() -> Void)?
 
-            let observer = { (event: AsyncEvent<Value, Next, Error>) -> Void in
+            let observer = { (event: AsyncEvent<Value, Next, Error>) in
 
                 let rertyOrFinish = { (result: Result<Value, Error>) in
                     if !until(result) && count > 0 {
