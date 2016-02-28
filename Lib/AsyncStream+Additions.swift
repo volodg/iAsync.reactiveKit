@@ -40,9 +40,9 @@ public extension AsyncStreamType {
                 }
             }
 
-            return BlockDisposable({ () -> () in
+            return BlockDisposable { () in
                 observerHolder = nil
-            })
+            }
         }
     }
 
@@ -146,7 +146,7 @@ public func asyncStreamWithSameThreadJob<Value, Next, Error: ErrorType>(job: (Ne
 
         var observerHolder: (Event -> ())? = observer
 
-        Queue.global.async({
+        Queue.global.async {
 
             let result = job { next -> Void in
                 observerHolder?(.Next(next))
@@ -158,7 +158,7 @@ public func asyncStreamWithSameThreadJob<Value, Next, Error: ErrorType>(job: (Ne
             case .Failure(let error):
                 observerHolder?(.Failure(error))
             }
-        })
+        }
 
         return BlockDisposable {
 

@@ -14,9 +14,9 @@ extension NSURL {
 
     public func localDataStream() -> AsyncStream<NSData, AnyObject, NSError> {
 
-        return create(producer: { observer -> DisposableType? in
+        return create { observer -> DisposableType? in
 
-            self.localDataWithCallbacks({ data -> Void in
+            self.localDataWithCallbacks({ data in
 
                 observer(.Success(data))
             }) { error -> Void in
@@ -24,6 +24,6 @@ extension NSURL {
                 observer(.Failure(error))
             }
             return nil
-        })
+        }
     }
 }
