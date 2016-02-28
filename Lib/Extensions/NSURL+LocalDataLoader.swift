@@ -19,7 +19,7 @@ extension NSURL {
             self.localDataWithCallbacks({ data in
 
                 observer(.Success(data))
-            }) { error -> Void in
+            }) { error in
 
                 observer(.Failure(error))
             }
