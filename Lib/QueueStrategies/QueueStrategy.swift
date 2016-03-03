@@ -23,8 +23,8 @@ extension QueueStrategy {
 
         var objectIndex: Int?
 
-        for (index, loader) in queueState.pendingStreams.enumerate() {
-            if loader === pendingStream {
+        for (index, stream) in queueState.pendingStreams.enumerate() {
+            if stream === pendingStream {
                 objectIndex = index
                 break
             }
