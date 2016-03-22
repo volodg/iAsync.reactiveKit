@@ -13,9 +13,9 @@ import iAsync_utils
 import ReactiveKit
 
 public protocol AsyncStreamType: StreamType {
-    typealias Value
-    typealias Next
-    typealias Error: ErrorType
+    associatedtype Value
+    associatedtype Next
+    associatedtype Error: ErrorType
 
     func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Next, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E>
 }

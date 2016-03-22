@@ -78,7 +78,7 @@ public extension AsyncStreamType {
                     bindObserver(result)
                 case .Failure(let error):
                     if bindable.value.result?.value == nil {
-                        result.result  = .Failure(error)
+                        result.result = .Failure(error)
                     }
                     result.loading = false
                     bindObserver(result)

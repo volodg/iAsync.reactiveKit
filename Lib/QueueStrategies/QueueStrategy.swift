@@ -10,9 +10,9 @@ import Foundation
 
 public protocol QueueStrategy {
 
-    typealias Value
-    typealias Next
-    typealias Error: ErrorType
+    associatedtype Value
+    associatedtype Next
+    associatedtype Error: ErrorType
 
     static func nextPendingStream(queueState: QueueState<Value, Next, Error>) -> StreamOwner<Value, Next, Error>?
 }
