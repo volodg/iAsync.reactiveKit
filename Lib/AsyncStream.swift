@@ -275,7 +275,10 @@ public extension AsyncStreamType {
 
     //TODO test
     @warn_unused_result
-    public func retry(var count: Int, delay: NSTimeInterval? = nil, until: Result<Value, Error> -> Bool) -> AsyncStream<Value, Next, Error> {
+    public func retry(count: Int, delay: NSTimeInterval? = nil, until: Result<Value, Error> -> Bool) -> AsyncStream<Value, Next, Error> {
+
+        var count_ = count
+
         return create { observer in
             let serialDisposable = SerialDisposable(otherDisposable: nil)
 
@@ -284,8 +287,8 @@ public extension AsyncStreamType {
             let observer = { (event: AsyncEvent<Value, Next, Error>) in
 
                 let rertyOrFinish = { (result: Result<Value, Error>) in
-                    if !until(result) && count > 0 {
-                        count -= 1
+                    if !until(result) && count_ > 0 {
+                        count_ -= 1
                         attempt?()
                     } else {
                         attempt = nil
