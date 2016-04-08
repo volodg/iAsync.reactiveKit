@@ -12,9 +12,9 @@ import ReactiveKit
 
 public protocol AsyncStreamInterface {
 
-    associatedtype Value
-    associatedtype Next
-    associatedtype Error: ErrorType
+    typealias Value
+    typealias Next
+    typealias Error: ErrorType
 
     func asyncWithCallbacks(
         success _: Value -> Void,
