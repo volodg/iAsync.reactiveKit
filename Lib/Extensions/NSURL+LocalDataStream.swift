@@ -8,11 +8,13 @@
 
 import Foundation
 
+import iAsync_utils
+
 import ReactiveKit
 
 extension NSURL {
 
-    public func localDataStream() -> AsyncStream<NSData, AnyObject, NSError> {
+    public func localDataStream() -> AsyncStream<NSData, AnyObject, ErrorWithContext> {
 
         return create { observer -> DisposableType? in
 

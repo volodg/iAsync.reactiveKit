@@ -8,6 +8,8 @@
 
 import Foundation
 
+import iAsync_utils
+
 import ReactiveKit
 
 private final class AsyncObserverHolder<Value, Next, Error: ErrorType> {
@@ -201,7 +203,7 @@ public func asyncStreamWithJob<Value, Next, Error: ErrorType>(
     }
 }
 
-public func asyncStreamJob(job: () -> Void) -> AsyncStream<Void, Void, NSError> {
+public func asyncStreamJob(job: () -> Void) -> AsyncStream<Void, Void, ErrorWithContext> {
 
     return asyncStreamWithJob { _ in
         job()

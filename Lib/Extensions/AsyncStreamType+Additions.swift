@@ -8,11 +8,13 @@
 
 import Foundation
 
-public extension AsyncStreamType where Error == NSError {
+import iAsync_utils
+
+public extension AsyncStreamType where Error == ErrorWithContext {
 
     public func logError() -> AsyncStream<Value, Next, Error> {
 
-        return self.on(failure: { $0.writeErrorWithLogger() })
+        return self.on(failure: { $0.error.writeErrorWithLogger($0.context) })
     }
 }
 
