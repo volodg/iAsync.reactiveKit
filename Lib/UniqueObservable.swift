@@ -12,7 +12,7 @@ import ReactiveKit
 
 public final class UniqueObservable<Value: Equatable>: ActiveStream<Value>, ObservableType {
 
-    public var _value: Value!
+    private var _value: Value!
 
     public var value: Value {
         get {
