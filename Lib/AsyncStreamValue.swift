@@ -94,12 +94,13 @@ public extension AsyncStreamType {
 
 extension MergedAsyncStream {
 
-    public func mergedStream<T: AsyncStreamType,
+    public func mergedStream<
+        T: AsyncStreamType,
         B : BindableType where T.Value == Value, T.Next == Next, T.Error == Error,
         B.Event == AsyncValue<Value, Error>,
         B: ObservableType, B.Value == AsyncValue<Value, Error>>(
         factory : () -> T,
-        key     : Key,
+        key     : Key,//TODO remove key parameter
         bindable: B,
         lazy    : Bool = true
         ) -> StreamT {
@@ -118,5 +119,85 @@ extension MergedAsyncStream {
                 return nil
             }
         })
+    }
+
+    public func mergedStream<
+        T: AsyncStreamType where T.Value == Value, T.Next == Next, T.Error == Error>(
+        factory     : () -> T,
+        key         : Key,
+        inout holder: [Key:AsyncValue<Value, Error>],
+        lazy        : Bool = true
+        ) -> StreamT {
+
+        let bindedFactory = { () -> AsyncStream<Value, Next, Error> in
+            let stream = factory()
+
+            let bindable = BindableWithBlock<Value, Error>(putVal: { val in
+
+                holder[key] = val
+            }, getVal: { () -> AsyncValue<Value, Error> in
+
+                if let result = holder[key] {
+                    return result
+                }
+                let result = AsyncValue<Value, Error>()
+                holder[key] = result
+                return result
+            })
+
+            return stream.bindedToObservableAsyncVal(bindable)
+        }
+
+        return mergedStream(bindedFactory, key: key, getter: { () -> AsyncEvent<Value, Next, Error>? in
+            guard let result = holder[key]?.result else { return nil }
+            switch result {
+            case .Success(let value) where lazy:
+                return .Success(value)
+            default:
+                return nil
+            }
+        })
+    }
+}
+
+private struct BindableWithBlock<ValueT, Error: ErrorType> : BindableType, ObservableType, StreamType {
+
+    typealias Event = AsyncValue<ValueT, Error>
+    typealias Value = AsyncValue<ValueT, Error>
+
+    private let stream = ActiveStream<Value>()
+
+    public var value: AsyncValue<ValueT, Error> {
+        get {
+            return getVal()
+        }
+        set {
+            putVal(newValue)
+            stream.next(newValue)
+        }
+    }
+
+    public typealias Observer = Event -> ()
+
+    private let getVal: () -> Event
+    private let putVal: (Event) -> ()
+
+    init(putVal: (Event) -> (), getVal: () -> Event) {
+        self.putVal = putVal
+        self.getVal = getVal
+    }
+
+    public func observer(disconnectDisposable: DisposableType?) -> (Event -> ()) {
+        return { value -> () in
+            self.putVal(value)
+            self.stream.next(value)
+        }
+    }
+
+    public func observe(on context: ExecutionContext?, observer: Event -> ()) -> DisposableType {
+
+        let disposable = stream.observe(on: context, observer: observer)
+        observer(value)
+        return disposable
     }
 }

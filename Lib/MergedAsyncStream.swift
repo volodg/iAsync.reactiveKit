@@ -25,7 +25,8 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
     private var streamsByKey  = [Key:AsyncStream<Value, Next, Error>]()
     private var disposesByKey = [Key:[SerialDisposable]]()
 
-    public func mergedStream<T: AsyncStreamType where T.Value == Value, T.Next == Next, T.Error == Error>(
+    public func mergedStream<
+        T: AsyncStreamType where T.Value == Value, T.Next == Next, T.Error == Error>(
         factory: () -> T,
         key    : Key,
         getter : (() -> StreamT.Event?)? = nil,
