@@ -96,7 +96,7 @@ extension MergedAsyncStream {
 
     public func mergedStream<
         T: AsyncStreamType,
-        B : BindableType where T.Value == Value, T.Next == Next, T.Error == Error,
+        B: BindableType where T.Value == Value, T.Next == Next, T.Error == Error,
         B.Event == AsyncValue<Value, Error>,
         B: ObservableType, B.Value == AsyncValue<Value, Error>>(
         factory : () -> T,
@@ -122,11 +122,13 @@ extension MergedAsyncStream {
     }
 
     public func mergedStream<
-        T: AsyncStreamType where T.Value == Value, T.Next == Next, T.Error == Error>(
-        factory     : () -> T,
-        key         : Key,
-        inout holder: [Key:AsyncValue<Value, Error>],
-        lazy        : Bool = true
+        T: AsyncStreamType,
+        B: BindableType where T.Value == Value, T.Next == Next, T.Error == Error,
+        B: ObservableType, B.Value == [Key:AsyncValue<Value, Error>]>(
+        factory: () -> T,
+        key    : Key,
+        var holder: B,
+        lazy   : Bool = true
         ) -> StreamT {
 
         let bindedFactory = { () -> AsyncStream<Value, Next, Error> in
@@ -134,14 +136,14 @@ extension MergedAsyncStream {
 
             let bindable = BindableWithBlock<Value, Error>(putVal: { val in
 
-                holder[key] = val
+                holder.value[key] = val
             }, getVal: { () -> AsyncValue<Value, Error> in
 
-                if let result = holder[key] {
+                if let result = holder.value[key] {
                     return result
                 }
                 let result = AsyncValue<Value, Error>()
-                holder[key] = result
+                holder.value[key] = result
                 return result
             })
 
@@ -149,7 +151,7 @@ extension MergedAsyncStream {
         }
 
         return mergedStream(bindedFactory, key: key, getter: { () -> AsyncEvent<Value, Next, Error>? in
-            guard let result = holder[key]?.result else { return nil }
+            guard let result = holder.value[key]?.result else { return nil }
             switch result {
             case .Success(let value) where lazy:
                 return .Success(value)
