@@ -8,8 +8,6 @@
 
 import Foundation
 
-import iAsync_utils
-
 import ReactiveKit
 
 final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorType> {
@@ -44,7 +42,7 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
                 if let setter = setter {
                     stream = factory().withEventValueSetter(setter)
                 } else {
-                    stream = factory().map(id)
+                    stream = factory().map(id_)
                 }
 
                 resultStream = stream.on(completed: { _ in

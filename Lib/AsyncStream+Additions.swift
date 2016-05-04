@@ -8,8 +8,6 @@
 
 import Foundation
 
-import iAsync_utils
-
 import ReactiveKit
 
 private final class AsyncObserverHolder<Value, Next, Error: ErrorType> {

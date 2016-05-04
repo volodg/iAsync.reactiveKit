@@ -8,8 +8,6 @@
 
 import Foundation
 
-import iAsync_utils
-
 import ReactiveKit
 
 public struct AsyncValue<Value, Error: ErrorType> {

@@ -8,8 +8,6 @@
 
 import Foundation
 
-import iAsync_utils
-
 import ReactiveKit
 
 public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStreamType {
@@ -54,7 +52,7 @@ public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStr
 
     public func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Next, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E> {
         return create { observer in
-            return transform(self.stream.map(id)).observe(on: nil, observer: observer)
+            return transform(self.stream.map(id_)).observe(on: nil, observer: observer)
         }
     }
 
