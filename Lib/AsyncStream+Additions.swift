@@ -146,18 +146,15 @@ public func asyncStreamWithSameThreadJob<Value, Next, Error: ErrorType>(job: (Ne
 
         var observerHolder: (Event -> ())? = observer
 
-        Queue.global.async {
+        let result = job { next in
+            observerHolder?(.Next(next))
+        }
 
-            let result = job { next in
-                observerHolder?(.Next(next))
-            }
-
-            switch result {
-            case .Success(let value):
-                observerHolder?(.Success(value))
-            case .Failure(let error):
-                observerHolder?(.Failure(error))
-            }
+        switch result {
+        case .Success(let value):
+            observerHolder?(.Success(value))
+        case .Failure(let error):
+            observerHolder?(.Failure(error))
         }
 
         return BlockDisposable {
