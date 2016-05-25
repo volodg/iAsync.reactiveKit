@@ -27,7 +27,7 @@ final public class StreamOwner<Value, Next, Error: ErrorType> {
 
     init<T: AsyncStreamType where T.Value == Value, T.Next == Next, T.Error == Error>(stream: T, observer: ObserverType, barrier: Bool, onComplete: OnComplete) {
 
-        self.stream     = stream.map(id)
+        self.stream     = stream.map(id_)
         self.observer   = observer
         self.barrier    = barrier
         self.onComplete = onComplete
