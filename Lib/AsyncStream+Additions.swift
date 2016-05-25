@@ -25,7 +25,7 @@ public extension AsyncStreamType {
 
     typealias Event = AsyncEvent<Value, Next, Error>
 
-    public func run() -> DisposableType {
+    public func run() -> Disposable {
         return observe(on: nil, observer: {_ in})
     }
 
@@ -79,7 +79,7 @@ public extension AsyncStreamType {
 
         typealias ObserverHolder = AsyncObserverHolder<Value, Next, Error>
         var observers: [ObserverHolder] = []
-        var dispose: DisposableType?
+        var dispose: Disposable?
 
         var buffer = [Next]()
 

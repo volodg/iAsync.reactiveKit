@@ -46,7 +46,7 @@ public func combineLatest<S: SequenceType, T where S.Generator.Element == Stream
             }
         }
 
-        var disposes = [DisposableType]()
+        var disposes = [Disposable]()
 
         for (index, stream) in producers.enumerate() {
 
@@ -99,7 +99,7 @@ public func combineLatest<S: SequenceType, T, N, E where S.Generator.Element == 
             }
         }
 
-        var disposes = [DisposableType]()
+        var disposes = [Disposable]()
 
         for (index, stream) in producers.enumerate() {
 
@@ -121,7 +121,7 @@ extension Stream {
 
     public init(value: Event) {
 
-        self.init { handler -> DisposableType? in
+        self.init { handler -> Disposable? in
 
             handler(value)
             return nil

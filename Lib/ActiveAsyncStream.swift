@@ -28,7 +28,7 @@ public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStr
         stream = ActiveStream()
     }
 
-    public init(producer: Observer -> DisposableType?) {
+    public init(producer: Observer -> Disposable?) {
         stream = ActiveStream  { observer in
             var observerHolder: Observer? = observer
 
@@ -48,13 +48,13 @@ public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStr
         }
     }
 
-    public func observe(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Observer) -> DisposableType {
+    public func observe(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Observer) -> Disposable {
         return stream.observe(on: context, observer: observer)
     }
 
     public func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Next, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E> {
         return create { observer in
-            return transform(self.stream.map(id)).observe(on: nil, observer: observer)
+            return transform(self.stream.map(id_)).observe(on: nil, observer: observer)
         }
     }
 
@@ -62,12 +62,12 @@ public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStr
         stream.next(event)
     }
 
-    internal func registerDisposable(disposable: DisposableType) {
+    internal func registerDisposable(disposable: Disposable) {
         stream.registerDisposable(disposable)
     }
 }
 
-public func create<Value, Next, Error: ErrorType>(producer producer: (AsyncEvent<Value, Next, Error> -> ()) -> DisposableType?) -> ActiveAsyncStream<Value, Next, Error> {
+public func create<Value, Next, Error: ErrorType>(producer producer: (AsyncEvent<Value, Next, Error> -> ()) -> Disposable?) -> ActiveAsyncStream<Value, Next, Error> {
     return ActiveAsyncStream<Value, Next, Error> { observer in
         return producer(observer)
     }
@@ -77,7 +77,7 @@ extension ActiveAsyncStream: BindableType {
 
     /// Creates a new observer that can be used to update the receiver.
     /// Optionally accepts a disposable that will be disposed on receiver's deinit.
-    public func observer(disconnectDisposable: DisposableType?) -> Event -> () {
+    public func observer(disconnectDisposable: Disposable?) -> Event -> () {
 
         if let disconnectDisposable = disconnectDisposable {
             registerDisposable(disconnectDisposable)

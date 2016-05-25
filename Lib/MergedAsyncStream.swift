@@ -33,7 +33,7 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
         setter : (StreamT.Event -> Void)? = nil
         ) -> StreamT {
 
-        let result: StreamT = create(producer: { observer -> DisposableType? in
+        let result: StreamT = create(producer: { observer -> Disposable? in
 
             let resultStream: StreamT
 
@@ -44,7 +44,7 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
                 if let setter = setter {
                     stream = factory().withEventValueSetter(setter)
                 } else {
-                    stream = factory().map(id)
+                    stream = factory().map(id_)
                 }
 
                 resultStream = stream.on(completed: { _ in

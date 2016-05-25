@@ -16,7 +16,7 @@ extension NSURL {
 
     public func localDataStream() -> AsyncStream<NSData, AnyObject, ErrorWithContext> {
 
-        return create { observer -> DisposableType? in
+        return create { observer -> Disposable? in
 
             self.localDataWithCallbacks({ data in
 

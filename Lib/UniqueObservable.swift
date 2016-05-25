@@ -1,5 +1,5 @@
 //
-//  UniqueObservable.swift
+//  UniqueProperty.swift
 //  iAsync_reactiveKit
 //
 //  Created by Gorbenko Vladimir on 05/02/16.
@@ -10,35 +10,72 @@ import Foundation
 
 import ReactiveKit
 
-public final class UniqueObservable<Value: Equatable>: ActiveStream<Value>, ObservableType {
+private protocol Lock {
+    func lock()
+    func unlock()
+    func atomic<T>(@noescape body: () -> T) -> T
+}
 
-    private var _value: Value!
+private extension Lock {
+    func atomic<T>(@noescape body: () -> T) -> T {
+        lock(); defer { unlock() }
+        return body()
+    }
+}
 
-    public var value: Value {
+/// Recursive Lock
+private final class RecursiveLock: NSRecursiveLock, Lock {
+
+    private init(name: String) {
+        super.init()
+        self.name = name
+    }
+}
+
+public final class UniqueProperty<T: Equatable>: PropertyType, StreamType, SubjectType {
+
+    private var _value: T
+    private let subject = PublishSubject<StreamEvent<T>>()
+    private let lock = RecursiveLock(name: "iAsync_reactiveKit.UniqueProperty")
+    private let disposeBag = DisposeBag()
+
+    public var rawStream: RawStream<StreamEvent<T>> {
+        return subject.toRawStream().startWith(.Next(value))
+    }
+
+    /// Underlying value. Changing it emits `.Next` event with new value.
+    public var value: T {
         get {
-            return _value
+            return lock.atomic { _value }
         }
         set {
-            if _value != newValue {
+            lock.atomic {
                 _value = newValue
-                super.next(newValue)
+                if _value != newValue {
+                    _value = newValue
+                    subject.next(newValue)
+                }
             }
         }
     }
 
-    public override func next(event: Value) {
-
-        self.value = event
+    public func on(event: StreamEvent<T>) {
+        subject.on(event)
     }
 
-    public override func observe(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Observer) -> DisposableType {
-        let disposable = super.observe(on: context, observer: observer)
-        observer(value)
-        return disposable
+//    public var readOnlyView: AnyProperty<T> {
+//        return AnyProperty(property: self)
+//    }
+
+    public init(_ value: T) {
+        _value = value
     }
 
-    public init(_ value: Value) {
-        super.init()
-        self.value = value
+    public func silentUpdate(value: T) {
+        _value = value
+    }
+
+    deinit {
+        subject.completed()
     }
 }

@@ -58,10 +58,10 @@ public struct AsyncValue<Value, Error: ErrorType> {
 public extension AsyncStreamType {
 
     func bindedToObservableAsyncVal<B : BindableType where
-        B.Event == AsyncValue<Value, Error>, B: ObservableType, B.Value == AsyncValue<Value, Error>>
+        B.Event == AsyncValue<Value, Error>, B: PropertyType, B.Value == AsyncValue<Value, Error>>
         (bindable: B) -> AsyncStream<Value, Next, Error> {
 
-        return create(producer: { observer -> DisposableType? in
+        return create(producer: { observer -> Disposable? in
 
             var result = bindable.value
             result.loading = true
@@ -98,7 +98,7 @@ extension MergedAsyncStream {
         T: AsyncStreamType,
         B: BindableType where T.Value == Value, T.Next == Next, T.Error == Error,
         B.Event == AsyncValue<Value, Error>,
-        B: ObservableType, B.Value == AsyncValue<Value, Error>>(
+        B: PropertyType, B.Value == AsyncValue<Value, Error>>(
         factory : () -> T,
         key     : Key,//TODO remove key parameter
         bindable: B,
@@ -124,7 +124,7 @@ extension MergedAsyncStream {
     public func mergedStream<
         T: AsyncStreamType,
         B: BindableType where T.Value == Value, T.Next == Next, T.Error == Error,
-        B: ObservableType, B.Value == [Key:AsyncValue<Value, Error>]>(
+        B: PropertyType, B.Value == [Key:AsyncValue<Value, Error>]>(
         factory: () -> T,
         key    : Key,
         var holder: B,
@@ -162,7 +162,7 @@ extension MergedAsyncStream {
     }
 }
 
-private struct BindableWithBlock<ValueT, Error: ErrorType> : BindableType, ObservableType, StreamType {
+private struct BindableWithBlock<ValueT, Error: ErrorType> : BindableType, PropertyType, StreamType {
 
     typealias Event = AsyncValue<ValueT, Error>
     typealias Value = AsyncValue<ValueT, Error>
@@ -189,14 +189,14 @@ private struct BindableWithBlock<ValueT, Error: ErrorType> : BindableType, Obser
         self.getVal = getVal
     }
 
-    public func observer(disconnectDisposable: DisposableType?) -> (Event -> ()) {
+    public func observer(disconnectDisposable: Disposable?) -> (Event -> ()) {
         return { value -> () in
             self.putVal(value)
             self.stream.next(value)
         }
     }
 
-    public func observe(on context: ExecutionContext?, observer: Event -> ()) -> DisposableType {
+    public func observe(on context: ExecutionContext?, observer: Event -> ()) -> Disposable {
 
         let disposable = stream.observe(on: context, observer: observer)
         observer(value)
