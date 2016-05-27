@@ -3,7 +3,7 @@
 //  iAsync_reactiveKit
 //
 //  Created by Gorbenko Vladimir on 10/02/16.
-//  Copyright (c) 2016 AppDaddy. All rights reserved.
+//  Copyright © 2016 AppDaddy. All rights reserved.
 //
 
 import Foundation

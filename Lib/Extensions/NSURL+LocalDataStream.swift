@@ -3,7 +3,7 @@
 //  iAsync_reactiveKit
 //
 //  Created by Gorbenko Vladimir on 25.11.15.
-//  Copyright (c) 2015 EmbeddedSources. All rights reserved.
+//  Copyright © 2015 EmbeddedSources. All rights reserved.
 //
 
 import Foundation
