@@ -60,4 +60,11 @@ public extension Result {
             ifSuccess: transform,
             ifFailure: Result<U, Error>.Failure)
     }
+
+    /// Returns the result of applying `transform` to `Success`es’ values, or re-wrapping `Failure`’s errors.
+    public func flatMapError<Error2>(@noescape transform: Error -> Result<T, Error2>) -> Result<T, Error2> {
+        return analysis(
+            ifSuccess: Result<T, Error2>.Success,
+            ifFailure: transform)
+    }
 }
