@@ -20,13 +20,9 @@
     "tag": "0.0.3"
   },
   "source_files": "iAsync.utils/**/*.{swift}",
-  "xcconfig": {
-    "SWIFT_INCLUDE_PATHS": "${PODS_ROOT}/SysXattr"
-  },
-  "preserve_paths": "SysXattr/*",
   "dependencies": {
-    "Result": [
-
+    "ReactiveKit": [
+      "~> 1.1.3"
     ]
   }
 }
