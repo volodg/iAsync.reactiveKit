@@ -17,6 +17,7 @@ public protocol AsyncStreamType: StreamType {
     associatedtype Next
     associatedtype Error: ErrorType
 
+    @warn_unused_result
     func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Next, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E>
 }
 
@@ -69,12 +70,14 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         return stream.observe(on: context, observer: observer)
     }
 
+    @warn_unused_result
     public func after(delay: NSTimeInterval) -> AsyncStream<Value, Next, Error> {
 
         let delayStream = AsyncStream<Void, Next, Error>.succeededAfter(delay: delay, with: ())
         return delayStream.flatMap { self }
     }
 
+    @warn_unused_result
     public static func succeeded(with value: Value) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             observer(.Success(value))
@@ -82,6 +85,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         }
     }
 
+    @warn_unused_result
     public static func value(with value: Result<Value, Error>) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             switch value {
@@ -94,6 +98,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         }
     }
 
+    @warn_unused_result
     public static func succeededAfter(delay delay: NSTimeInterval, with value: Value) -> AsyncStream<Value, Next, Error> {
         return create { observer in
 
@@ -106,6 +111,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         }
     }
 
+    @warn_unused_result
     public static func failed(with error: Error) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             observer(.Failure(error))
@@ -113,6 +119,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         }
     }
 
+    @warn_unused_result
     public func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Next, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E> {
         return create { observer in
             return transform(self.stream).observe(on: nil, observer: observer)
@@ -120,6 +127,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
     }
 }
 
+@warn_unused_result
 public func create<Value, Next, Error: ErrorType>(producer producer: (AsyncEvent<Value, Next, Error> -> ()) -> DisposableType?) -> AsyncStream<Value, Next, Error> {
     return AsyncStream<Value, Next, Error> { observer in
         return producer(observer)
@@ -337,6 +345,7 @@ public extension AsyncStreamType {
         }
     }
 
+    @warn_unused_result
     public func retry(count: Int) -> AsyncStream<Value, Next, Error> {
 
         return retry(count, until: { result -> Bool in

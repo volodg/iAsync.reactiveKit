@@ -52,6 +52,7 @@ public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStr
         return stream.observe(on: context, observer: observer)
     }
 
+    @warn_unused_result
     public func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Next, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E> {
         return create { observer in
             return transform(self.stream.map(id_)).observe(on: nil, observer: observer)

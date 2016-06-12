@@ -57,6 +57,7 @@ public struct AsyncValue<Value, Error: ErrorType> {
 
 public extension AsyncStreamType {
 
+    @warn_unused_result
     func bindedToObservableAsyncVal<B : BindableType where
         B.Event == AsyncValue<Value, Error>, B: ObservableType, B.Value == AsyncValue<Value, Error>>
         (bindable: B) -> AsyncStream<Value, Next, Error> {
@@ -94,6 +95,7 @@ public extension AsyncStreamType {
 
 extension MergedAsyncStream {
 
+    @warn_unused_result
     public func mergedStream<
         T: AsyncStreamType,
         B: BindableType where T.Value == Value, T.Next == Next, T.Error == Error,
@@ -121,6 +123,7 @@ extension MergedAsyncStream {
         })
     }
 
+    @warn_unused_result
     public func mergedStream<
         T: AsyncStreamType,
         B: BindableType where T.Value == Value, T.Next == Next, T.Error == Error,

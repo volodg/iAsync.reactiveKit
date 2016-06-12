@@ -24,6 +24,7 @@ public protocol AsyncStreamInterface {
     func cancel()
 }
 
+@warn_unused_result
 public func createStream<T: AsyncStreamInterface>(factory: () -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
 
     return create(producer: { observer -> DisposableType? in
