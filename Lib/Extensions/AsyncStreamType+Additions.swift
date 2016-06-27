@@ -15,7 +15,7 @@ public extension AsyncStreamType where Error == ErrorWithContext {
     @warn_unused_result
     public func logError() -> AsyncStream<Value, Next, Error> {
 
-        return self.on(failure: { $0.error.writeErrorWithLogger($0.context) })
+        return self.on(failure: { $0.postToLog() })
     }
 }
 
