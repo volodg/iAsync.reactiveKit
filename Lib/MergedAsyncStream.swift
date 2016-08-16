@@ -16,7 +16,7 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
 
     private let sharedNextLimit: Int
 
-    public init(sharedNextLimit: Int = 0) {
+    public init(sharedNextLimit: Int = Int.max) {
         self.sharedNextLimit = sharedNextLimit
     }
 
