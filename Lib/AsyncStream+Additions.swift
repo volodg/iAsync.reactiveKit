@@ -13,6 +13,7 @@ import iAsync_utils
 import enum ReactiveKit.Result
 import struct ReactiveKit.Queue
 import protocol ReactiveKit.Disposable
+import class ReactiveKit.BlockDisposable
 import ReactiveKit_old//???
 
 private final class AsyncObserverHolder<Value, Next, Error: ErrorType> {

@@ -9,6 +9,7 @@
 import Foundation
 
 import protocol ReactiveKit.Disposable
+import class ReactiveKit.BlockDisposable
 import ReactiveKit_old//???
 
 public protocol AsyncStreamInterface {

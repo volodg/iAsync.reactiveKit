@@ -10,6 +10,7 @@ import Foundation
 
 import iAsync_utils
 
+import class ReactiveKit.BlockDisposable
 import ReactiveKit_old//???
 
 //TODO test
