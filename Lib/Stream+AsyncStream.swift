@@ -8,7 +8,7 @@
 
 import Foundation
 
-import ReactiveKit
+import ReactiveKit_old
 
 public extension StreamType where Event: AsyncStreamType {
 

@@ -10,7 +10,7 @@ import Foundation
 
 import iAsync_utils
 
-import ReactiveKit
+import ReactiveKit_old
 
 final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorType> {
 

@@ -10,7 +10,7 @@ import Foundation
 
 import iAsync_utils
 
-import ReactiveKit
+import ReactiveKit_old
 
 private final class AsyncObserverHolder<Value, Next, Error: ErrorType> {
 

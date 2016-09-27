@@ -10,7 +10,7 @@ import Foundation
 
 import iAsync_utils
 
-import ReactiveKit
+import ReactiveKit_old
 
 public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStreamType {
 
