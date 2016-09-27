@@ -9,6 +9,7 @@
 import Foundation
 
 import class ReactiveKit.SerialDisposable
+import class ReactiveKit.CompositeDisposable
 import ReactiveKit_old//???
 
 public extension StreamType_old where Event: AsyncStreamType {
@@ -18,16 +19,16 @@ public extension StreamType_old where Event: AsyncStreamType {
         return create { observer in
             let compositeDisposable = CompositeDisposable()
 
-            compositeDisposable += self.observe(on: nil) { task in
-                compositeDisposable += task.observe(on: nil) { event in
+            compositeDisposable.addDisposable(self.observe(on: nil) { task in
+                compositeDisposable.addDisposable(task.observe(on: nil) { event in
                     switch event {
                     case .Next, .Failure:
                         observer(event)
                     case .Success:
                         break
                     }
-                }
-            }
+                })
+            })
             return compositeDisposable
         }
     }
@@ -38,7 +39,7 @@ public extension StreamType_old where Event: AsyncStreamType {
             let serialDisposable = SerialDisposable(otherDisposable: nil)
             let compositeDisposable = CompositeDisposable([serialDisposable])
 
-            compositeDisposable += self.observe(on: nil) { task in
+            compositeDisposable.addDisposable(self.observe(on: nil) { task in
 
                 serialDisposable.otherDisposable?.dispose()
                 serialDisposable.otherDisposable = task.observe(on: nil) { event in
@@ -52,7 +53,7 @@ public extension StreamType_old where Event: AsyncStreamType {
                         observer(.Next(value))
                     }
                 }
-            }
+            })
 
             return compositeDisposable
         }
@@ -96,9 +97,9 @@ public extension StreamType_old where Event: AsyncStreamType {
                 }
             }
 
-            compositeDisposable += self.observe(on: nil) { task in
+            compositeDisposable.addDisposable(self.observe(on: nil) { task in
                 addToQueue(task)
-            }
+            })
 
             return compositeDisposable
         }

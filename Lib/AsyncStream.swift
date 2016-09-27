@@ -15,6 +15,7 @@ import struct ReactiveKit.Queue
 import protocol ReactiveKit.Disposable
 import let ReactiveKit.ImmediateOnMainExecutionContext
 import class ReactiveKit.SerialDisposable
+import class ReactiveKit.CompositeDisposable
 import ReactiveKit_old//???
 
 public protocol AsyncStreamType: StreamType_old {
@@ -466,7 +467,7 @@ public extension AsyncStreamType where Value: AsyncStreamType, Value.Next == Nex
             let serialDisposable = SerialDisposable(otherDisposable: nil)
             let compositeDisposable = CompositeDisposable([serialDisposable])
 
-            compositeDisposable += self.observe(on: nil) { taskEvent in
+            compositeDisposable.addDisposable(self.observe(on: nil) { taskEvent in
 
                 switch taskEvent {
                 case .Failure(let error):
@@ -479,7 +480,7 @@ public extension AsyncStreamType where Value: AsyncStreamType, Value.Next == Nex
                 case .Next(let next):
                     observer(.Next(next))
                 }
-            }
+            })
 
             return compositeDisposable
         }

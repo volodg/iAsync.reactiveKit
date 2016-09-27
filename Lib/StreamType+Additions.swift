@@ -9,6 +9,7 @@
 import Foundation
 
 import struct ReactiveKit.Queue
+import class ReactiveKit.CompositeDisposable
 import ReactiveKit_old//???
 
 extension StreamType_old {
@@ -25,7 +26,7 @@ extension StreamType_old {
             var skipedEvent: Event?
 
             let compositeDisposable = CompositeDisposable()
-            compositeDisposable += by.observe(on: nil) { value in
+            compositeDisposable.addDisposable(by.observe(on: nil) { value in
                 allowed = value
                 if allowed {
                     queue.after(delayAfterPause, block: {
@@ -38,16 +39,16 @@ extension StreamType_old {
                         }
                     })
                 }
-            }
+            })
 
-            compositeDisposable += self.observe(on: nil) { event in
+            compositeDisposable.addDisposable(self.observe(on: nil) { event in
                 if allowed {
                     skipedEvent = nil
                     observer(event)
                 } else {
                     skipedEvent = event
                 }
-            }
+            })
 
             return compositeDisposable
         }
@@ -61,21 +62,21 @@ extension StreamType_old {
             var skipedEvent: Event?
 
             let compositeDisposable = CompositeDisposable()
-            compositeDisposable += by.observe(on: nil) { value in
+            compositeDisposable.addDisposable(by.observe(on: nil) { value in
                 allowed = value
                 if allowed, let skipedEvent_ = skipedEvent {
                     skipedEvent = nil
                     observer(skipedEvent_)
                 }
-            }
+            })
 
-            compositeDisposable += self.observe(on: nil) { event in
+            compositeDisposable.addDisposable(self.observe(on: nil) { event in
                 if allowed {
                     observer(event)
                 } else {
                     skipedEvent = event
                 }
-            }
+            })
 
             return compositeDisposable
         }
@@ -105,7 +106,7 @@ extension StreamType_old {
 
             let blockDisposable = BlockDisposable { tryDispatch = nil }
             let compositeDisposable = CompositeDisposable([blockDisposable])
-            compositeDisposable += self.observe(on: nil) { event in
+            compositeDisposable.addDisposable(self.observe(on: nil) { event in
 
                 if !predicate(event) {
 
@@ -122,7 +123,7 @@ extension StreamType_old {
 
                 guard timerInFlight == false else { return }
                 tryDispatch?()
-            }
+            })
             return compositeDisposable
         }
     }
