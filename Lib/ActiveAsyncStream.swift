@@ -73,7 +73,7 @@ public func create<Value, Next, Error: ErrorType>(producer producer: (AsyncEvent
     }
 }
 
-extension ActiveAsyncStream: BindableType {
+extension ActiveAsyncStream: BindableType_old {
 
     /// Creates a new observer that can be used to update the receiver.
     /// Optionally accepts a disposable that will be disposed on receiver's deinit.

@@ -57,7 +57,7 @@ public struct AsyncValue<Value, Error: ErrorType> {
 
 public extension AsyncStreamType {
 
-    func bindedToObservableAsyncVal<B : BindableType where
+    func bindedToObservableAsyncVal<B : BindableType_old where
         B.Event == AsyncValue<Value, Error>, B: ObservableType, B.Value == AsyncValue<Value, Error>>
         (bindable: B) -> AsyncStream<Value, Next, Error> {
 
@@ -96,7 +96,7 @@ extension MergedAsyncStream {
 
     public func mergedStream<
         T: AsyncStreamType,
-        B: BindableType where T.Value == Value, T.Next == Next, T.Error == Error,
+        B: BindableType_old where T.Value == Value, T.Next == Next, T.Error == Error,
         B.Event == AsyncValue<Value, Error>,
         B: ObservableType, B.Value == AsyncValue<Value, Error>>(
         factory : () -> T,
@@ -123,7 +123,7 @@ extension MergedAsyncStream {
 
     public func mergedStream<
         T: AsyncStreamType,
-        B: BindableType where T.Value == Value, T.Next == Next, T.Error == Error,
+        B: BindableType_old where T.Value == Value, T.Next == Next, T.Error == Error,
         B: ObservableType, B.Value == [Key:AsyncValue<Value, Error>]>(
         factory: () -> T,
         key    : Key,
@@ -162,7 +162,7 @@ extension MergedAsyncStream {
     }
 }
 
-private struct BindableWithBlock<ValueT, Error: ErrorType> : BindableType, ObservableType, StreamType_old {
+private struct BindableWithBlock<ValueT, Error: ErrorType> : BindableType_old, ObservableType, StreamType_old {
 
     typealias Event = AsyncValue<ValueT, Error>
     typealias Value = AsyncValue<ValueT, Error>
