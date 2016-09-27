@@ -10,6 +10,7 @@ import Foundation
 
 import iAsync_utils
 
+import enum ReactiveKit.Result
 import ReactiveKit_old//???
 
 public protocol AsyncStreamType: StreamType_old {
