@@ -12,12 +12,10 @@ import ReactiveKit_old//???
 
 extension StreamType {
 
-    @warn_unused_result
     public func flatMap<S : StreamType>(transform: Self.Event -> S) -> Stream<S.Event> {
         return flatMap(.Latest, transform: transform)
     }
 
-    @warn_unused_result
     public func pausable<S: StreamType where S.Event == Bool>(by: S, delayAfterPause: Double, on queue: Queue) -> Stream<Event> {
         return create { observer in
 
@@ -54,7 +52,6 @@ extension StreamType {
         }
     }
 
-    @warn_unused_result
     public func pausable2<S: StreamType where S.Event == Bool>(by: S) -> Stream<Event> {
         return create { observer in
 
@@ -83,7 +80,6 @@ extension StreamType {
         }
     }
 
-    @warn_unused_result
     public func throttleIf(seconds: Double, predicate: (Event) -> Bool, on queue: Queue) -> Stream<Event> {
         return create { observer in
 

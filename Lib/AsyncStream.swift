@@ -17,7 +17,6 @@ public protocol AsyncStreamType: StreamType {
     associatedtype Next
     associatedtype Error: ErrorType
 
-    @warn_unused_result
     func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Next, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E>
 }
 
@@ -70,14 +69,12 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         return stream.observe(on: context, observer: observer)
     }
 
-    @warn_unused_result
     public func after(delay: NSTimeInterval) -> AsyncStream<Value, Next, Error> {
 
         let delayStream = AsyncStream<Void, Next, Error>.succeededAfter(delay: delay, with: ())
         return delayStream.flatMap { self }
     }
 
-    @warn_unused_result
     public static func succeeded(with value: Value) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             observer(.Success(value))
@@ -85,7 +82,6 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         }
     }
 
-    @warn_unused_result
     public static func value(with value: Result<Value, Error>) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             switch value {
@@ -98,7 +94,6 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         }
     }
 
-    @warn_unused_result
     public static func succeededAfter(delay delay: NSTimeInterval, with value: Value) -> AsyncStream<Value, Next, Error> {
         return create { observer in
 
@@ -111,7 +106,6 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         }
     }
 
-    @warn_unused_result
     public static func failed(with error: Error) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             observer(.Failure(error))
@@ -119,7 +113,6 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         }
     }
 
-    @warn_unused_result
     public func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Next, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E> {
         return create { observer in
             return transform(self.stream).observe(on: nil, observer: observer)
@@ -127,7 +120,6 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
     }
 }
 
-@warn_unused_result
 public func create<Value, Next, Error: ErrorType>(producer producer: (AsyncEvent<Value, Next, Error> -> ()) -> DisposableType?) -> AsyncStream<Value, Next, Error> {
     return AsyncStream<Value, Next, Error> { observer in
         return producer(observer)
@@ -136,7 +128,6 @@ public func create<Value, Next, Error: ErrorType>(producer producer: (AsyncEvent
 
 public extension AsyncStreamType {
 
-    @warn_unused_result
     public func on(next next: (Next -> ())? = nil, success: (Value -> ())? = nil, failure: (Error -> ())? = nil, start: (() -> Void)? = nil, completed: (() -> Void)? = nil, context: ExecutionContext? = ImmediateOnMainExecutionContext) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             start?()
@@ -177,24 +168,20 @@ public extension AsyncStreamType {
         }
     }
 
-    @warn_unused_result
     public func shareNext(limit: Int = Int.max, context: ExecutionContext? = nil) -> ObservableBuffer<Next> {
         return ObservableBuffer(limit: limit) { observer in
             return self.observeNext(on: context, observer: observer)
         }
     }
 
-    @warn_unused_result
     public func map<U>(transform: Value -> U) -> AsyncStream<U, Next, Error> {
         return lift { $0.map { $0.map(transform) } }
     }
 
-    @warn_unused_result
     public func mapValue<U>(transform: Value -> U) -> AsyncStream<U, Next, Error> {
         return lift { $0.map { $0.map(transform) } }
     }
 
-    @warn_unused_result
     public func tryMap<U>(transform: Value -> Result<U, Error>) -> AsyncStream<U, Next, Error> {
         return lift { $0.map { operationEvent in
             switch operationEvent {
@@ -215,7 +202,6 @@ public extension AsyncStreamType {
     }
 
     //tryMapError
-    @warn_unused_result
     public func tryMapError<F>(transform: Error -> Result<Value, F>) -> AsyncStream<Value, Next, F> {
         return lift { $0.map { operationEvent in
             switch operationEvent {
@@ -235,7 +221,6 @@ public extension AsyncStreamType {
         }
     }
 
-    @warn_unused_result
     public func mapNext<F>(transform: Next -> F) -> AsyncStream<Value, F, Error> {
         return create { observer in
             return self.observe(on: nil, observer: { event -> () in
@@ -251,38 +236,31 @@ public extension AsyncStreamType {
         }
     }
 
-    @warn_unused_result
     public func mapError<F>(transform: Error -> F) -> AsyncStream<Value, Next, F> {
         return lift { $0.map { $0.mapError(transform) } }
     }
 
-    @warn_unused_result
     public func filter(include: Value -> Bool) -> AsyncStream<Value, Next, Error> {
         return lift { $0.filter { $0.filter(include) } }
     }
 
-    @warn_unused_result
     public func switchTo(context: ExecutionContext) -> AsyncStream<Value, Next, Error> {
         return lift { $0.switchTo(context) }
     }
 
-    @warn_unused_result
     public func throttle(seconds: Double, on queue: Queue) -> AsyncStream<Value, Next, Error> {
         return lift { $0.throttle(seconds, on: queue) }
     }
 
-    @warn_unused_result
     public func skip(count: Int) -> AsyncStream<Value, Next, Error> {
         return lift { $0.skip(count) }
     }
 
-    @warn_unused_result
     public func startWith(event: Next) -> AsyncStream<Value, Next, Error> {
         return lift { $0.startWith(.Next(event)) }
     }
 
     //TODO test
-    @warn_unused_result
     public func retry(count: Int?, delay: NSTimeInterval? = nil, until: Result<Value, Error> -> Bool) -> AsyncStream<Value, Next, Error> {
 
         var count_ = count
@@ -345,7 +323,6 @@ public extension AsyncStreamType {
         }
     }
 
-    @warn_unused_result
     public func retry(count: Int) -> AsyncStream<Value, Next, Error> {
 
         return retry(count, until: { result -> Bool in
@@ -358,130 +335,7 @@ public extension AsyncStreamType {
         })
     }
 
-//    @warn_unused_result
-//    public func take(count: Int) -> Operation<Value, Error> {
-//        return create { observer in
-//
-//            if count <= 0 {
-//                observer.success()
-//                return nil
-//            }
-//
-//            var taken = 0
-//
-//            let serialDisposable = SerialDisposable(otherDisposable: nil)
-//            serialDisposable.otherDisposable = self.observe(on: nil) { event in
-//
-//                switch event {
-//                case .Next(let value):
-//                    if taken < count {
-//                        taken += 1
-//                        observer.next(value)
-//                    }
-//                    if taken == count {
-//                        observer.success()
-//                        serialDisposable.otherDisposable?.dispose()
-//                    }
-//                default:
-//                    observer.observer(event)
-//                }
-//            }
-//
-//            return serialDisposable
-//        }
-//    }
-//
-//    @warn_unused_result
-//    public func first() -> Operation<Value, Error> {
-//        return take(1)
-//    }
-//
-//    @warn_unused_result
-//    public func takeLast(count: Int = 1) -> Operation<Value, Error> {
-//        return create { observer in
-//
-//            var values: [Value] = []
-//            values.reserveCapacity(count)
-//
-//            return self.observe(on: nil) { event in
-//
-//                switch event {
-//                case .Next(let value):
-//                    while values.count + 1 > count {
-//                        values.removeFirst()
-//                    }
-//                    values.append(value)
-//                case .Success:
-//                    values.forEach(observer.next)
-//                    observer.success()
-//                default:
-//                    observer.observer(event)
-//                }
-//            }
-//        }
-//    }
-//
-//    @warn_unused_result
-//    public func last() -> Operation<Value, Error> {
-//        return takeLast(1)
-//    }
-//
-//    @warn_unused_result
-//    public func pausable<S: StreamType where S.Event == Bool>(by: S) -> Operation<Value, Error> {
-//        return create { observer in
-//
-//            var allowed: Bool = true
-//
-//            let compositeDisposable = CompositeDisposable()
-//            compositeDisposable += by.observe(on: nil) { value in
-//                allowed = value
-//            }
-//
-//            compositeDisposable += self.observe(on: nil) { event in
-//                switch event {
-//                case .Next(let value):
-//                    if allowed {
-//                        observer.next(value)
-//                    }
-//                default:
-//                    observer.observer(event)
-//                }
-//            }
-//
-//            return compositeDisposable
-//        }
-//    }
-//
-//    @warn_unused_result
-//    public func scan<U>(initial: U, _ combine: (U, Value) -> U) -> Operation<U, Error> {
-//        return create { observer in
-//
-//            var scanned = initial
-//
-//            return self.observe(on: nil) { event in
-//                observer.observer(event.map { value in
-//                    scanned = combine(scanned, value)
-//                    return scanned
-//                })
-//            }
-//        }
-//    }
-//
-//    @warn_unused_result
-//    public func reduce<U>(initial: U, _ combine: (U, Value) -> U) -> Operation<U, Error> {
-//        return Operation<U, Error> { observer in
-//            observer.next(initial)
-//            return self.scan(initial, combine).observe(on: nil, observer: observer.observer)
-//            }.takeLast()
-//    }
-//    
-//    @warn_unused_result
-//    public func collect() -> Operation<[Value], Error> {
-//        return reduce([], { memo, new in memo + [new] })
-//    }
-
     //TODO test
-    @warn_unused_result
     public func combineLatestWith<S: AsyncStreamType where S.Error == Error>(other: S) -> AsyncStream<(Value, S.Value), (Next?, S.Next?), Error> {
         return create { observer in
 
@@ -538,7 +392,6 @@ public extension AsyncStreamType {
         }
     }
 
-    @warn_unused_result
     public func zipWith<S: AsyncStreamType where S.Error == Error>(other: S) -> AsyncStream<(Value, S.Value), (Next, S.Next), Error> {
         return create { observer in
             let queue = Queue(name: "com.ReactiveKit.ReactiveKit.ZipWith")
@@ -603,61 +456,13 @@ public extension AsyncStreamType {
     }
 }
 
-//public extension OperationType where Value: OptionalType {
-//    
-//    @warn_unused_result
-//    public func ignoreNil() -> Operation<Value.Wrapped?, Error> {
-//        return lift { $0.filter { $0.filter { $0._unbox != nil } }.map { $0.map { $0._unbox! } } }
-//    }
-//}
-
 public extension AsyncStreamType where Value: AsyncStreamType, Value.Next == Next, Value.Error == Error {
 
-    @warn_unused_result
     public func merge() -> AsyncStream<Value.Value, Value.Next, Value.Error> {
 
         fatalError()
-//        return create { observer in
-//            let queue = Queue(name: "com.ReactiveKit.ReactiveKit.Operation.Merge")
-//
-//            var numberOfOperations = 1
-//            let compositeDisposable = CompositeDisposable()
-//
-//            let decrementNumberOfOperations = { () -> () in
-//                queue.sync {
-//                    numberOfOperations -= 1
-//                    if numberOfOperations == 0 {
-//                        observer.success()
-//                    }
-//                }
-//            }
-//
-//            compositeDisposable += self.observe(on: nil) { taskEvent in
-//
-//                switch taskEvent {
-//                case .Failure(let error):
-//                    return observer.failure(error)
-//                case .Success:
-//                    decrementNumberOfOperations()
-//                case .Next(let task):
-//                    queue.sync {
-//                        numberOfOperations += 1
-//                    }
-//                    compositeDisposable += task.observe(on: nil) { event in
-//                        switch event {
-//                        case .Next, .Failure:
-//                            observer.observer(event)
-//                        case .Success:
-//                            decrementNumberOfOperations()
-//                        }
-//                    }
-//                }
-//            }
-//            return compositeDisposable
-//        }
     }
 
-    @warn_unused_result
     public func switchToLatest() -> AsyncStream<Value.Value, Value.Next, Value.Error> {
 
         return create { observer in
@@ -683,74 +488,9 @@ public extension AsyncStreamType where Value: AsyncStreamType, Value.Next == Nex
         }
     }
 
-    @warn_unused_result
     public func concat() -> AsyncStream<Value.Value, Value.Next, Value.Error> {
 
         fatalError()
-//        return create { observer in
-//            let queue = Queue(name: "com.ReactiveKit.ReactiveKit.Operation.Concat")
-//
-//            let serialDisposable = SerialDisposable(otherDisposable: nil)
-//            let compositeDisposable = CompositeDisposable([serialDisposable])
-//
-//            var outerCompleted: Bool = false
-//            var innerCompleted: Bool = true
-//
-//            var taskQueue: [Value] = []
-//
-//            var startNextOperation: (() -> ())! = nil
-//            startNextOperation = {
-//                innerCompleted = false
-//
-//                let task: Value = queue.sync {
-//                    return taskQueue.removeAtIndex(0)
-//                }
-//
-//                serialDisposable.otherDisposable?.dispose()
-//                serialDisposable.otherDisposable = task.observe(on: nil) { event in
-//                    switch event {
-//                    case .Failure(let error):
-//                        observer.failure(error)
-//                    case .Success:
-//                        innerCompleted = true
-//                        if taskQueue.count > 0 {
-//                            startNextOperation()
-//                        } else if outerCompleted {
-//                            observer.success()
-//                        }
-//                    case .Next(let value):
-//                        observer.next(value)
-//                    }
-//                }
-//            }
-//
-//            let addToQueue = { (task: Value) -> () in
-//                queue.sync {
-//                    taskQueue.append(task)
-//                }
-//
-//                if innerCompleted {
-//                    startNextOperation()
-//                }
-//            }
-//
-//            compositeDisposable += self.observe(on: nil) { taskEvent in
-//
-//                switch taskEvent {
-//                case .Failure(let error):
-//                    observer.failure(error)
-//                case .Success:
-//                    outerCompleted = true
-//                    if innerCompleted {
-//                        observer.success()
-//                    }
-//                case .Next(let innerOperation):
-//                    addToQueue(innerOperation)
-//                }
-//            }
-//
-//            return compositeDisposable
-//        }
     }
 }
 
@@ -762,7 +502,6 @@ public enum AsyncStreamFlatMapStrategy {
 
 public extension AsyncStreamType {
 
-    @warn_unused_result
     public func flatMap<T: AsyncStreamType where T.Next == Next, T.Error == Error>(strategy: AsyncStreamFlatMapStrategy, transform: Value -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
         switch strategy {
         case .Latest:
@@ -774,12 +513,10 @@ public extension AsyncStreamType {
         }
     }
 
-    @warn_unused_result
     public func flatMap<T: AsyncStreamType where T.Next == Next, T.Error == Error>(transform: Value -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
         return flatMap(.Latest, transform: transform)
     }
 
-    @warn_unused_result
     public func flatMapError<T: AsyncStreamType where T.Value == Value, T.Next == Next>(recover: Error -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
         return create { observer in
             let serialDisposable = SerialDisposable(otherDisposable: nil)
@@ -802,32 +539,26 @@ public extension AsyncStreamType {
     }
 }
 
-@warn_unused_result
 public func combineLatest<A: AsyncStreamType, B: AsyncStreamType where A.Error == B.Error>(a: A, _ b: B) -> AsyncStream<(A.Value, B.Value), (A.Next?, B.Next?), A.Error> {
     return a.combineLatestWith(b)
 }
 
-@warn_unused_result
 public func zip<A: AsyncStreamType, B: AsyncStreamType where A.Error == B.Error>(a: A, _ b: B) -> AsyncStream<(A.Value, B.Value), (A.Next, B.Next), A.Error> {
     return a.zipWith(b)
 }
 
-@warn_unused_result
 public func combineLatest<A: AsyncStreamType, B: AsyncStreamType, C: AsyncStreamType where A.Error == B.Error, A.Error == C.Error>(a: A, _ b: B, _ c: C) -> AsyncStream<(A.Value, B.Value, C.Value), (A.Next?, B.Next?, C.Next?), A.Error> {
     return combineLatest(a, b).combineLatestWith(c).mapNext { ($0?.0, $0?.1, $1) }.map { ($0.0, $0.1, $1) }
 }
 
-@warn_unused_result
 public func zip<A: AsyncStreamType, B: AsyncStreamType, C: AsyncStreamType where A.Error == B.Error, A.Error == C.Error>(a: A, _ b: B, _ c: C) -> AsyncStream<(A.Value, B.Value, C.Value), (A.Next?, B.Next?, C.Next?), A.Error> {
     return zip(a, b).zipWith(c).mapNext { ($0.0, $0.1, $1) }.map { ($0.0, $0.1, $1) }
 }
 
-@warn_unused_result
 public func combineLatest<A: AsyncStreamType, B: AsyncStreamType, C: AsyncStreamType, D: AsyncStreamType where A.Error == B.Error, A.Error == C.Error, A.Error == D.Error>(a: A, _ b: B, _ c: C, _ d: D) -> AsyncStream<(A.Value, B.Value, C.Value, D.Value), (A.Next?, B.Next?, C.Next?, D.Next?), A.Error> {
     return combineLatest(a, b, c).combineLatestWith(d).mapNext { ($0?.0, $0?.1, $0?.2, $1) }.map { ($0.0, $0.1, $0.2, $1) }
 }
 
-@warn_unused_result
 public func combineLatest<A: AsyncStreamType, B: AsyncStreamType, C: AsyncStreamType, D: AsyncStreamType, E: AsyncStreamType where A.Error == B.Error, A.Error == C.Error, A.Error == D.Error, A.Error == E.Error>
     (a: A, _ b: B, _ c: C, _ d: D, _ e: E) -> AsyncStream<(A.Value, B.Value, C.Value, D.Value, E.Value), (A.Next?, B.Next?, C.Next?, D.Next?, E.Next?), A.Error>
 {

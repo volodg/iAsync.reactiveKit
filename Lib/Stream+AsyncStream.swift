@@ -13,7 +13,6 @@ import ReactiveKit_old//???
 public extension StreamType where Event: AsyncStreamType {
 
     //TODO test
-    @warn_unused_result
     public func merge() -> AsyncStream<Event.Value, Event.Next, Event.Error> {
         return create { observer in
             let compositeDisposable = CompositeDisposable()
@@ -32,7 +31,6 @@ public extension StreamType where Event: AsyncStreamType {
         }
     }
 
-    @warn_unused_result
     public func switchToLatest() -> AsyncStream<Event.Value, Event.Next, Event.Error>  {
         return create { observer in
 
@@ -60,7 +58,6 @@ public extension StreamType where Event: AsyncStreamType {
     }
 
     //TODO test
-    @warn_unused_result
     public func concat() -> AsyncStream<Event.Value, Event.Next, Event.Error>  {
         return create { observer in
             let serialDisposable = SerialDisposable(otherDisposable: nil)
@@ -109,7 +106,6 @@ public extension StreamType where Event: AsyncStreamType {
 
 public extension StreamType {
 
-    @warn_unused_result
     public func flatMap<T: AsyncStreamType>(strategy: AsyncStreamFlatMapStrategy, transform: Event -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
         switch strategy {
         case .Latest:

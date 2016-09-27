@@ -29,7 +29,6 @@ public extension AsyncStreamType {
         return observe(on: nil, observer: {_ in})
     }
 
-    @warn_unused_result
     public func unsubscribe() -> AsyncStream<Value, Next, Error> {
 
         return create { observer in
@@ -49,7 +48,6 @@ public extension AsyncStreamType {
         }
     }
 
-    @warn_unused_result
     public func withEventValueGetter(getter: () -> AsyncEvent<Value, Next, Error>?) -> AsyncStream<Value, Next, Error> {
 
         return create { observer in
@@ -65,7 +63,6 @@ public extension AsyncStreamType {
         }
     }
 
-    @warn_unused_result
     public func withEventValueSetter(setter: AsyncEvent<Value, Next, Error> -> Void) -> AsyncStream<Value, Next, Error> {
 
         return create { observer in
@@ -78,7 +75,6 @@ public extension AsyncStreamType {
         }
     }
 
-    @warn_unused_result
     public func mergedObservers(limit: Int = Int.max) -> AsyncStream<Value, Next, Error> {
 
         typealias ObserverHolder = AsyncObserverHolder<Value, Next, Error>
@@ -144,7 +140,6 @@ public extension AsyncStreamType {
     }
 }
 
-@warn_unused_result
 public func asyncStreamWithSameThreadJob<Value, Next, Error: ErrorType>(job: (Next -> Void) -> Result<Value, Error>) -> AsyncStream<Value, Next, Error> {
 
     typealias Event = AsyncEvent<Value, Next, Error>
@@ -171,7 +166,6 @@ public func asyncStreamWithSameThreadJob<Value, Next, Error: ErrorType>(job: (Ne
     }
 }
 
-@warn_unused_result
 public func asyncStreamWithJob<Value, Next, Error: ErrorType>(
     queueName: String? = nil,
     job: (Next -> Void) -> Result<Value, Error>) -> AsyncStream<Value, Next, Error> {
@@ -206,7 +200,6 @@ public func asyncStreamWithJob<Value, Next, Error: ErrorType>(
     }
 }
 
-@warn_unused_result
 public func asyncStreamJob(job: () -> Void) -> AsyncStream<Void, Void, ErrorWithContext> {
 
     return asyncStreamWithJob { _ in

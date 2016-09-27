@@ -10,7 +10,6 @@ import Foundation
 
 import ReactiveKit_old//???
 
-@warn_unused_result(message="Did you forget to call `start` on the producer?")
 public func combineLatest<S: SequenceType, T where S.Generator.Element == Stream<T>>(producers: S) -> Stream<[T]> {
 
     let size = Array(producers).count
@@ -65,7 +64,6 @@ public func combineLatest<S: SequenceType, T where S.Generator.Element == Stream
 }
 
 //TODO test
-@warn_unused_result(message="Did you forget to call `start` on the producer?")
 public func combineLatest<S: SequenceType, T, N, E where S.Generator.Element == AsyncStream<T, N, E>, E: ErrorType>(producers: S) -> AsyncStream<[T], N, E> {
 
     let size = Array(producers).count
@@ -131,7 +129,6 @@ extension Stream {
 
 public extension StreamType where Event: OptionalType, Event.Wrapped: Equatable {
 
-    @warn_unused_result
     public func distinctOptional2() -> Stream<Event.Wrapped?> {
         return create { observer in
             var lastEvent: Event.Wrapped? = nil

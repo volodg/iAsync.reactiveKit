@@ -14,7 +14,6 @@ import ReactiveKit_old//???
 
 extension NSURL {
 
-    @warn_unused_result
     public func localDataStream() -> AsyncStream<NSData, AnyObject, ErrorWithContext> {
 
         return create { observer -> DisposableType? in
