@@ -10,6 +10,7 @@ import Foundation
 
 import iAsync_utils
 
+import protocol ReactiveKit.Disposable
 import ReactiveKit_old//???
 
 final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorType> {
@@ -33,7 +34,7 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
         setter : (StreamT.Event -> Void)? = nil
         ) -> StreamT {
 
-        let result: StreamT = create(producer: { observer -> DisposableType? in
+        let result: StreamT = create(producer: { observer -> Disposable? in
 
             let resultStream: StreamT
 

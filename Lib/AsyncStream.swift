@@ -12,6 +12,7 @@ import iAsync_utils
 
 import enum ReactiveKit.Result
 import struct ReactiveKit.Queue
+import protocol ReactiveKit.Disposable
 import ReactiveKit_old//???
 
 public protocol AsyncStreamType: StreamType_old {
@@ -47,7 +48,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
 
     public typealias Observer = Event -> ()
 
-    public init(producer: Observer -> DisposableType?) {
+    public init(producer: Observer -> Disposable?) {
         stream = Stream_old  { observer in
             var observerHolder: Observer? = observer
 
@@ -67,7 +68,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         }
     }
 
-    public func observe(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Observer) -> DisposableType {
+    public func observe(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Observer) -> Disposable {
         return stream.observe(on: context, observer: observer)
     }
 
@@ -122,7 +123,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
     }
 }
 
-public func create<Value, Next, Error: ErrorType>(producer producer: (AsyncEvent<Value, Next, Error> -> ()) -> DisposableType?) -> AsyncStream<Value, Next, Error> {
+public func create<Value, Next, Error: ErrorType>(producer producer: (AsyncEvent<Value, Next, Error> -> ()) -> Disposable?) -> AsyncStream<Value, Next, Error> {
     return AsyncStream<Value, Next, Error> { observer in
         return producer(observer)
     }
@@ -150,7 +151,7 @@ public extension AsyncStreamType {
         }
     }
 
-    public func observeNext(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Next -> ()) -> DisposableType {
+    public func observeNext(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Next -> ()) -> Disposable {
         return self.observe(on: context) { event in
             switch event {
             case .Next(let event):
@@ -160,7 +161,7 @@ public extension AsyncStreamType {
         }
     }
 
-    public func observeError(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Error -> ()) -> DisposableType {
+    public func observeError(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Error -> ()) -> Disposable {
         return self.observe(on: context) { event in
             switch event {
             case .Failure(let error):

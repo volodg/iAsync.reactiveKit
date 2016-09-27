@@ -8,6 +8,7 @@
 
 import Foundation
 
+import protocol ReactiveKit.Disposable
 import ReactiveKit_old//???
 
 public final class UniqueObservable<Value: Equatable>: ActiveStream<Value>, ObservableType {
@@ -31,7 +32,7 @@ public final class UniqueObservable<Value: Equatable>: ActiveStream<Value>, Obse
         self.value = event
     }
 
-    public override func observe(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Observer) -> DisposableType {
+    public override func observe(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Observer) -> Disposable {
         let disposable = super.observe(on: context, observer: observer)
         observer(value)
         return disposable

@@ -10,13 +10,14 @@ import Foundation
 
 import iAsync_utils
 
+import protocol ReactiveKit.Disposable
 import ReactiveKit_old//???
 
 extension NSURL {
 
     public func localDataStream() -> AsyncStream<NSData, AnyObject, ErrorWithContext> {
 
-        return create { observer -> DisposableType? in
+        return create { observer -> Disposable? in
 
             self.localDataWithCallbacks({ data in
 

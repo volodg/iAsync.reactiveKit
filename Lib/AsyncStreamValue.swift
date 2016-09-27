@@ -11,6 +11,7 @@ import Foundation
 import iAsync_utils
 
 import enum ReactiveKit.Result
+import protocol ReactiveKit.Disposable
 import ReactiveKit_old//???
 
 public struct AsyncValue<Value, Error: ErrorType> {
@@ -62,7 +63,7 @@ public extension AsyncStreamType {
         B.Event == AsyncValue<Value, Error>, B: ObservableType, B.Value == AsyncValue<Value, Error>>
         (bindable: B) -> AsyncStream<Value, Next, Error> {
 
-        return create(producer: { observer -> DisposableType? in
+        return create(producer: { observer -> Disposable? in
 
             var result = bindable.value
             result.loading = true
@@ -190,14 +191,14 @@ private struct BindableWithBlock<ValueT, Error: ErrorType> : BindableType_old, O
         self.getVal = getVal
     }
 
-    public func observer(disconnectDisposable: DisposableType?) -> (Event -> ()) {
+    public func observer(disconnectDisposable: Disposable?) -> (Event -> ()) {
         return { value -> () in
             self.putVal(value)
             self.stream.next(value)
         }
     }
 
-    public func observe(on context: ExecutionContext_old?, observer: Event -> ()) -> DisposableType {
+    public func observe(on context: ExecutionContext_old?, observer: Event -> ()) -> Disposable {
 
         let disposable = stream.observe(on: context, observer: observer)
         observer(value)
