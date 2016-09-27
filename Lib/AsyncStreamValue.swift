@@ -196,7 +196,7 @@ private struct BindableWithBlock<ValueT, Error: ErrorType> : BindableType, Obser
         }
     }
 
-    public func observe(on context: ExecutionContext?, observer: Event -> ()) -> DisposableType {
+    public func observe(on context: ExecutionContext_old?, observer: Event -> ()) -> DisposableType {
 
         let disposable = stream.observe(on: context, observer: observer)
         observer(value)

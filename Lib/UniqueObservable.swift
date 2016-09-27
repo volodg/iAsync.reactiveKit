@@ -31,7 +31,7 @@ public final class UniqueObservable<Value: Equatable>: ActiveStream<Value>, Obse
         self.value = event
     }
 
-    public override func observe(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Observer) -> DisposableType {
+    public override func observe(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Observer) -> DisposableType {
         let disposable = super.observe(on: context, observer: observer)
         observer(value)
         return disposable

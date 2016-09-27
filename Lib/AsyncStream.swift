@@ -65,7 +65,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         }
     }
 
-    public func observe(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Observer) -> DisposableType {
+    public func observe(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Observer) -> DisposableType {
         return stream.observe(on: context, observer: observer)
     }
 
@@ -128,7 +128,7 @@ public func create<Value, Next, Error: ErrorType>(producer producer: (AsyncEvent
 
 public extension AsyncStreamType {
 
-    public func on(next next: (Next -> ())? = nil, success: (Value -> ())? = nil, failure: (Error -> ())? = nil, start: (() -> Void)? = nil, completed: (() -> Void)? = nil, context: ExecutionContext? = ImmediateOnMainExecutionContext) -> AsyncStream<Value, Next, Error> {
+    public func on(next next: (Next -> ())? = nil, success: (Value -> ())? = nil, failure: (Error -> ())? = nil, start: (() -> Void)? = nil, completed: (() -> Void)? = nil, context: ExecutionContext_old? = ImmediateOnMainExecutionContext) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             start?()
             return self.observe(on: context) { event in
@@ -148,7 +148,7 @@ public extension AsyncStreamType {
         }
     }
 
-    public func observeNext(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Next -> ()) -> DisposableType {
+    public func observeNext(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Next -> ()) -> DisposableType {
         return self.observe(on: context) { event in
             switch event {
             case .Next(let event):
@@ -158,7 +158,7 @@ public extension AsyncStreamType {
         }
     }
 
-    public func observeError(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Error -> ()) -> DisposableType {
+    public func observeError(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Error -> ()) -> DisposableType {
         return self.observe(on: context) { event in
             switch event {
             case .Failure(let error):
@@ -168,7 +168,7 @@ public extension AsyncStreamType {
         }
     }
 
-    public func shareNext(limit: Int = Int.max, context: ExecutionContext? = nil) -> ObservableBuffer<Next> {
+    public func shareNext(limit: Int = Int.max, context: ExecutionContext_old? = nil) -> ObservableBuffer<Next> {
         return ObservableBuffer(limit: limit) { observer in
             return self.observeNext(on: context, observer: observer)
         }
@@ -244,7 +244,7 @@ public extension AsyncStreamType {
         return lift { $0.filter { $0.filter(include) } }
     }
 
-    public func switchTo(context: ExecutionContext) -> AsyncStream<Value, Next, Error> {
+    public func switchTo(context: ExecutionContext_old) -> AsyncStream<Value, Next, Error> {
         return lift { $0.switchTo(context) }
     }
 

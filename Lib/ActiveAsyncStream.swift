@@ -48,7 +48,7 @@ public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStr
         }
     }
 
-    public func observe(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Observer) -> DisposableType {
+    public func observe(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Observer) -> DisposableType {
         return stream.observe(on: context, observer: observer)
     }
 
