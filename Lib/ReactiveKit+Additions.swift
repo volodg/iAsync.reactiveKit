@@ -8,7 +8,7 @@
 
 import Foundation
 
-import ReactiveKit_old
+import ReactiveKit_old//???
 
 @warn_unused_result(message="Did you forget to call `start` on the producer?")
 public func combineLatest<S: SequenceType, T where S.Generator.Element == Stream<T>>(producers: S) -> Stream<[T]> {

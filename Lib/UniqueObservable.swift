@@ -8,7 +8,7 @@
 
 import Foundation
 
-import ReactiveKit_old
+import ReactiveKit_old//???
 
 public final class UniqueObservable<Value: Equatable>: ActiveStream<Value>, ObservableType {
 
