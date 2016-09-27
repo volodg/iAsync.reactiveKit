@@ -11,6 +11,7 @@ import Foundation
 import iAsync_utils
 
 import protocol ReactiveKit.Disposable
+import let ReactiveKit.ImmediateOnMainExecutionContext
 import ReactiveKit_old//???
 
 public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStreamType {
