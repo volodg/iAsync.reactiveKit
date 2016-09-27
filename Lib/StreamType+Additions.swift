@@ -17,7 +17,7 @@ extension StreamType_old {
     }
 
     public func pausable<S: StreamType_old where S.Event == Bool>(by: S, delayAfterPause: Double, on queue: Queue) -> Stream_old<Event> {
-        return create { observer in
+        return create_old { observer in
 
             var allowed: Bool = false
 
@@ -53,7 +53,7 @@ extension StreamType_old {
     }
 
     public func pausable2<S: StreamType_old where S.Event == Bool>(by: S) -> Stream_old<Event> {
-        return create { observer in
+        return create_old { observer in
 
             var allowed: Bool = false
 
@@ -81,7 +81,7 @@ extension StreamType_old {
     }
 
     public func throttleIf(seconds: Double, predicate: (Event) -> Bool, on queue: Queue) -> Stream_old<Event> {
-        return create { observer in
+        return create_old { observer in
 
             var timerInFlight: Bool = false
             var latestEvent: Event! = nil

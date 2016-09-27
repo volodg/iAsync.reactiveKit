@@ -18,7 +18,7 @@ public func combineLatest<S: SequenceType, T where S.Generator.Element == Stream
         return Stream_old<[T]>(value: [])
     }
 
-    return create { observer in
+    return create_old { observer in
 
         let queue = Queue(name: "com.ReactiveKit.ReactiveKit.combineLatest")
 
@@ -130,7 +130,7 @@ extension Stream_old {
 public extension StreamType_old where Event: OptionalType, Event.Wrapped: Equatable {
 
     public func distinctOptional2() -> Stream_old<Event.Wrapped?> {
-        return create { observer in
+        return create_old { observer in
             var lastEvent: Event.Wrapped? = nil
             var firstEvent: Bool = true
             return self.observe(on: nil) { event in
