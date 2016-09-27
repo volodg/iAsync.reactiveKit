@@ -252,14 +252,6 @@ public extension AsyncStreamType {
         return lift { $0.throttle(seconds, on: queue) }
     }
 
-    public func skip(count: Int) -> AsyncStream<Value, Next, Error> {
-        return lift { $0.skip(count) }
-    }
-
-    public func startWith(event: Next) -> AsyncStream<Value, Next, Error> {
-        return lift { $0.startWith(.Next(event)) }
-    }
-
     //TODO test
     public func retry(count: Int?, delay: NSTimeInterval? = nil, until: Result<Value, Error> -> Bool) -> AsyncStream<Value, Next, Error> {
 
@@ -412,7 +404,7 @@ public extension AsyncStreamType {
             }
 
             let dispatchValueIfPossible = {
-                if let selfValue = selfValue, otherValue = otherValue {
+                if let selfValue = selfValue, let otherValue = otherValue {
                     observer(.Success(selfValue, otherValue))
                 }
             }
