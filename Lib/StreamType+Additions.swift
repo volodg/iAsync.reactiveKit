@@ -8,6 +8,7 @@
 
 import Foundation
 
+import struct ReactiveKit.Queue
 import ReactiveKit_old//???
 
 extension StreamType_old {

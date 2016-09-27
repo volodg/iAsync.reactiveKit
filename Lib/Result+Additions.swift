@@ -8,6 +8,7 @@
 
 import Foundation
 
+import enum ReactiveKit.Result
 import ReactiveKit_old//???
 
 public extension Result {
@@ -19,26 +20,6 @@ public extension Result {
             return .Success(f(value))
         case .Failure(let error):
             return .Failure(error)
-        }
-    }
-
-    var value: T? {
-
-        switch self {
-        case .Success(let value):
-            return value
-        case .Failure:
-            return nil
-        }
-    }
-
-    var error: Error? {
-
-        switch self {
-        case .Success:
-            return nil
-        case .Failure(let error):
-            return error
         }
     }
 

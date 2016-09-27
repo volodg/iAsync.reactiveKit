@@ -11,6 +11,7 @@ import Foundation
 import iAsync_utils
 
 import enum ReactiveKit.Result
+import struct ReactiveKit.Queue
 import ReactiveKit_old//???
 
 public protocol AsyncStreamType: StreamType_old {

@@ -8,6 +8,8 @@
 
 import Foundation
 
+import struct ReactiveKit.Queue
+import protocol ReactiveKit.OptionalType
 import ReactiveKit_old//???
 
 public func combineLatest<S: SequenceType, T where S.Generator.Element == Stream_old<T>>(producers: S) -> Stream_old<[T]> {
