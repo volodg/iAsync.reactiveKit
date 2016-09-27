@@ -10,12 +10,12 @@ import Foundation
 
 import ReactiveKit_old//???
 
-public func combineLatest<S: SequenceType, T where S.Generator.Element == Stream<T>>(producers: S) -> Stream<[T]> {
+public func combineLatest<S: SequenceType, T where S.Generator.Element == Stream_old<T>>(producers: S) -> Stream_old<[T]> {
 
     let size = Array(producers).count
 
     if size == 0 {
-        return Stream<[T]>(value: [])
+        return Stream_old<[T]>(value: [])
     }
 
     return create { observer in
@@ -115,7 +115,7 @@ public func combineLatest<S: SequenceType, T, N, E where S.Generator.Element == 
     }
 }
 
-extension Stream {
+extension Stream_old {
 
     public init(value: Event) {
 
@@ -129,7 +129,7 @@ extension Stream {
 
 public extension StreamType_old where Event: OptionalType, Event.Wrapped: Equatable {
 
-    public func distinctOptional2() -> Stream<Event.Wrapped?> {
+    public func distinctOptional2() -> Stream_old<Event.Wrapped?> {
         return create { observer in
             var lastEvent: Event.Wrapped? = nil
             var firstEvent: Bool = true

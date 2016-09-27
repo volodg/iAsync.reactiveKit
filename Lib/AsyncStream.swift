@@ -17,7 +17,7 @@ public protocol AsyncStreamType: StreamType_old {
     associatedtype Next
     associatedtype Error: ErrorType
 
-    func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Next, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E>
+    func lift<R, P, E: ErrorType>(transform: Stream_old<AsyncEvent<Value, Next, Error>> -> Stream_old<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E>
 }
 
 public struct AsyncObserver<Value, Next, Error: ErrorType> {
@@ -41,12 +41,12 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
 
     public typealias Event = AsyncEvent<Value, Next, Error>
 
-    private let stream: Stream<Event>
+    private let stream: Stream_old<Event>
 
     public typealias Observer = Event -> ()
 
     public init(producer: Observer -> DisposableType?) {
-        stream = Stream  { observer in
+        stream = Stream_old  { observer in
             var observerHolder: Observer? = observer
 
             let dispose = producer { event in
@@ -113,7 +113,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
         }
     }
 
-    public func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Next, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E> {
+    public func lift<R, P, E: ErrorType>(transform: Stream_old<AsyncEvent<Value, Next, Error>> -> Stream_old<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E> {
         return create { observer in
             return transform(self.stream).observe(on: nil, observer: observer)
         }

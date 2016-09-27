@@ -24,7 +24,7 @@ public struct AsyncValue<Value, Error: ErrorType> {
         self.loading = loading
     }
 
-    public func mapStream<R>(f: Value -> Stream<R>) -> Stream<AsyncValue<R, Error>> {
+    public func mapStream<R>(f: Value -> Stream_old<R>) -> Stream_old<AsyncValue<R, Error>> {
 
         switch result {
         case .Some(.Success(let v)):
@@ -33,24 +33,24 @@ public struct AsyncValue<Value, Error: ErrorType> {
             }
         case .Some(.Failure(let error)):
             let value = AsyncValue<R, Error>(result: .Failure(error), loading: self.loading)
-            return Stream(value: value)
+            return Stream_old(value: value)
         case .None:
             let value = AsyncValue<R, Error>(result: .None, loading: self.loading)
-            return Stream(value: value)
+            return Stream_old(value: value)
         }
     }
 
-    public func mapStream2<R>(f: Value -> Stream<AsyncValue<R, Error>>) -> Stream<AsyncValue<R, Error>> {
+    public func mapStream2<R>(f: Value -> Stream_old<AsyncValue<R, Error>>) -> Stream_old<AsyncValue<R, Error>> {
 
         switch result {
         case .Some(.Success(let v)):
             return f(v)
         case .Some(.Failure(let error)):
             let value = AsyncValue<R, Error>(result: .Failure(error), loading: self.loading)
-            return Stream(value: value)
+            return Stream_old(value: value)
         case .None:
             let value = AsyncValue<R, Error>(result: .None, loading: self.loading)
-            return Stream(value: value)
+            return Stream_old(value: value)
         }
     }
 }

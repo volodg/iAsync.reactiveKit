@@ -52,7 +52,7 @@ public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStr
         return stream.observe(on: context, observer: observer)
     }
 
-    public func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Next, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E> {
+    public func lift<R, P, E: ErrorType>(transform: Stream_old<AsyncEvent<Value, Next, Error>> -> Stream_old<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E> {
         return create { observer in
             return transform(self.stream.map(id_)).observe(on: nil, observer: observer)
         }
