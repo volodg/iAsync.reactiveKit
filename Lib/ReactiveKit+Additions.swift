@@ -127,7 +127,7 @@ extension Stream {
     }
 }
 
-public extension StreamType where Event: OptionalType, Event.Wrapped: Equatable {
+public extension StreamType_old where Event: OptionalType, Event.Wrapped: Equatable {
 
     public func distinctOptional2() -> Stream<Event.Wrapped?> {
         return create { observer in

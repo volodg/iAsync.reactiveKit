@@ -162,7 +162,7 @@ extension MergedAsyncStream {
     }
 }
 
-private struct BindableWithBlock<ValueT, Error: ErrorType> : BindableType, ObservableType, StreamType {
+private struct BindableWithBlock<ValueT, Error: ErrorType> : BindableType, ObservableType, StreamType_old {
 
     typealias Event = AsyncValue<ValueT, Error>
     typealias Value = AsyncValue<ValueT, Error>

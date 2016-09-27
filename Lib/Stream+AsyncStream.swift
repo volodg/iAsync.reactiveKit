@@ -10,7 +10,7 @@ import Foundation
 
 import ReactiveKit_old//???
 
-public extension StreamType where Event: AsyncStreamType {
+public extension StreamType_old where Event: AsyncStreamType {
 
     //TODO test
     public func merge() -> AsyncStream<Event.Value, Event.Next, Event.Error> {
@@ -104,7 +104,7 @@ public extension StreamType where Event: AsyncStreamType {
     }
 }
 
-public extension StreamType {
+public extension StreamType_old {
 
     public func flatMap<T: AsyncStreamType>(strategy: AsyncStreamFlatMapStrategy, transform: Event -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
         switch strategy {
