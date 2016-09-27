@@ -10,6 +10,7 @@ import Foundation
 
 import iAsync_utils
 
+import class ReactiveKit.SerialDisposable
 import ReactiveKit_old//???
 
 final public class StreamOwner<Value, Next, Error: ErrorType> {

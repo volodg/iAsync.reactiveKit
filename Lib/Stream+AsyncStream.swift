@@ -8,6 +8,7 @@
 
 import Foundation
 
+import class ReactiveKit.SerialDisposable
 import ReactiveKit_old//???
 
 public extension StreamType_old where Event: AsyncStreamType {

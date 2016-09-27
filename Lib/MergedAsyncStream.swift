@@ -11,6 +11,7 @@ import Foundation
 import iAsync_utils
 
 import protocol ReactiveKit.Disposable
+import class ReactiveKit.SerialDisposable
 import ReactiveKit_old//???
 
 final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorType> {
