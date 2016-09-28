@@ -29,7 +29,7 @@ public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStr
         stream = PushStream()
     }
 
-    public func observe(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Observer) -> Disposable {
+    public func observe(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Observer) -> Disposable {
 
         return stream.observeNext { value in
 
