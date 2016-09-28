@@ -245,10 +245,6 @@ public extension AsyncStreamType {
         return lift { $0.filter { $0.filter(include) } }
     }
 
-    public func throttle(seconds: Double, on queue: Queue) -> AsyncStream<Value, Next, Error> {
-        return lift { $0.throttle(seconds, on: queue) }
-    }
-
     //TODO test
     public func retry(count: Int?, delay: NSTimeInterval? = nil, until: Result<Value, Error> -> Bool) -> AsyncStream<Value, Next, Error> {
 
