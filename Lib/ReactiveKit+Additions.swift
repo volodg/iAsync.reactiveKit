@@ -70,26 +70,37 @@ public extension RawStreamType where Event.Element: OptionalType, Event.Element.
         return Stream { observer in
             var lastEvent: Event.Element.Wrapped? = nil
             var firstEvent: Bool = true
-            return self.observeNext { event in
+            return self.observe { event in
 
-                switch (lastEvent, event._unbox) {
-                case (.None, .Some(let new)):
-                    firstEvent = false
-                    observer.next(new)
-                case (.Some, .None):
-                    firstEvent = false
-                    observer.next(nil)
-                case (.None, .None) where firstEvent:
-                    firstEvent = false
-                    observer.next(nil)
-                case (.Some(let old), .Some(let new)) where old != new:
-                    firstEvent = false
-                    observer.next(new)
-                default:
-                    break
+                if event.isTermination {
+
+//                    let result = StreamEvent<Event.Element>.completed()
+//                    observer.on(result)
+//                    return
+                    fatalError()
                 }
 
-                lastEvent = event._unbox
+                if let value = event.element {
+
+                    switch (lastEvent, value._unbox) {
+                    case (.None, .Some(let new)):
+                        firstEvent = false
+                        observer.next(new)
+                    case (.Some, .None):
+                        firstEvent = false
+                        observer.next(nil)
+                    case (.None, .None) where firstEvent:
+                        firstEvent = false
+                        observer.next(nil)
+                    case (.Some(let old), .Some(let new)) where old != new:
+                        firstEvent = false
+                        observer.next(new)
+                    default:
+                        break
+                    }
+
+                    lastEvent = value._unbox
+                }
             }
         }
     }
