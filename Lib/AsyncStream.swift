@@ -235,10 +235,6 @@ public extension AsyncStreamType {
         return lift { $0.map { $0.mapError(transform) } }
     }
 
-    public func filter(include: Value -> Bool) -> AsyncStream<Value, Next, Error> {
-        return lift { $0.filter { $0.filter(include) } }
-    }
-
     //TODO test
     public func retry(count: Int?, delay: NSTimeInterval? = nil, until: Result<Value, Error> -> Bool) -> AsyncStream<Value, Next, Error> {
 
