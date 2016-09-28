@@ -202,11 +202,3 @@ public func asyncStreamWithJob<Value, Next, Error: ErrorType>(
         }
     }
 }
-
-public func asyncStreamJob(job: () -> Void) -> AsyncStream<Void, Void, ErrorWithContext> {
-
-    return asyncStreamWithJob { _ in
-        job()
-        return .Success(())
-    }
-}
