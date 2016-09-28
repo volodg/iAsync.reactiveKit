@@ -10,6 +10,7 @@ import Foundation
 
 import iAsync_utils
 
+import class ReactiveKit.PushStream
 import enum ReactiveKit.Result
 import protocol ReactiveKit.Disposable
 import ReactiveKit_old//???
@@ -169,7 +170,7 @@ private struct BindableWithBlock<ValueT, Error: ErrorType> : BindableType_old, O
     typealias Event = AsyncValue<ValueT, Error>
     typealias Value = AsyncValue<ValueT, Error>
 
-    private let stream = ActiveStream<Value>()
+    private let stream = PushStream<Value>()
 
     public var value: AsyncValue<ValueT, Error> {
         get {
@@ -200,7 +201,9 @@ private struct BindableWithBlock<ValueT, Error: ErrorType> : BindableType_old, O
 
     public func observe(on context: ExecutionContext_old?, observer: Event -> ()) -> Disposable {
 
-        let disposable = stream.observe(on: context, observer: observer)
+        let disposable = stream.observeNext { value in
+            observer(value)
+        }
         observer(value)
         return disposable
     }
