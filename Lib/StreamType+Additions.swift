@@ -8,124 +8,56 @@
 
 import Foundation
 
-import struct ReactiveKit.Queue
-import class ReactiveKit.CompositeDisposable
-import class ReactiveKit.BlockDisposable
-import ReactiveKit_old//???
+import ReactiveKit
 
-extension StreamType_old {
+extension RawStreamType {
 
-    public func flatMap<S : StreamType_old>(transform: Self.Event -> S) -> Stream_old<S.Event> {
-        return flatMap(.Latest, transform: transform)
-    }
+    @warn_unused_result
+    public func pausable2<R: _StreamType where R.Event.Element == Bool>(by: R) -> RawStream<Event> {
 
-    public func pausable<S: StreamType_old where S.Event == Bool>(by: S, delayAfterPause: Double, on queue: Queue) -> Stream_old<Event> {
-        return create_old { observer in
+        let result = RawStream<Event> { observer in
 
-            var allowed: Bool = false
+            var allowed: Bool = true
 
             var skipedEvent: Event?
 
             let compositeDisposable = CompositeDisposable()
-            compositeDisposable.addDisposable(by.observe(on: nil) { value in
-                allowed = value
-                if allowed {
-                    queue.after(delayAfterPause, block: {
+            compositeDisposable += by.observe { value in
+                if let element = value.element {
+                    allowed = element
 
-                        guard let skipedEvent_ = skipedEvent else { return }
+                    if allowed, let skipedEvent_ = skipedEvent {
                         skipedEvent = nil
-
-                        if allowed {
-                            observer(skipedEvent_)
-                        }
-                    })
-                }
-            })
-
-            compositeDisposable.addDisposable(self.observe(on: nil) { event in
-                if allowed {
-                    skipedEvent = nil
-                    observer(event)
-                } else {
-                    skipedEvent = event
-                }
-            })
-
-            return compositeDisposable
-        }
-    }
-
-    public func pausable2<S: StreamType_old where S.Event == Bool>(by: S) -> Stream_old<Event> {
-        return create_old { observer in
-
-            var allowed: Bool = false
-
-            var skipedEvent: Event?
-
-            let compositeDisposable = CompositeDisposable()
-            compositeDisposable.addDisposable(by.observe(on: nil) { value in
-                allowed = value
-                if allowed, let skipedEvent_ = skipedEvent {
-                    skipedEvent = nil
-                    observer(skipedEvent_)
-                }
-            })
-
-            compositeDisposable.addDisposable(self.observe(on: nil) { event in
-                if allowed {
-                    observer(event)
-                } else {
-                    skipedEvent = event
-                }
-            })
-
-            return compositeDisposable
-        }
-    }
-
-    public func throttleIf(seconds: Double, predicate: (Event) -> Bool, on queue: Queue) -> Stream_old<Event> {
-        return create_old { observer in
-
-            var timerInFlight: Bool = false
-            var latestEvent: Event! = nil
-            var latestEventDate: NSDate! = nil
-
-            var tryDispatch: (() -> Void)?
-            tryDispatch = {
-                if latestEventDate.dateByAddingTimeInterval(seconds).compare(NSDate()) == NSComparisonResult.OrderedAscending {
-                    observer(latestEvent)
-                } else {
-                    timerInFlight = true
-                    queue.after(seconds) {
-                        if timerInFlight {
-                            timerInFlight = false
-                            tryDispatch?()
-                        }
+                        observer.observer(skipedEvent_)
                     }
+                } else {
+                    // ignore?
                 }
             }
 
-            let blockDisposable = BlockDisposable { tryDispatch = nil }
-            let compositeDisposable = CompositeDisposable([blockDisposable])
-            compositeDisposable.addDisposable(self.observe(on: nil) { event in
-
-                if !predicate(event) {
-
-                    latestEvent     = nil
-                    latestEventDate = nil
-                    timerInFlight   = false
-
-                    observer(event)
-                    return
+            compositeDisposable += self.observe { event in
+                if event.isTermination {
+                    skipedEvent = nil
+                    observer.observer(event)
+                } else if allowed {
+                    skipedEvent = nil
+                    observer.observer(event)
+                } else {
+                    skipedEvent = event
                 }
+            }
 
-                latestEvent = event
-                latestEventDate = NSDate()
-
-                guard timerInFlight == false else { return }
-                tryDispatch?()
-            })
             return compositeDisposable
         }
+
+        return result
+    }
+}
+
+public extension StreamType {
+
+    @warn_unused_result
+    public func pausable2<S: _StreamType where S.Event.Element == Bool>(by other: S) -> Stream<Element> {
+        return lift { $0.pausable2(other) }
     }
 }

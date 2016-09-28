@@ -175,12 +175,6 @@ public extension AsyncStreamType {
         }
     }
 
-    public func shareNext(limit: Int = Int.max, context: ExecutionContext_old? = nil) -> ObservableBuffer<Next> {
-        return ObservableBuffer(limit: limit) { observer in
-            return self.observeNext(on: context, observer: observer)
-        }
-    }
-
     public func map<U>(transform: Value -> U) -> AsyncStream<U, Next, Error> {
         return lift { $0.map { $0.map(transform) } }
     }
