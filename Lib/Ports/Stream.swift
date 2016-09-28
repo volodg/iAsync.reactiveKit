@@ -25,6 +25,20 @@ extension Stream_old {
     }
 }
 
+extension RawStream {
+
+    public func toStream() -> Stream<Event> {
+
+        return Stream { observer in
+
+            return self.observe { value in
+
+                observer.next(value)
+            }
+        }
+    }
+}
+
 extension Stream {
 
     public func toStream() -> Stream_old<Element> {
