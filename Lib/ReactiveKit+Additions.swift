@@ -63,6 +63,45 @@ public func combineLatest<S: SequenceType, T where S.Generator.Element == Stream
     }
 }
 
+public extension RawStreamType where Event.Element: OptionalType, Event.Element.Wrapped: Equatable {
+
+    public func distinctOptional2() -> Stream<Event.Element.Wrapped?> {
+
+        return Stream { observer in
+            var lastEvent: Event.Element.Wrapped? = nil
+            var firstEvent: Bool = true
+            return self.observeNext { event in
+
+                switch (lastEvent, event._unbox) {
+                case (.None, .Some(let new)):
+                    firstEvent = false
+                    observer.next(new)
+                case (.Some, .None):
+                    firstEvent = false
+                    observer.next(nil)
+                case (.None, .None) where firstEvent:
+                    firstEvent = false
+                    observer.next(nil)
+                case (.Some(let old), .Some(let new)) where old != new:
+                    firstEvent = false
+                    observer.next(new)
+                default:
+                    break
+                }
+
+                lastEvent = event._unbox
+            }
+        }
+    }
+}
+
+public extension StreamType where Element: OptionalType, Element.Wrapped: Equatable {
+
+    public func distinctOptional2() -> Stream<Element.Wrapped?> {
+        return rawStream.distinctOptional2()
+    }
+}
+
 ////TODO test
 //public func combineLatest<S: SequenceType, T, N, E where S.Generator.Element == AsyncStream<T, N, E>, E: ErrorType>(producers: S) -> AsyncStream<[T], N, E> {
 //    

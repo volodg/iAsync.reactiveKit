@@ -133,7 +133,7 @@ extension Stream_old {
 
 public extension StreamType_old where Event: OptionalType, Event.Wrapped: Equatable {
 
-    public func distinctOptional2() -> Stream_old<Event.Wrapped?> {
+    public func distinctOptional2_old() -> Stream_old<Event.Wrapped?> {
         return create_old { observer in
             var lastEvent: Event.Wrapped? = nil
             var firstEvent: Bool = true

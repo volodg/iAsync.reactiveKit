@@ -56,6 +56,10 @@ extension RawStreamType {
 
 public extension StreamType {
 
+    public func flatMap<U: StreamType>(transform: Element -> U) -> Stream<U.Element> {
+        return flatMap(.Latest, transform: transform)
+    }
+
     @warn_unused_result
     public func pausable2<S: _StreamType where S.Event.Element == Bool>(by other: S) -> Stream<Element> {
         return lift { $0.pausable2(other) }
