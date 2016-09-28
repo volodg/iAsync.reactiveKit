@@ -10,9 +10,7 @@ import Foundation
 
 import iAsync_utils
 
-import class ReactiveKit.PushStream
-import enum ReactiveKit.Result
-import protocol ReactiveKit.Disposable
+import ReactiveKit
 import ReactiveKit_old//???
 
 public struct AsyncValue<Value, Error: ErrorType> {
@@ -27,7 +25,7 @@ public struct AsyncValue<Value, Error: ErrorType> {
         self.loading = loading
     }
 
-    public func mapStream<R>(f: Value -> Stream_old<R>) -> Stream_old<AsyncValue<R, Error>> {
+    public func mapStream<R>(f: Value -> Stream<R>) -> Stream<AsyncValue<R, Error>> {
 
         switch result {
         case .Some(.Success(let v)):
@@ -36,32 +34,32 @@ public struct AsyncValue<Value, Error: ErrorType> {
             }
         case .Some(.Failure(let error)):
             let value = AsyncValue<R, Error>(result: .Failure(error), loading: self.loading)
-            return Stream_old(value: value)
+            return Stream.next(value)
         case .None:
             let value = AsyncValue<R, Error>(result: .None, loading: self.loading)
-            return Stream_old(value: value)
+            return Stream.next(value)
         }
     }
 
-    public func mapStream2<R>(f: Value -> Stream_old<AsyncValue<R, Error>>) -> Stream_old<AsyncValue<R, Error>> {
+    public func mapStream2<R>(f: Value -> Stream<AsyncValue<R, Error>>) -> Stream<AsyncValue<R, Error>> {
 
         switch result {
         case .Some(.Success(let v)):
             return f(v)
         case .Some(.Failure(let error)):
             let value = AsyncValue<R, Error>(result: .Failure(error), loading: self.loading)
-            return Stream_old(value: value)
+            return Stream.next(value)
         case .None:
             let value = AsyncValue<R, Error>(result: .None, loading: self.loading)
-            return Stream_old(value: value)
+            return Stream.next(value)
         }
     }
 }
 
 public extension AsyncStreamType {
 
-    func bindedToObservableAsyncVal<B : BindableType_old where
-        B.Event == AsyncValue<Value, Error>, B: ObservableType, B.Value == AsyncValue<Value, Error>>
+    func bindedToObservableAsyncVal<B : BindableType where
+        B.Element == AsyncValue<Value, Error>, B: PropertyType, B.ProperyElement == AsyncValue<Value, Error>>
         (bindable: B) -> AsyncStream<Value, Next, Error> {
 
         return create(producer: { observer -> Disposable? in
@@ -69,8 +67,9 @@ public extension AsyncStreamType {
             var result = bindable.value
             result.loading = true
 
-            let bindObserver = bindable.observer(nil)
-            bindObserver(result)
+            let bindObserver = bindable.observer(NotDisposable)
+            let val_ = StreamEvent.Next(result)
+            bindObserver(val_)
 
             return self.observe(on: nil, observer: { event -> () in
 
@@ -78,13 +77,15 @@ public extension AsyncStreamType {
                 case .Success(let value):
                     result.result  = .Success(value)
                     result.loading = false
-                    bindObserver(result)
+                    let val_ = StreamEvent.Next(result)
+                    bindObserver(val_)
                 case .Failure(let error):
                     if bindable.value.result?.value == nil {
                         result.result = .Failure(error)
                     }
                     result.loading = false
-                    bindObserver(result)
+                    let val_ = StreamEvent.Next(result)
+                    bindObserver(val_)
                 default:
                     break
                 }
@@ -99,9 +100,9 @@ extension MergedAsyncStream {
 
     public func mergedStream<
         T: AsyncStreamType,
-        B: BindableType_old where T.Value == Value, T.Next == Next, T.Error == Error,
-        B.Event == AsyncValue<Value, Error>,
-        B: ObservableType, B.Value == AsyncValue<Value, Error>>(
+        B: BindableType where T.Value == Value, T.Next == Next, T.Error == Error,
+        B.Element == AsyncValue<Value, Error>,
+        B: PropertyType, B.ProperyElement == AsyncValue<Value, Error>>(
         factory : () -> T,
         key     : Key,//TODO remove key parameter
         bindable: B,
@@ -126,8 +127,8 @@ extension MergedAsyncStream {
 
     public func mergedStream<
         T: AsyncStreamType,
-        B: BindableType_old where T.Value == Value, T.Next == Next, T.Error == Error,
-        B: ObservableType, B.Value == [Key:AsyncValue<Value, Error>]>(
+        B: BindableType where T.Value == Value, T.Next == Next, T.Error == Error,
+        B: PropertyType, B.ProperyElement == [Key:AsyncValue<Value, Error>]>(
         factory: () -> T,
         key    : Key,
         var holder: B,
@@ -165,12 +166,13 @@ extension MergedAsyncStream {
     }
 }
 
-private struct BindableWithBlock<ValueT, Error: ErrorType> : BindableType_old, ObservableType, StreamType_old {
+private struct BindableWithBlock<ValueT, Error: ErrorType> : PropertyType, BindableType {
 
     typealias Event = AsyncValue<ValueT, Error>
-    typealias Value = AsyncValue<ValueT, Error>
+    typealias Element = AsyncValue<ValueT, Error>
+    typealias ProperyElement = AsyncValue<ValueT, Error>
 
-    private let stream = PushStream<Value>()
+    private let stream = PushStream<Element>()
 
     public var value: AsyncValue<ValueT, Error> {
         get {
@@ -182,8 +184,6 @@ private struct BindableWithBlock<ValueT, Error: ErrorType> : BindableType_old, O
         }
     }
 
-    public typealias Observer = Event -> ()
-
     private let getVal: () -> Event
     private let putVal: (Event) -> ()
 
@@ -192,19 +192,11 @@ private struct BindableWithBlock<ValueT, Error: ErrorType> : BindableType_old, O
         self.getVal = getVal
     }
 
-    public func observer(disconnectDisposable: Disposable?) -> (Event -> ()) {
-        return { value -> () in
-            self.putVal(value)
-            self.stream.next(value)
-        }
-    }
+    func observer(disconnectDisposable: Disposable) -> (StreamEvent<Element> -> Void) {
 
-    public func observe(on context: ExecutionContext_old?, observer: Event -> ()) -> Disposable {
-
-        let disposable = stream.observeNext { value in
-            observer(value)
+        return { value in
+            self.putVal(value.element!)
+            self.stream.on(value)
         }
-        observer(value)
-        return disposable
     }
 }

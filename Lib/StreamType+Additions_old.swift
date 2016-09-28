@@ -19,7 +19,7 @@ extension StreamType_old {
         return flatMap(.Latest, transform: transform)
     }
 
-    public func pausable<S: StreamType_old where S.Event == Bool>(by: S, delayAfterPause: Double, on queue: Queue) -> Stream_old<Event> {
+    public func pausable_old<S: StreamType_old where S.Event == Bool>(by: S, delayAfterPause: Double, on queue: Queue) -> Stream_old<Event> {
         return create_old { observer in
 
             var allowed: Bool = false

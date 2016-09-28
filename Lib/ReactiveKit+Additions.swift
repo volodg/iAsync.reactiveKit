@@ -74,10 +74,8 @@ public extension RawStreamType where Event.Element: OptionalType, Event.Element.
 
                 if event.isTermination {
 
-//                    let result = StreamEvent<Event.Element>.completed()
-//                    observer.on(result)
-//                    return
-                    fatalError()
+                    observer.completed()
+                    return
                 }
 
                 if let value = event.element {

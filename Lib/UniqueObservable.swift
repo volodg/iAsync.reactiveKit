@@ -11,35 +11,21 @@ import Foundation
 import ReactiveKit
 import ReactiveKit_old//???
 
-public final class UniqueObservable<Value: Equatable>: ActiveStream<Value>, ObservableType {
+public final class UniqueProperty<Value: Equatable>: Property<Value> {
 
-    private var _value: Value!
+    public override init(_ value: Value) {
+        super.init(value)
+    }
 
-    public var value: Value {
+    override public var value: Value {
         get {
-            return _value
+            return super.value
         }
         set {
-            if _value != newValue {
-                _value = newValue
+            if super.value != newValue {
+                super.value = newValue
                 super.next(newValue)
             }
         }
-    }
-
-    public override func next(event: Value) {
-
-        self.value = event
-    }
-
-    public override func observe(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Observer) -> Disposable {
-        let disposable = super.observe(on: context, observer: observer)
-        observer(value)
-        return disposable
-    }
-
-    public init(_ value: Value) {
-        super.init()
-        self.value = value
     }
 }

@@ -12,10 +12,46 @@ import ReactiveKit
 
 extension RawStreamType {
 
-    @warn_unused_result
+    public func pausable<S: _StreamType where S.Event.Element == Bool>(by: S, delayAfterPause: Double, on queue: Queue) -> RawStream<Event> {
+
+        return RawStream { observer in
+
+            var allowed: Bool = false
+
+            var skipedEvent: Event?
+
+            let compositeDisposable = CompositeDisposable()
+            compositeDisposable.addDisposable(by.observeNext { value in
+                allowed = value
+                if allowed {
+                    queue.after(delayAfterPause, block: {
+
+                        guard let skipedEvent_ = skipedEvent else { return }
+                        skipedEvent = nil
+
+                        if allowed {
+                            observer.on(skipedEvent_)
+                        }
+                    })
+                }
+            })
+
+            compositeDisposable.addDisposable(self.observe { event in
+                if allowed {
+                    skipedEvent = nil
+                    observer.on(event)
+                } else {
+                    skipedEvent = event
+                }
+            })
+
+            return compositeDisposable
+        }
+    }
+
     public func pausable2<R: _StreamType where R.Event.Element == Bool>(by: R) -> RawStream<Event> {
 
-        let result = RawStream<Event> { observer in
+        return RawStream { observer in
 
             var allowed: Bool = true
 
@@ -49,8 +85,6 @@ extension RawStreamType {
 
             return compositeDisposable
         }
-
-        return result
     }
 }
 
@@ -60,7 +94,10 @@ public extension StreamType {
         return flatMap(.Latest, transform: transform)
     }
 
-    @warn_unused_result
+    public func pausable<S: StreamType where S.Event.Element == Bool>(by: S, delayAfterPause: Double, on queue: Queue) -> Stream<Element> {
+        return lift { $0.pausable(by, delayAfterPause: delayAfterPause, on: queue) }
+    }
+
     public func pausable2<S: _StreamType where S.Event.Element == Bool>(by other: S) -> Stream<Element> {
         return lift { $0.pausable2(other) }
     }
