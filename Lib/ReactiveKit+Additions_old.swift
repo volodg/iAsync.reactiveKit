@@ -130,34 +130,3 @@ extension Stream_old {
         }
     }
 }
-
-public extension StreamType_old where Event: OptionalType, Event.Wrapped: Equatable {
-
-    public func distinctOptional2_old() -> Stream_old<Event.Wrapped?> {
-        return create_old { observer in
-            var lastEvent: Event.Wrapped? = nil
-            var firstEvent: Bool = true
-            return self.observe(on: nil) { event in
-
-                switch (lastEvent, event._unbox) {
-                case (.None, .Some(let new)):
-                    firstEvent = false
-                    observer(new)
-                case (.Some, .None):
-                    firstEvent = false
-                    observer(nil)
-                case (.None, .None) where firstEvent:
-                    firstEvent = false
-                    observer(nil)
-                case (.Some(let old), .Some(let new)) where old != new:
-                    firstEvent = false
-                    observer(new)
-                default:
-                    break
-                }
-
-                lastEvent = event._unbox
-            }
-        }
-    }
-}
