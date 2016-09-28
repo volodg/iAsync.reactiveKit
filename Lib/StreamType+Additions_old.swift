@@ -15,10 +15,6 @@ import ReactiveKit_old//???
 
 extension StreamType_old {
 
-    public func flatMap<S : StreamType_old>(transform: Self.Event -> S) -> Stream_old<S.Event> {
-        return flatMap(.Latest, transform: transform)
-    }
-
     public func throttleIf(seconds: Double, predicate: (Event) -> Bool, on queue: Queue) -> Stream_old<Event> {
         return create_old { observer in
 
