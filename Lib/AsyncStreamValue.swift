@@ -11,7 +11,6 @@ import Foundation
 import iAsync_utils
 
 import ReactiveKit
-import ReactiveKit_old//???
 
 public struct AsyncValue<Value, Error: ErrorType> {
 

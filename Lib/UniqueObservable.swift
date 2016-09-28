@@ -9,7 +9,6 @@
 import Foundation
 
 import ReactiveKit
-import ReactiveKit_old//???
 
 public final class UniqueProperty<Value: Equatable>: Property<Value> {
 

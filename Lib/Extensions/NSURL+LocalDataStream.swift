@@ -11,7 +11,6 @@ import Foundation
 import iAsync_utils
 
 import protocol ReactiveKit.Disposable
-import ReactiveKit_old//???
 
 extension NSURL {
 
