@@ -8,8 +8,7 @@
 
 import Foundation
 
-import protocol ReactiveKit.Disposable
-import let ReactiveKit.ImmediateOnMainExecutionContext
+import ReactiveKit
 import ReactiveKit_old//???
 
 public final class UniqueObservable<Value: Equatable>: ActiveStream<Value>, ObservableType {

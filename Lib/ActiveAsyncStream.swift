@@ -9,10 +9,9 @@
 import Foundation
 
 import iAsync_utils
+import iAsync_reactiveKit
 
-import protocol ReactiveKit.Disposable
-import let ReactiveKit.ImmediateOnMainExecutionContext
-import class ReactiveKit.BlockDisposable
+import ReactiveKit
 import ReactiveKit_old//???
 
 public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStreamType {
@@ -23,41 +22,27 @@ public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStr
 
     public typealias Event = AsyncEvent<Value, Next, Error>
 
-    private let stream: ActiveStream<Event>
+    private let stream: PushStream<Event>
 
     public typealias Observer = Event -> ()
 
     public init() {
-        stream = ActiveStream()
-    }
-
-    public init(producer: Observer -> Disposable?) {
-        stream = ActiveStream  { observer in
-            var observerHolder: Observer? = observer
-
-            let dispose = producer { event in
-                if let observer = observerHolder {
-                    if event.isTerminal {
-                        observerHolder = nil
-                    }
-                    observer(event)
-                }
-            }
-
-            return BlockDisposable { _ in
-                //observerHolder = nil
-                dispose?.dispose()
-            }
-        }
+        stream = PushStream()
     }
 
     public func observe(on context: ExecutionContext_old? = ImmediateOnMainExecutionContext, observer: Observer) -> Disposable {
-        return stream.observe(on: context, observer: observer)
+
+        return stream.observeNext { value in
+
+            return observer(value)
+        }
     }
 
     public func lift<R, P, E: ErrorType>(transform: Stream_old<AsyncEvent<Value, Next, Error>> -> Stream_old<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E> {
         return create { observer in
-            return transform(self.stream.map(id_)).observe(on: nil, observer: observer)
+
+            let stream = self.stream.toStream().toStream()
+            return transform(stream.map(id_)).observe(on: nil, observer: observer)
         }
     }
 
@@ -66,13 +51,7 @@ public final class ActiveAsyncStream<ValueT, NextT, ErrorT: ErrorType>: AsyncStr
     }
 
     internal func registerDisposable(disposable: Disposable) {
-        stream.registerDisposable(disposable)
-    }
-}
-
-public func create<Value, Next, Error: ErrorType>(producer producer: (AsyncEvent<Value, Next, Error> -> ()) -> Disposable?) -> ActiveAsyncStream<Value, Next, Error> {
-    return ActiveAsyncStream<Value, Next, Error> { observer in
-        return producer(observer)
+        stream.disposeBag.addDisposable(disposable)
     }
 }
 
