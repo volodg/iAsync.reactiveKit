@@ -12,7 +12,7 @@ import enum ReactiveKit.Result
 
 public extension Result {
 
-    func map<U>(f: T -> U) -> Result<U, Error> {
+    func map<U>(f: T -> U) -> Result<U, Error_> {
 
         switch self {
         case .Success(let value):
@@ -25,7 +25,7 @@ public extension Result {
     /// Case analysis for Result.
     ///
     /// Returns the value produced by applying `ifFailure` to `Failure` Results, or `ifSuccess` to `Success` Results.
-    public func analysis<Result>(@noescape ifSuccess ifSuccess: T -> Result, @noescape ifFailure: Error -> Result) -> Result {
+    public func analysis<Result>(@noescape ifSuccess ifSuccess: T -> Result, @noescape ifFailure: Error_ -> Result) -> Result {
         switch self {
         case let .Success(value):
             return ifSuccess(value)
@@ -35,14 +35,14 @@ public extension Result {
     }
 
     /// Returns the result of applying `transform` to `Success`es’ values, or re-wrapping `Failure`’s errors.
-    public func flatMap<U>(@noescape transform: T -> Result<U, Error>) -> Result<U, Error> {
+    public func flatMap<U>(@noescape transform: T -> Result<U, Error_>) -> Result<U, Error_> {
         return analysis(
             ifSuccess: transform,
-            ifFailure: Result<U, Error>.Failure)
+            ifFailure: Result<U, Error_>.Failure)
     }
 
     /// Returns the result of applying `transform` to `Success`es’ values, or re-wrapping `Failure`’s errors.
-    public func flatMapError<Error2>(@noescape transform: Error -> Result<T, Error2>) -> Result<T, Error2> {
+    public func flatMapError<Error2>(@noescape transform: Error_ -> Result<T, Error2>) -> Result<T, Error2> {
         return analysis(
             ifSuccess: Result<T, Error2>.Success,
             ifFailure: transform)
