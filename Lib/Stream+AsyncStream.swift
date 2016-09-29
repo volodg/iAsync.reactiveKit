@@ -10,7 +10,6 @@ import Foundation
 
 import class ReactiveKit.SerialDisposable
 import class ReactiveKit.CompositeDisposable
-import ReactiveKit_old//???
 
 public extension StreamType_old where Event: AsyncStreamType {
 

@@ -12,7 +12,6 @@ import struct ReactiveKit.Queue
 import protocol ReactiveKit.OptionalType
 import protocol ReactiveKit.Disposable
 import class ReactiveKit.CompositeDisposable
-import ReactiveKit_old//???
 
 //TODO test
 public func combineLatest_old<S: SequenceType, T, N, E where S.Generator.Element == AsyncStream<T, N, E>, E: ErrorType>(producers: S) -> AsyncStream<[T], N, E> {

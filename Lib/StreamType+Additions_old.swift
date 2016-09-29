@@ -11,7 +11,6 @@ import Foundation
 import struct ReactiveKit.Queue
 import class ReactiveKit.CompositeDisposable
 import class ReactiveKit.BlockDisposable
-import ReactiveKit_old//???
 
 extension StreamType_old {
 
