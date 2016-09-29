@@ -119,6 +119,5 @@ Pod::Spec.new do |s|
   
   s.dependency "iAsync.utils"#, "~> 1.0.1"
   s.dependency 'ReactiveKit'
-  s.dependency "ReactiveKit_old" #, "~> 1.1.2"
 
 end
