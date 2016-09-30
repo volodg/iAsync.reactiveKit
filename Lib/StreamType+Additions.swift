@@ -12,6 +12,59 @@ import ReactiveKit
 
 extension RawStreamType {
 
+    public func throttleIf(seconds: Double, predicate: (Event.Element) -> Bool, on queue: Queue) -> RawStream<Event> {
+
+        return RawStream { observer in
+
+            var timerInFlight: Bool = false
+            var latestEvent: Event.Element! = nil
+            var latestEventDate: NSDate! = nil
+
+            var tryDispatch: (() -> Void)?
+            tryDispatch = {
+                if latestEventDate.dateByAddingTimeInterval(seconds).compare(NSDate()) == NSComparisonResult.OrderedAscending {
+                    observer.next(latestEvent)
+                } else {
+                    timerInFlight = true
+                    queue.after(seconds) {
+                        if timerInFlight {
+                            timerInFlight = false
+                            tryDispatch?()
+                        }
+                    }
+                }
+            }
+
+            let blockDisposable = BlockDisposable { tryDispatch = nil }
+            let compositeDisposable = CompositeDisposable([blockDisposable])
+            compositeDisposable.addDisposable(self.observe { event in
+
+                if let element = event.element {
+
+                    if !predicate(element) {
+
+                        latestEvent     = nil
+                        latestEventDate = nil
+                        timerInFlight   = false
+
+                        observer.next(element)
+                        return
+                    }
+
+                    latestEvent = element
+                    latestEventDate = NSDate()
+
+                    guard timerInFlight == false else { return }
+                    tryDispatch?()
+                } else {
+
+                    observer.on(event)
+                }
+            })
+            return compositeDisposable
+        }
+    }
+
     public func pausable<S: _StreamType where S.Event.Element == Bool>(by: S, delayAfterPause: Double, on queue: Queue) -> RawStream<Event> {
 
         return RawStream { observer in
@@ -92,6 +145,10 @@ public extension StreamType {
 
     public func flatMap<U: StreamType>(transform: Element -> U) -> Stream<U.Element> {
         return flatMap(.Latest, transform: transform)
+    }
+
+    public func throttleIf(seconds: Double, predicate: (Element) -> Bool, on queue: Queue) -> Stream<Element> {
+        return lift { $0.throttleIf(seconds, predicate: predicate, on: queue) }
     }
 
     public func pausable<S: StreamType where S.Event.Element == Bool>(by: S, delayAfterPause: Double, on queue: Queue) -> Stream<Element> {
