@@ -14,7 +14,7 @@ import protocol ReactiveKit.Disposable
 import class ReactiveKit.CompositeDisposable
 
 //TODO test
-public func combineLatest_old<S: SequenceType, T, N, E where S.Generator.Element == AsyncStream<T, N, E>, E: ErrorType>(producers: S) -> AsyncStream<[T], N, E> {
+public func combineLatest<S: SequenceType, T, N, E where S.Generator.Element == AsyncStream<T, N, E>, E: ErrorType>(producers: S) -> AsyncStream<[T], N, E> {
 
     let size = Array(producers).count
 
@@ -62,17 +62,5 @@ public func combineLatest_old<S: SequenceType, T, N, E where S.Generator.Element
         }
 
         return CompositeDisposable(disposes)
-    }
-}
-
-extension Stream_old {
-
-    public init(value: Event) {
-
-        self.init { handler -> Disposable? in
-
-            handler(value)
-            return nil
-        }
     }
 }
