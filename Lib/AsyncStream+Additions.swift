@@ -10,10 +10,7 @@ import Foundation
 
 import iAsync_utils
 
-import enum ReactiveKit.Result
-import struct ReactiveKit.Queue
-import protocol ReactiveKit.Disposable
-import class ReactiveKit.BlockDisposable
+import ReactiveKit
 
 private final class AsyncObserverHolder<Value, Next, Error: ErrorType> {
 
@@ -29,7 +26,7 @@ public extension AsyncStreamType {
     typealias Event = AsyncEvent<Value, Next, Error>
 
     public func run() -> Disposable {
-        return observe(on: nil, observer: {_ in})
+        return observe {_ in}
     }
 
     public func unsubscribe() -> AsyncStream<Value, Next, Error> {
@@ -39,7 +36,7 @@ public extension AsyncStreamType {
             typealias Observer = AsyncEvent<Value, Next, Error> -> ()
             var observerHolder: Observer? = observer
 
-            self.observe(on: nil) { event in
+            self.observe { event in
                 if let observer = observerHolder {
                     observer(event)
                 }
@@ -59,10 +56,10 @@ public extension AsyncStreamType {
 
             if let event = event {
                 observer(event)
-                if event.isTerminal { return nil }
+                if event.isTerminal { return NotDisposable }
             }
 
-            return self.observe(on: nil, observer: observer)
+            return self.observe(observer)
         }
     }
 
@@ -70,7 +67,7 @@ public extension AsyncStreamType {
 
         return create { observer in
 
-            return self.observe(on: nil) { event in
+            return self.observe { event in
 
                 setter(event)
                 observer(event)
@@ -122,7 +119,7 @@ public extension AsyncStreamType {
                 notify(observers_, event)
             }
 
-            dispose = self.observe(on: nil) { event in
+            dispose = self.observe { event in
 
                 switch event {
                 case .Success, .Failure:

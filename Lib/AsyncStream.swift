@@ -17,7 +17,7 @@ public protocol AsyncStreamType: StreamType_old {
     associatedtype Next
     associatedtype Error: ErrorType
 
-    func lift<R, P, E: ErrorType>(transform: Stream_old<AsyncEvent<Value, Next, Error>> -> Stream_old<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E>
+    func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Next, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E>
 }
 
 public struct AsyncObserver<Value, Next, Error: ErrorType> {
@@ -41,12 +41,12 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
 
     public typealias Event = AsyncEvent<Value, Next, Error>
 
-    private let stream: Stream_old<Event>
+    private let stream: Stream<Event>
 
-    public typealias Observer = Event -> ()
+    public typealias ObserverT = Event -> ()
 
-    public init(producer: Observer -> Disposable?) {
-        stream = Stream_old  { observer in
+    public init(producer: ObserverT -> Disposable) {
+        stream = Stream { observer in
             var observerHolder: Observer? = observer
 
             let dispose = producer { event in
@@ -54,19 +54,21 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
                     if event.isTerminal {
                         observerHolder = nil
                     }
-                    observer(event)
+                    observer.observer(.Next(event))
                 }
             }
 
             return BlockDisposable { _ in
                 //observerHolder = nil
-                dispose?.dispose()
+                dispose.dispose()
             }
         }
     }
 
-    public func observe(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Observer) -> Disposable {
-        return stream.observe(on: context, observer: observer)
+    public func observe(observer: ObserverT) -> Disposable {
+        return stream.observe({ event in
+            observer(event.element!)
+        })
     }
 
     public func after(delay: NSTimeInterval) -> AsyncStream<Value, Next, Error> {
@@ -78,7 +80,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
     public static func succeeded(with value: Value) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             observer(.Success(value))
-            return nil
+            return NotDisposable
         }
     }
 
@@ -90,7 +92,7 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
             case .Failure(let error):
                 observer(.Failure(error))
             }
-            return nil
+            return NotDisposable
         }
     }
 
@@ -109,18 +111,20 @@ public struct AsyncStream<Value, Next, Error: ErrorType>: AsyncStreamType {
     public static func failed(with error: Error) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             observer(.Failure(error))
-            return nil
+            return NotDisposable
         }
     }
 
-    public func lift<R, P, E: ErrorType>(transform: Stream_old<AsyncEvent<Value, Next, Error>> -> Stream_old<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E> {
+    public func lift<R, P, E: ErrorType>(transform: Stream<AsyncEvent<Value, Next, Error>> -> Stream<AsyncEvent<R, P, E>>) -> AsyncStream<R, P, E> {
         return create { observer in
-            return transform(self.stream).observe(on: nil, observer: observer)
+            return transform(self.stream).observe({ event in
+                observer(event.element!)
+            })
         }
     }
 }
 
-public func create<Value, Next, Error: ErrorType>(producer producer: (AsyncEvent<Value, Next, Error> -> ()) -> Disposable?) -> AsyncStream<Value, Next, Error> {
+public func create<Value, Next, Error: ErrorType>(producer producer: (AsyncEvent<Value, Next, Error> -> ()) -> Disposable) -> AsyncStream<Value, Next, Error> {
     return AsyncStream<Value, Next, Error> { observer in
         return producer(observer)
     }
@@ -131,7 +135,7 @@ public extension AsyncStreamType {
     public func on(next next: (Next -> ())? = nil, success: (Value -> ())? = nil, failure: (Error -> ())? = nil, start: (() -> Void)? = nil, completed: (() -> Void)? = nil, context: ExecutionContext? = ImmediateOnMainExecutionContext) -> AsyncStream<Value, Next, Error> {
         return create { observer in
             start?()
-            return self.observe(on: context) { event in
+            return self.observe { event in
                 switch event {
                 case .Next(let value):
                     next?(value)
@@ -148,8 +152,8 @@ public extension AsyncStreamType {
         }
     }
 
-    public func observeNext(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Next -> ()) -> Disposable {
-        return self.observe(on: context) { event in
+    public func observeNext(observer: Next -> ()) -> Disposable {
+        return self.observe { event in
             switch event {
             case .Next(let event):
                 observer(event)
@@ -158,8 +162,8 @@ public extension AsyncStreamType {
         }
     }
 
-    public func observeError(on context: ExecutionContext? = ImmediateOnMainExecutionContext, observer: Error -> ()) -> Disposable {
-        return self.observe(on: context) { event in
+    public func observeError(observer: Error -> ()) -> Disposable {
+        return self.observe { event in
             switch event {
             case .Failure(let error):
                 observer(error)
@@ -217,7 +221,7 @@ public extension AsyncStreamType {
 
     public func mapNext<F>(transform: Next -> F) -> AsyncStream<Value, F, Error> {
         return create { observer in
-            return self.observe(on: nil, observer: { event -> () in
+            return self.observe { event -> () in
                 switch event {
                 case .Next(let next):
                     observer(.Next(transform(next)))
@@ -226,7 +230,7 @@ public extension AsyncStreamType {
                 case .Success(let value):
                     observer(.Success(value))
                 }
-            })
+            }
         }
     }
 
@@ -279,13 +283,13 @@ public extension AsyncStreamType {
 
                 serialDisposable.otherDisposable?.dispose()
                 serialDisposable.otherDisposable = nil
-                let dispose = delayStream.flatMap { self }.observe(on: nil, observer: observer)
+                let dispose = delayStream.flatMap { self }.observe(observer)
                 if serialDisposable.otherDisposable == nil {
                     serialDisposable.otherDisposable = dispose
                 }
             }
 
-            let dispose = self.observe(on: nil, observer: observer)
+            let dispose = self.observe(observer)
             if serialDisposable.otherDisposable == nil {
                 serialDisposable.otherDisposable = dispose
             }
@@ -344,7 +348,7 @@ public extension AsyncStreamType {
                 }
             }
 
-            let selfDisposable = self.observe(on: nil) { event in
+            let selfDisposable = self.observe { event in
                 if case .Failure(let error) = event {
                     observer(.Failure(error))
                 } else {
@@ -353,7 +357,7 @@ public extension AsyncStreamType {
                 }
             }
 
-            let otherDisposable = other.observe(on: nil) { event in
+            let otherDisposable = other.observe { event in
                 if case .Failure(let error) = event {
                     observer(.Failure(error))
                 } else {
@@ -391,7 +395,7 @@ public extension AsyncStreamType {
                 }
             }
 
-            let selfDisposable = self.observe(on: nil) { event in
+            let selfDisposable = self.observe { event in
                 switch event {
                 case .Failure(let error):
                     observer(.Failure(error))
@@ -408,7 +412,7 @@ public extension AsyncStreamType {
                 }
             }
 
-            let otherDisposable = other.observe(on: nil) { event in
+            let otherDisposable = other.observe { event in
                 switch event {
                 case .Failure(let error):
                     observer(.Failure(error))
@@ -443,16 +447,16 @@ public extension AsyncStreamType where Value: AsyncStreamType, Value.Next == Nex
             let serialDisposable = SerialDisposable(otherDisposable: nil)
             let compositeDisposable = CompositeDisposable([serialDisposable])
 
-            compositeDisposable.addDisposable(self.observe(on: nil) { taskEvent in
+            compositeDisposable.addDisposable(self.observe { taskEvent in
 
                 switch taskEvent {
                 case .Failure(let error):
                     observer(.Failure(error))
                 case .Success(let value):
                     serialDisposable.otherDisposable?.dispose()
-                    serialDisposable.otherDisposable = value.observe(on: nil, observer: { (value) -> () in
+                    serialDisposable.otherDisposable = value.observe { value in
                         observer(value)
-                    })
+                    }
                 case .Next(let next):
                     observer(.Next(next))
                 }
@@ -495,14 +499,14 @@ public extension AsyncStreamType {
         return create { observer in
             let serialDisposable = SerialDisposable(otherDisposable: nil)
 
-            serialDisposable.otherDisposable = self.observe(on: nil) { taskEvent in
+            serialDisposable.otherDisposable = self.observe { taskEvent in
                 switch taskEvent {
                 case .Next(let value):
                     observer(.Next(value))
                 case .Success(let value):
                     observer(.Success(value))
                 case .Failure(let error):
-                    serialDisposable.otherDisposable = recover(error).observe(on: nil) { event in
+                    serialDisposable.otherDisposable = recover(error).observe { event in
                         observer(event)
                     }
                 }

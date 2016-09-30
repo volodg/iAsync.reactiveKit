@@ -10,9 +10,7 @@ import Foundation
 
 import iAsync_utils
 
-import protocol ReactiveKit.Disposable
-import class ReactiveKit.SerialDisposable
-import class ReactiveKit.BlockDisposable
+import ReactiveKit
 
 final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorType> {
 
@@ -35,7 +33,7 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
         setter : (StreamT.Event -> Void)? = nil
         ) -> StreamT {
 
-        let result: StreamT = create(producer: { observer -> Disposable? in
+        let result: StreamT = create(producer: { observer -> Disposable in
 
             let resultStream: StreamT
 
@@ -56,11 +54,11 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
                 self.streamsByKey[key] = resultStream
             }
 
-            let dispose = SerialDisposable(otherDisposable: resultStream.observe(observer: observer))
+            let dispose = SerialDisposable(otherDisposable: resultStream.observe(observer))
 
             //TODO test - when immediately finished
             if self.streamsByKey[key] == nil {
-                return nil
+                return NotDisposable
             }
 
             var disposes: [SerialDisposable]

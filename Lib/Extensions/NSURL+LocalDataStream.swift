@@ -9,6 +9,7 @@
 import Foundation
 
 import iAsync_utils
+import ReactiveKit
 
 import protocol ReactiveKit.Disposable
 
@@ -16,7 +17,7 @@ extension NSURL {
 
     public func localDataStream() -> AsyncStream<NSData, AnyObject, ErrorWithContext> {
 
-        return create { observer -> Disposable? in
+        return create { observer -> Disposable in
 
             self.localDataWithCallbacks({ data in
 
@@ -25,7 +26,7 @@ extension NSURL {
 
                 observer(.Failure(error))
             }
-            return nil
+            return NotDisposable
         }
     }
 }

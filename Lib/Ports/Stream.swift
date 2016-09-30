@@ -21,20 +21,6 @@ public extension Stream {
     }
 }
 
-extension Stream_old {
-
-    public func toStream() -> Stream<Event> {
-
-        return Stream { observer in
-
-            return self.observe { value in
-
-                observer.next(value)
-            }
-        }
-    }
-}
-
 extension RawStream {
 
     public func toStream() -> Stream<Event> {
@@ -58,24 +44,6 @@ extension Property {
             return self.observe { value in
 
                 observer.on(value)
-            }
-        }
-    }
-}
-
-extension Stream {
-
-    public func toStream() -> Stream_old<Element> {
-
-        return create_old { observer in
-
-            return self.observe { value in
-
-                if let val = value.element {
-                    observer(val)
-                } else {
-                    fatalError()
-                }
             }
         }
     }

@@ -51,7 +51,7 @@ public func combineLatest<S: SequenceType, T, N, E where S.Generator.Element == 
 
         for (index, stream) in producers.enumerate() {
 
-            let dispose = stream.observe(on: nil) { event in
+            let dispose = stream.observe { event in
                 queue.sync {
                     results[index] = event
                     dispatchIfPossible(index, event)

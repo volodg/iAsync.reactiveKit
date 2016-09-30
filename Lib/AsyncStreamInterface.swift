@@ -27,7 +27,7 @@ public protocol AsyncStreamInterface {
 
 public func createStream<T: AsyncStreamInterface>(factory: () -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
 
-    return create(producer: { observer -> Disposable? in
+    return create(producer: { observer -> Disposable in
 
         var observerHolder: (AsyncEvent<T.Value, T.Next, T.Error> -> ())? = observer
 

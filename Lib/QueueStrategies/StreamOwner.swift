@@ -38,7 +38,7 @@ final public class StreamOwner<Value, Next, Error: ErrorType> {
         self.disposeStream = SerialDisposable(otherDisposable: nil)
 
         let observer = self.observer!
-        let dispose = stream.on(completed: { [weak self] in self?.complete() }).observe(observer: observer)
+        let dispose = stream.on(completed: { [weak self] in self?.complete() }).observe(observer)
 
         if let dispose_ = self.disposeStream {
             dispose_.otherDisposable = dispose

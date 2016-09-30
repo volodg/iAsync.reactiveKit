@@ -28,16 +28,5 @@ import ReactiveKit
 
 public protocol StreamType_old {
     associatedtype Event
-    func observe(on context: ExecutionContext?, observer: Event -> ()) -> Disposable
-}
-
-extension StreamType_old {
-    
-    public func map<U>(transform: Event -> U) -> Stream_old<U> {
-        return create_old { observer in
-            return self.observe(on: nil) { event in
-                observer(transform(event))
-            }
-        }
-    }
+    func observe(observer: Event -> ()) -> Disposable
 }

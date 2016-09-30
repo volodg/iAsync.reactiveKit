@@ -61,7 +61,7 @@ public extension AsyncStreamType {
         B.Element == AsyncValue<Value, Error>, B: PropertyType, B.ProperyElement == AsyncValue<Value, Error>>
         (bindable: B) -> AsyncStream<Value, Next, Error> {
 
-        return create(producer: { observer -> Disposable? in
+        return create(producer: { observer -> Disposable in
 
             var result = bindable.value
             result.loading = true
@@ -70,7 +70,7 @@ public extension AsyncStreamType {
             let val_ = StreamEvent.Next(result)
             bindObserver(val_)
 
-            return self.observe(on: nil, observer: { event -> () in
+            return self.observe { event -> () in
 
                 switch event {
                 case .Success(let value):
@@ -90,7 +90,7 @@ public extension AsyncStreamType {
                 }
 
                 observer(event)
-            })
+            }
         })
     }
 }
