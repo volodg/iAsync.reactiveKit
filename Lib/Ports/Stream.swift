@@ -20,31 +20,3 @@ public extension Stream {
         }
     }
 }
-
-extension RawStream {
-
-    public func toStream() -> Stream<Event> {
-
-        return Stream { observer in
-
-            return self.observe { value in
-
-                observer.next(value)
-            }
-        }
-    }
-}
-
-extension Property {
-
-    public func toStream() -> Stream<ProperyElement> {
-
-        return Stream { observer in
-
-            return self.observe { value in
-
-                observer.on(value)
-            }
-        }
-    }
-}
