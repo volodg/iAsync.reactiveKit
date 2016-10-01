@@ -26,7 +26,7 @@ import Foundation
 
 import ReactiveKit
 
-public protocol StreamType_old {
+public protocol StreamType_ {
     associatedtype Event
     func observe(observer: Event -> ()) -> Disposable
 }
