@@ -8,15 +8,15 @@
 
 import Foundation
 
-public enum AsyncEvent<ValueT, NextT, ErrorT: ErrorType> {
+public enum AsyncEvent<ValueT, NextT, ErrorT: Error> {
 
-    case Success(ValueT)
-    case Failure(ErrorT)
-    case Next(NextT)
+    case success(ValueT)
+    case failure(ErrorT)
+    case next(NextT)
 
     public var value: ValueT? {
         switch self {
-        case .Success(let value):
+        case .success(let value):
             return value
         default:
             return nil
@@ -25,7 +25,7 @@ public enum AsyncEvent<ValueT, NextT, ErrorT: ErrorType> {
 
     public var error: ErrorT? {
         switch self {
-        case .Failure(let error):
+        case .failure(let error):
             return error
         default:
             return nil
@@ -34,9 +34,9 @@ public enum AsyncEvent<ValueT, NextT, ErrorT: ErrorType> {
 
     public var isTerminal: Bool {
         switch self {
-        case .Success, .Failure:
+        case .success, .failure:
             return true
-        case .Next:
+        case .next:
             return false
         }
     }
@@ -49,31 +49,31 @@ public enum AsyncEvent<ValueT, NextT, ErrorT: ErrorType> {
         return error != nil
     }
 
-    public func map<U>(transform: ValueT -> U) -> AsyncEvent<U, NextT, ErrorT> {
+    public func map<U>(_ transform: (ValueT) -> U) -> AsyncEvent<U, NextT, ErrorT> {
         switch self {
-        case .Next(let event):
-            return .Next(event)
-        case .Failure(let error):
-            return .Failure(error)
-        case .Success(let event):
-            return .Success(transform(event))
+        case .next(let event):
+            return .next(event)
+        case .failure(let error):
+            return .failure(error)
+        case .success(let event):
+            return .success(transform(event))
         }
     }
 
-    public func mapError<F>(transform: ErrorT -> F) -> AsyncEvent<ValueT, NextT, F> {
+    public func mapError<F>(_ transform: (ErrorT) -> F) -> AsyncEvent<ValueT, NextT, F> {
         switch self {
-        case .Next(let event):
-            return .Next(event)
-        case .Failure(let error):
-            return .Failure(transform(error))
-        case .Success(let event):
-            return .Success(event)
+        case .next(let event):
+            return .next(event)
+        case .failure(let error):
+            return .failure(transform(error))
+        case .success(let event):
+            return .success(event)
         }
     }
 
-    public func filter(include: ValueT -> Bool) -> Bool {
+    public func filter(_ include: (ValueT) -> Bool) -> Bool {
         switch self {
-        case .Success(let value):
+        case .success(let value):
             if include(value) {
                 return true
             } else {

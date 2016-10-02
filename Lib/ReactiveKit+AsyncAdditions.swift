@@ -14,7 +14,7 @@ import protocol ReactiveKit.Disposable
 import class ReactiveKit.CompositeDisposable
 
 //TODO test
-public func combineLatest<S: SequenceType, T, N, E where S.Generator.Element == AsyncStream<T, N, E>, E: ErrorType>(producers: S) -> AsyncStream<[T], N, E> {
+public func combineLatest<S: Sequence, T, N, E>(_ producers: S) -> AsyncStream<[T], N, E> where S.Iterator.Element == AsyncStream<T, N, E>, E: Error {
 
     let size = Array(producers).count
 
@@ -22,7 +22,7 @@ public func combineLatest<S: SequenceType, T, N, E where S.Generator.Element == 
         return AsyncStream.succeeded(with: [])
     }
 
-    return create { observer in
+    return AsyncStream { observer in
 
         let queue = Queue(name: "com.ReactiveKit.ReactiveKit.combineLatest")
 
@@ -30,26 +30,26 @@ public func combineLatest<S: SequenceType, T, N, E where S.Generator.Element == 
 
         let dispatchIfPossible = { (currIndex: Int, currEv: AsyncEvent<T, N, E>) -> () in
 
-            if let index = results.indexOf({ $0.1.isFailure }) {
+            if let index = results.index(where: { $0.1.isFailure }) {
 
                 let el = results[index]
-                observer(.Failure(el.1.error!))
+                observer(.failure(el.1.error!))
             }
 
             if results.count == size && results.all({ $0.1.isSuccess }) {
 
                 let els = results.map { $0.1.value! }
-                observer(.Success(els))
+                observer(.success(els))
             }
 
-            if case .Next(let val) = currEv {
-                observer(.Next(val))
+            if case .next(let val) = currEv {
+                observer(.next(val))
             }
         }
 
         var disposes = [Disposable]()
 
-        for (index, stream) in producers.enumerate() {
+        for (index, stream) in producers.enumerated() {
 
             let dispose = stream.observe { event in
                 queue.sync {

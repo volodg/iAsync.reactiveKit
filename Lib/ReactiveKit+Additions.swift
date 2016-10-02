@@ -10,7 +10,7 @@ import Foundation
 
 import ReactiveKit
 
-public func combineLatest<S: SequenceType, T where S.Generator.Element == Stream<T>>(producers: S) -> Stream<[T]> {
+public func combineLatest<S: SequenceType, T>(producers: S) -> Stream<[T]> where S.Generator.Element == Stream<T> {
 
     let size = Array(producers).count
 

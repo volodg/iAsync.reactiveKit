@@ -9,16 +9,16 @@
 import Foundation
 
 public enum PackedValue<Value1, Value2> {
-    case First(Value1)
-    case Second(Value2)
+    case first(Value1)
+    case second(Value2)
 }
 
-public enum PackedError<Error1: ErrorType, Error2: ErrorType>: ErrorType {
-    case First(Error1)
-    case Second(Error2)
+public enum PackedError<Error1: Error, Error2: Error>: Error {
+    case first(Error1)
+    case second(Error2)
 }
 
-public enum AsyncStreamTypesTransform<Value1, Value2, Next1, Next2, Error1: ErrorType, Error2: ErrorType> {
+public enum AsyncStreamTypesTransform<Value1, Value2, Next1, Next2, Error1: Error, Error2: Error> {
 
     public typealias Stream1 = AsyncStream<Value1, Next1, Error1>
     public typealias Stream2 = AsyncStream<Value2, Next2, Error2>
@@ -29,18 +29,18 @@ public enum AsyncStreamTypesTransform<Value1, Value2, Next1, Next2, Error1: Erro
 
     public typealias PackedAsyncStream = AsyncStream<PackedValueT, PackedNextT, PackedErrorT>
 
-    public typealias AsyncStreamTransformer = PackedAsyncStream -> PackedAsyncStream
+    public typealias AsyncStreamTransformer = (PackedAsyncStream) -> PackedAsyncStream
 
-    public static func transformStreamsType(stream: Stream1, transformer: AsyncStreamTransformer) -> Stream1 {
+    public static func transformStreamsType(_ stream: Stream1, transformer: AsyncStreamTransformer) -> Stream1 {
 
         let packedStream = stream.lift { $0.map { (ev: Stream1.Event) -> PackedAsyncStream.Event in
             switch ev {
-            case .Success(let value):
-                return .Success(.First(value))
-            case .Failure(let value):
-                return .Failure(.First(value))
-            case .Next(let value):
-                return .Next(.First(value))
+            case .success(let value):
+                return .success(.first(value))
+            case .failure(let value):
+                return .failure(.first(value))
+            case .next(let value):
+                return .next(.first(value))
             }
         }}
 
@@ -48,28 +48,28 @@ public enum AsyncStreamTypesTransform<Value1, Value2, Next1, Next2, Error1: Erro
 
         return transformedStream.lift { $0.map { ev -> Stream1.Event in
             switch ev {
-            case .Success(.First(let value)):
-                return .Success(value)
-            case .Failure(.First(let value)):
-                return .Failure(value)
-            case .Next(.First(let value)):
-                return .Next(value)
+            case .success(.first(let value)):
+                return .success(value)
+            case .failure(.first(let value)):
+                return .failure(value)
+            case .next(.first(let value)):
+                return .next(value)
             default:
                 fatalError()
             }
         }}
     }
 
-    public static func transformStreamsType(stream: Stream2, transformer: AsyncStreamTransformer) -> Stream2 {
+    public static func transformStreamsType(_ stream: Stream2, transformer: AsyncStreamTransformer) -> Stream2 {
 
         let packedStream = stream.lift { $0.map { ev -> PackedAsyncStream.Event in
             switch ev {
-            case .Success(let value):
-                return .Success(.Second(value))
-            case .Failure(let value):
-                return .Failure(.Second(value))
-            case .Next(let value):
-                return .Next(.Second(value))
+            case .success(let value):
+                return .success(.second(value))
+            case .failure(let value):
+                return .failure(.second(value))
+            case .next(let value):
+                return .next(.second(value))
             }
         }}
 
@@ -77,12 +77,12 @@ public enum AsyncStreamTypesTransform<Value1, Value2, Next1, Next2, Error1: Erro
 
         return transformedStream.lift { $0.map { ev -> Stream2.Event in
             switch ev {
-            case .Success(.Second(let value)):
-                return .Success(value)
-            case .Failure(.Second(let value)):
-                return .Failure(value)
-            case .Next(.Second(let value)):
-                return .Next(value)
+            case .success(.second(let value)):
+                return .success(value)
+            case .failure(.second(let value)):
+                return .failure(value)
+            case .next(.second(let value)):
+                return .next(value)
             default:
                 fatalError()
             }

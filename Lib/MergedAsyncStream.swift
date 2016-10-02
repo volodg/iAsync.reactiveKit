@@ -12,28 +12,28 @@ import iAsync_utils
 
 import ReactiveKit
 
-final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorType> {
+final public class MergedAsyncStream<KeyT: Hashable, ValueT, NextT, ErrorT: Error> {
 
-    private let sharedNextLimit: Int
+    fileprivate let sharedNextLimit: Int
 
     public init(sharedNextLimit: Int = Int.max) {
         self.sharedNextLimit = sharedNextLimit
     }
 
-    public typealias StreamT = AsyncStream<Value, Next, Error>
+    public typealias StreamT = AsyncStream<ValueT, NextT, ErrorT>
 
-    private var streamsByKey  = [Key:AsyncStream<Value, Next, Error>]()
-    private var disposesByKey = [Key:[SerialDisposable]]()
+    fileprivate var streamsByKey  = [KeyT:AsyncStream<ValueT, NextT, ErrorT>]()
+    fileprivate var disposesByKey = [KeyT:[SerialDisposable]]()
 
     public func mergedStream<
-        T: AsyncStreamType where T.Value == Value, T.Next == Next, T.Error == Error>(
-        factory: () -> T,
-        key    : Key,
+        T: AsyncStreamType>(
+        _ factory: @escaping () -> T,
+        key    : KeyT,
         getter : (() -> StreamT.Event?)? = nil,
-        setter : (StreamT.Event -> Void)? = nil
-        ) -> StreamT {
+        setter : ((StreamT.Event) -> Void)? = nil
+        ) -> StreamT where T.ValueT == ValueT, T.NextT == NextT, T.ErrorT == ErrorT {
 
-        let result: StreamT = create(producer: { observer -> Disposable in
+        let result: StreamT = StreamT { observer -> Disposable in
 
             let resultStream: StreamT
 
@@ -48,8 +48,8 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
                 }
 
                 resultStream = stream.on(completed: { _ in
-                    self.streamsByKey.removeValueForKey(key)
-                    self.disposesByKey.removeValueForKey(key)
+                    self.streamsByKey.removeValue(forKey: key)
+                    self.disposesByKey.removeValue(forKey: key)
                 }).mergedObservers(self.sharedNextLimit)
                 self.streamsByKey[key] = resultStream
             }
@@ -58,7 +58,7 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
 
             //TODO test - when immediately finished
             if self.streamsByKey[key] == nil {
-                return NotDisposable
+                return NonDisposable.instance
             }
 
             var disposes: [SerialDisposable]
@@ -72,13 +72,13 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
             return BlockDisposable { _ in
 
                 if var disposes_ = self.disposesByKey[key] {
-                    for (index, dispose_) in disposes_.enumerate() {
+                    for (index, dispose_) in disposes_.enumerated() {
                         guard dispose_ === dispose else { continue }
-                        disposes_.removeAtIndex(index)
+                        disposes_.remove(at: index)
                         self.disposesByKey[key] = disposes_
                         if disposes_.isEmpty {
-                            self.disposesByKey.removeValueForKey(key)
-                            self.streamsByKey.removeValueForKey(key)
+                            self.disposesByKey.removeValue(forKey: key)
+                            self.streamsByKey.removeValue(forKey: key)
                         }
                         break
                     }
@@ -86,7 +86,7 @@ final public class MergedAsyncStream<Key: Hashable, Value, Next, Error: ErrorTyp
 
                 dispose.dispose()
             }
-        })
+        }
 
         if let getter = getter {
             return result.withEventValueGetter(getter)

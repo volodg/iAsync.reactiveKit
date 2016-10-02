@@ -12,86 +12,91 @@ import iAsync_utils
 
 import ReactiveKit
 
-public struct AsyncValue<Value, Error: ErrorType> {
+public struct AsyncValue<ValueT, ErrorT: Error> {
 
-    public var result: Result<Value, Error>? = nil
+    public var result: Result<ValueT, ErrorT>? = nil
     public var loading: Bool = false
 
     public init() {}
 
-    public init(result: Result<Value, Error>?, loading: Bool) {
+    public init(result: Result<ValueT, ErrorT>?, loading: Bool) {
         self.result  = result
         self.loading = loading
     }
 
-    public func mapStream<R>(f: Value -> Stream<R>) -> Stream<AsyncValue<R, Error>> {
+    public func mapStream<R>(_ f: (ValueT) -> Signal1<R>) -> Signal1<AsyncValue<R, ErrorT>> {
 
         switch result {
-        case .Some(.Success(let v)):
-            return f(v).map { (val: R) -> AsyncValue<R, Error> in
-                return AsyncValue<R, Error>(result: .Success(val), loading: self.loading)
+        case .some(.success(let v)):
+            return f(v).map { (val: R) -> AsyncValue<R, ErrorT> in
+                let result = AsyncValue<R, ErrorT>(result: .success(val), loading: self.loading)
+                return result
             }
-        case .Some(.Failure(let error)):
-            let value = AsyncValue<R, Error>(result: .Failure(error), loading: self.loading)
-            return Stream.next(value)
-        case .None:
-            let value = AsyncValue<R, Error>(result: .None, loading: self.loading)
-            return Stream.next(value)
+        case .some(.failure(let error)):
+            let value = AsyncValue<R, ErrorT>(result: .failure(error), loading: self.loading)
+            return Signal.next(value)
+        case .none:
+            let value = AsyncValue<R, ErrorT>(result: .none, loading: self.loading)
+            return Signal.next(value)
         }
     }
 
-    public func mapStream2<R>(f: Value -> Stream<AsyncValue<R, Error>>) -> Stream<AsyncValue<R, Error>> {
+    public func mapStream2<R>(_ f: (ValueT) -> Signal1<AsyncValue<R, ErrorT>>) -> Signal1<AsyncValue<R, ErrorT>> {
 
         switch result {
-        case .Some(.Success(let v)):
+        case .some(.success(let v)):
             return f(v)
-        case .Some(.Failure(let error)):
-            let value = AsyncValue<R, Error>(result: .Failure(error), loading: self.loading)
-            return Stream.next(value)
-        case .None:
-            let value = AsyncValue<R, Error>(result: .None, loading: self.loading)
-            return Stream.next(value)
+        case .some(.failure(let error)):
+            let value = AsyncValue<R, ErrorT>(result: .failure(error), loading: self.loading)
+            return Signal1.next(value)
+        case .none:
+            let value = AsyncValue<R, ErrorT>(result: .none, loading: self.loading)
+            return Signal1.next(value)
         }
     }
 }
 
 public extension AsyncStreamType {
 
-    func bindedToObservableAsyncVal<B : BindableType where
-        B.Element == AsyncValue<Value, Error>, B: PropertyType, B.ProperyElement == AsyncValue<Value, Error>>
-        (bindable: B) -> AsyncStream<Value, Next, Error> {
+    func bindedToObservableAsyncVal<B : BindableProtocol>
+        (_ bindable: B) -> AsyncStream<ValueT, NextT, ErrorT> where
+        B.Element == AsyncValue<ValueT, ErrorT>, B.Error == NoError, B: PropertyProtocol, B.ProperyElement == AsyncValue<ValueT, ErrorT> {
 
-        return create(producer: { observer -> Disposable in
+        return AsyncStream { observer -> Disposable in
 
             var result = bindable.value
             result.loading = true
 
-            let bindObserver = bindable.observer(NotDisposable)
-            let val_ = StreamEvent.Next(result)
-            bindObserver(val_)
+            let bindedSignal = Property(result)
 
-            return self.observe { event -> () in
+            let disposes = CompositeDisposable()
+
+            let dispose1 = bindable.bind(signal: bindedSignal.toSignal())
+            disposes.add(disposable: dispose1)
+
+            let dispose2 = self.observe { event -> () in
 
                 switch event {
-                case .Success(let value):
-                    result.result  = .Success(value)
+                case .success(let value):
+                    result.result  = .success(value)
                     result.loading = false
-                    let val_ = StreamEvent.Next(result)
-                    bindObserver(val_)
-                case .Failure(let error):
+                    bindedSignal.value = result
+                case .failure(let error):
                     if bindable.value.result?.value == nil {
-                        result.result = .Failure(error)
+                        result.result = .failure(error)
                     }
                     result.loading = false
-                    let val_ = StreamEvent.Next(result)
-                    bindObserver(val_)
+                    bindedSignal.value = result
                 default:
                     break
                 }
 
                 observer(event)
             }
-        })
+            disposes.add(disposable: dispose2)
+
+            return disposes
+        }
     }
 }
 
@@ -99,65 +104,67 @@ extension MergedAsyncStream {
 
     public func mergedStream<
         T: AsyncStreamType,
-        B: BindableType where T.Value == Value, T.Next == Next, T.Error == Error,
-        B.Element == AsyncValue<Value, Error>,
-        B: PropertyType, B.ProperyElement == AsyncValue<Value, Error>>(
-        factory : () -> T,
-        key     : Key,//TODO remove key parameter
+        B: BindableProtocol>(
+        _ factory : @escaping () -> T,
+        key     : KeyT,//TODO remove key parameter
         bindable: B,
         lazy    : Bool = true
-        ) -> StreamT {
+        ) -> StreamT where T.ValueT == ValueT, T.NextT == NextT, T.ErrorT == ErrorT,
+        B.Element == AsyncValue<ValueT, ErrorT>,
+        B: PropertyProtocol, B.Error == NoError, B.ProperyElement == AsyncValue<ValueT, ErrorT> {
 
-        let bindedFactory = { () -> AsyncStream<Value, Next, Error> in
+        let bindedFactory = { () -> AsyncStream<ValueT, NextT, ErrorT> in
             let stream = factory()
             return stream.bindedToObservableAsyncVal(bindable)
         }
 
-        return mergedStream(bindedFactory, key: key, getter: { () -> AsyncEvent<Value, Next, Error>? in
+        return mergedStream(bindedFactory, key: key, getter: { () -> AsyncEvent<ValueT, NextT, ErrorT>? in
             guard let result = bindable.value.result else { return nil }
             switch result {
-            case .Success(let value) where lazy:
-                return .Success(value)
+            case .success(let value) where lazy:
+                return .success(value)
             default:
                 return nil
             }
         })
     }
 
-    public func mergedStream<
+     public func mergedStream<
         T: AsyncStreamType,
-        B: BindableType where T.Value == Value, T.Next == Next, T.Error == Error,
-        B: PropertyType, B.ProperyElement == [Key:AsyncValue<Value, Error>]>(
-        factory: () -> T,
-        key    : Key,
-        var holder: B,
+        B: BindableProtocol>(
+        _ factory: @escaping () -> T,
+        key    : KeyT,
+        holder : inout B,
         lazy   : Bool = true
-        ) -> StreamT {
+        ) -> StreamT where T.ValueT == ValueT, T.NextT == NextT, T.ErrorT == ErrorT,
+        B: NSObjectProtocol,
+        B: PropertyProtocol, B.Error == NoError, B.ProperyElement == [KeyT:AsyncValue<ValueT, ErrorT>] {
 
-        let bindedFactory = { () -> AsyncStream<Value, Next, Error> in
+        let bindedFactory = { [weak holder] () -> AsyncStream<ValueT, NextT, ErrorT> in
+
             let stream = factory()
 
-            let bindable = BindableWithBlock<Value, Error>(putVal: { val in
+            let bindable = BindableWithBlock<ValueT, ErrorT>(putVal: { val in
 
-                holder.value[key] = val
-            }, getVal: { () -> AsyncValue<Value, Error> in
+                holder?.value[key] = val
+            }, getVal: { () -> AsyncValue<ValueT, ErrorT> in
 
-                if let result = holder.value[key] {
+                if let result = holder?.value[key] {
                     return result
                 }
-                let result = AsyncValue<Value, Error>()
-                holder.value[key] = result
+                let result = AsyncValue<ValueT, ErrorT>()
+                holder?.value[key] = result
                 return result
             })
 
             return stream.bindedToObservableAsyncVal(bindable)
         }
 
-        return mergedStream(bindedFactory, key: key, getter: { () -> AsyncEvent<Value, Next, Error>? in
-            guard let result = holder.value[key]?.result else { return nil }
+        return mergedStream(bindedFactory, key: key, getter: { [weak holder] () -> AsyncEvent<ValueT, NextT, ErrorT>? in
+            guard let result = holder?.value[key]?.result else { return nil }
             switch result {
-            case .Success(let value) where lazy:
-                return .Success(value)
+            case .success(let value) where lazy:
+                return .success(value)
             default:
                 return nil
             }
@@ -165,15 +172,16 @@ extension MergedAsyncStream {
     }
 }
 
-private struct BindableWithBlock<ValueT, Error: ErrorType> : PropertyType, BindableType {
+private struct BindableWithBlock<ValueT, ErrorT: Error> : PropertyProtocol, BindableProtocol {
 
-    typealias Event = AsyncValue<ValueT, Error>
-    typealias Element = AsyncValue<ValueT, Error>
-    typealias ProperyElement = AsyncValue<ValueT, Error>
+    typealias Event   = AsyncValue<ValueT, ErrorT>
+    typealias Element = AsyncValue<ValueT, ErrorT>
+    typealias Error   = NoError
+    typealias ProperyElement = AsyncValue<ValueT, ErrorT>
 
-    private let stream = PushStream<Element>()
+    fileprivate let stream = PublishSubject<Element, NoError>()
 
-    public var value: AsyncValue<ValueT, Error> {
+    public var value: AsyncValue<ValueT, ErrorT> {
         get {
             return getVal()
         }
@@ -183,19 +191,25 @@ private struct BindableWithBlock<ValueT, Error: ErrorType> : PropertyType, Binda
         }
     }
 
-    private let getVal: () -> Event
-    private let putVal: (Event) -> ()
+    fileprivate let getVal: () -> Event
+    fileprivate let putVal: (Event) -> ()
 
-    init(putVal: (Event) -> (), getVal: () -> Event) {
+    init(putVal: @escaping (Event) -> (), getVal: @escaping () -> Event) {
         self.putVal = putVal
         self.getVal = getVal
     }
 
-    func observer(disconnectDisposable: Disposable) -> (StreamEvent<Element> -> Void) {
+    func bind(signal: Signal<Element, NoError>) -> Disposable {
 
-        return { value in
-            self.putVal(value.element!)
-            self.stream.on(value)
+        return signal.observe { event in
+
+            switch event {
+            case .next(let val):
+                self.putVal(val)
+            default:
+                fatalError()
+            }
+            self.stream.on(event)
         }
     }
 }

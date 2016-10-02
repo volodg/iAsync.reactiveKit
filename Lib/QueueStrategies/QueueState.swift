@@ -8,29 +8,29 @@
 
 import Foundation
 
-final public class QueueState<Value, Next, Error: ErrorType>  {
+final public class QueueState<ValueT, NextT, ErrorT: Error>  {
 
-    typealias OwnerT = StreamOwner<Value, Next, Error>
+    typealias OwnerT = StreamOwner<ValueT, NextT, ErrorT>
 
     var activeStreams  = [OwnerT]()
     var pendingStreams = [OwnerT]()
 
-    func tryRemoveActiveStream(activeStream: OwnerT) -> Bool {
+    func tryRemoveActiveStream(_ activeStream: OwnerT) -> Bool {
 
-        for (index, object) in activeStreams.enumerate() {
+        for (index, object) in activeStreams.enumerated() {
             if object === activeStream {
-                activeStreams.removeAtIndex(index)
+                activeStreams.remove(at: index)
                 return true
             }
         }
         return false
     }
 
-    func tryRemovePendingStream(activeStream: OwnerT) {
+    func tryRemovePendingStream(_ activeStream: OwnerT) {
 
-        for (index, object) in pendingStreams.enumerate() {
+        for (index, object) in pendingStreams.enumerated() {
             if object === activeStream {
-                pendingStreams.removeAtIndex(index)
+                pendingStreams.remove(at: index)
                 return
             }
         }

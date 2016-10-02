@@ -12,31 +12,29 @@ import iAsync_utils
 
 import ReactiveKit
 
-private final class AsyncObserverHolder<Value, Next, Error: ErrorType> {
+private final class AsyncObserverHolder<ValueT, NextT, ErrorT: Error> {
 
-    let observer: AsyncEvent<Value, Next, Error> -> ()
+    let observer: (AsyncEvent<ValueT, NextT, ErrorT>) -> ()
 
-    init(observer: AsyncEvent<Value, Next, Error> -> ()) {
+    init(observer: @escaping (AsyncEvent<ValueT, NextT, ErrorT>) -> ()) {
         self.observer = observer
     }
 }
 
 public extension AsyncStreamType {
 
-    typealias Event = AsyncEvent<Value, Next, Error>
-
     public func run() -> Disposable {
         return observe {_ in}
     }
 
-    public func unsubscribe() -> AsyncStream<Value, Next, Error> {
+    public func unsubscribe() -> AsyncStream<ValueT, NextT, ErrorT> {
 
-        return create { observer in
+        return AsyncStream { observer in
 
-            typealias Observer = AsyncEvent<Value, Next, Error> -> ()
-            var observerHolder: Observer? = observer
+            typealias Observer = (AsyncEvent<ValueT, NextT, ErrorT>) -> ()
+            var observerHolder: ObserverT? = observer
 
-            self.observe { event in
+            _ = self.observe { event in
                 if let observer = observerHolder {
                     observer(event)
                 }
@@ -48,24 +46,24 @@ public extension AsyncStreamType {
         }
     }
 
-    public func withEventValueGetter(getter: () -> AsyncEvent<Value, Next, Error>?) -> AsyncStream<Value, Next, Error> {
+    public func withEventValueGetter(_ getter: @escaping () -> AsyncEvent<ValueT, NextT, ErrorT>?) -> AsyncStream<ValueT, NextT, ErrorT> {
 
-        return create { observer in
+        return AsyncStream { observer in
 
             let event = getter()
 
             if let event = event {
                 observer(event)
-                if event.isTerminal { return NotDisposable }
+                if event.isTerminal { return NonDisposable.instance }
             }
 
             return self.observe(observer)
         }
     }
 
-    public func withEventValueSetter(setter: AsyncEvent<Value, Next, Error> -> Void) -> AsyncStream<Value, Next, Error> {
+    public func withEventValueSetter(_ setter: @escaping (AsyncEvent<ValueT, NextT, ErrorT>) -> Void) -> AsyncStream<ValueT, NextT, ErrorT> {
 
-        return create { observer in
+        return AsyncStream { observer in
 
             return self.observe { event in
 
@@ -75,15 +73,15 @@ public extension AsyncStreamType {
         }
     }
 
-    public func mergedObservers(limit: Int = Int.max) -> AsyncStream<Value, Next, Error> {
+    public func mergedObservers(_ limit: Int = Int.max) -> AsyncStream<ValueT, NextT, ErrorT> {
 
-        typealias ObserverHolder = AsyncObserverHolder<Value, Next, Error>
+        typealias ObserverHolder = AsyncObserverHolder<ValueT, NextT, ErrorT>
         var observers: [ObserverHolder] = []
         var dispose: Disposable?
 
-        var buffer = [Next]()
+        var buffer = [NextT]()
 
-        return create { observer in
+        return AsyncStream { observer in
 
             let observerHolder = ObserverHolder(observer: observer)
             observers.append(observerHolder)
@@ -91,9 +89,9 @@ public extension AsyncStreamType {
             let removeObserver = { () in
 
                 let observers_ = observers
-                for (index, observer) in observers_.enumerate() {
+                for (index, observer) in observers_.enumerated() {
                     if observer === observerHolder {
-                        observers.removeAtIndex(index)
+                        observers.remove(at: index)
                         break
                     }
                 }
@@ -106,14 +104,14 @@ public extension AsyncStreamType {
             }
 
             if observers.count > 1 {
-                buffer.forEach { observer(.Next($0)) }
+                buffer.forEach { observer(.next($0)) }
                 return BlockDisposable( removeObserver )
             }
 
-            let notify = { (observers: [ObserverHolder], event: AsyncEvent<Value, Next, Error>) in
+            let notify = { (observers: [ObserverHolder], event: AsyncEvent<ValueT, NextT, ErrorT>) in
                 observers.forEach { $0.observer(event) }
             }
-            let finishNotify = { (event: AsyncEvent<Value, Next, Error>) in
+            let finishNotify = { (event: AsyncEvent<ValueT, NextT, ErrorT>) in
                 let observers_ = observers
                 observers.removeAll()
                 notify(observers_, event)
@@ -122,14 +120,14 @@ public extension AsyncStreamType {
             dispose = self.observe { event in
 
                 switch event {
-                case .Success, .Failure:
+                case .success, .failure:
                     finishNotify(event)
-                case .Next(let next):
+                case .next(let next):
                     if buffer.count < limit {
                         buffer.append(next)
                     }
                     if buffer.count > limit {
-                        buffer = Array(buffer.suffixFrom(1))
+                        buffer = Array(buffer.suffix(from: 1))
                     }
                     notify(observers, event)
                 }
@@ -140,23 +138,23 @@ public extension AsyncStreamType {
     }
 }
 
-public func asyncStreamWithSameThreadJob<Value, Next, Error: ErrorType>(job: (Next -> Void) -> Result<Value, Error>) -> AsyncStream<Value, Next, Error> {
+public func asyncStreamWithSameThreadJob<ValueT, NextT, ErrorT: Error>(_ job: @escaping ((NextT) -> Void) -> Result<ValueT, ErrorT>) -> AsyncStream<ValueT, NextT, ErrorT> {
 
-    typealias Event = AsyncEvent<Value, Next, Error>
+    typealias Event = AsyncEvent<ValueT, NextT, ErrorT>
 
-    return create { observer in
+    return AsyncStream { observer in
 
-        var observerHolder: (Event -> ())? = observer
+        var observerHolder: ((Event) -> ())? = observer
 
         let result = job { next in
-            observerHolder?(.Next(next))
+            observerHolder?(.next(next))
         }
 
         switch result {
-        case .Success(let value):
-            observerHolder?(.Success(value))
-        case .Failure(let error):
-            observerHolder?(.Failure(error))
+        case .success(let value):
+            observerHolder?(.success(value))
+        case .failure(let error):
+            observerHolder?(.failure(error))
         }
 
         return BlockDisposable {
@@ -166,30 +164,30 @@ public func asyncStreamWithSameThreadJob<Value, Next, Error: ErrorType>(job: (Ne
     }
 }
 
-public func asyncStreamWithJob<Value, Next, Error: ErrorType>(
-    queueName: String? = nil,
-    job: (Next -> Void) -> Result<Value, Error>) -> AsyncStream<Value, Next, Error> {
+public func asyncStreamWithJob<ValueT, NextT, ErrorT: Error>(
+    _ queueName: String? = nil,
+    job: @escaping ((NextT) -> Void) -> Result<ValueT, ErrorT>) -> AsyncStream<ValueT, NextT, ErrorT> {
 
-    typealias Event = AsyncEvent<Value, Next, Error>
+    typealias Event = AsyncEvent<ValueT, NextT, ErrorT>
 
-    return create { observer in
+    return AsyncStream { observer in
 
-        var observerHolder: (Event -> ())? = observer
+        var observerHolder: ((Event) -> ())? = observer
 
-        Queue.global.async {
+        DispatchQueue.global().async {
 
             let result = job { next in
-                Queue.main.async {
-                    observerHolder?(.Next(next))
+                DispatchQueue.main.async {
+                    observerHolder?(.next(next))
                 }
             }
 
-            Queue.main.async {
+            DispatchQueue.main.async {
                 switch result {
-                case .Success(let value):
-                    observerHolder?(.Success(value))
-                case .Failure(let error):
-                    observerHolder?(.Failure(error))
+                case .success(let value):
+                    observerHolder?(.success(value))
+                case .failure(let error):
+                    observerHolder?(.failure(error))
                 }
             }
         }

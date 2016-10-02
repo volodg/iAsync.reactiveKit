@@ -10,13 +10,13 @@ import Foundation
 
 import ReactiveKit
 
-public extension Stream {
+public extension SignalProtocol {
 
     /// Create a stream that emits given element and then completes.
-    public static func next(element: Element) -> Stream<Element> {
-        return Stream { observer in
+    public static func next(_ element: Element) -> Signal<Element, Error> {
+        return Signal { observer in
             observer.next(element)
-            return NotDisposable
+            return NonDisposable.instance
         }
     }
 }

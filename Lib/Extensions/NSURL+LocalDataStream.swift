@@ -13,20 +13,20 @@ import ReactiveKit
 
 import protocol ReactiveKit.Disposable
 
-extension NSURL {
+extension URL {
 
-    public func localDataStream() -> AsyncStream<NSData, AnyObject, ErrorWithContext> {
+    public func localDataStream() -> AsyncStream<Data, AnyObject, ErrorWithContext> {
 
-        return create { observer -> Disposable in
+        return AsyncStream { observer -> Disposable in
 
             self.localDataWithCallbacks({ data in
 
-                observer(.Success(data))
+                observer(.success(data))
             }) { error in
 
-                observer(.Failure(error))
+                observer(.failure(error))
             }
-            return NotDisposable
+            return NonDisposable.instance
         }
     }
 }
