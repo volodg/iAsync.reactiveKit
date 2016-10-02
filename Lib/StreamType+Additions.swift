@@ -10,23 +10,23 @@ import Foundation
 
 import ReactiveKit
 
-extension RawStreamType {
+extension SignalProtocol {
 
-    public func throttleIf(_ seconds: Double, predicate: (Event.Element) -> Bool, on queue: Queue) -> RawStream<Event> {
+    public func throttleIf(_ seconds: Double, predicate: @escaping (Element) -> Bool, on queue: DispatchQueue) -> Signal<Element, Error> {
 
-        return RawStream { observer in
+        return Signal { observer in
 
             var timerInFlight: Bool = false
-            var latestEvent: Event.Element! = nil
+            var latestEvent: Element! = nil
             var latestEventDate: NSDate! = nil
 
             var tryDispatch: (() -> Void)?
             tryDispatch = {
-                if latestEventDate.dateByAddingTimeInterval(seconds).compare(NSDate()) == NSComparisonResult.OrderedAscending {
+                if latestEventDate.addingTimeInterval(seconds).compare(Date()) == ComparisonResult.orderedAscending {
                     observer.next(latestEvent)
                 } else {
                     timerInFlight = true
-                    queue.after(seconds) {
+                    queue.after(when: seconds) {
                         if timerInFlight {
                             timerInFlight = false
                             tryDispatch?()
@@ -37,9 +37,10 @@ extension RawStreamType {
 
             let blockDisposable = BlockDisposable { tryDispatch = nil }
             let compositeDisposable = CompositeDisposable([blockDisposable])
-            compositeDisposable.addDisposable(self.observe { event in
+            compositeDisposable.add(disposable: self.observe { event in
 
-                if let element = event.element {
+                switch event {
+                case .next(let element):
 
                     if !predicate(element) {
 
@@ -56,8 +57,9 @@ extension RawStreamType {
 
                     guard timerInFlight == false else { return }
                     tryDispatch?()
-                } else {
-
+                case .failed:
+                    observer.on(event)
+                case .completed:
                     observer.on(event)
                 }
             })
@@ -65,19 +67,20 @@ extension RawStreamType {
         }
     }
 
-    public func pausable<S: _StreamType>(_ by: S, delayAfterPause: Double, on queue: Queue) -> RawStream<Event> where S.Event.Element == Bool {
+    public func pausable<S: SignalProtocol>(_ by: S, delayAfterPause: Double, on queue: DispatchQueue) -> Signal<Element, Error> where S.Element == Bool {
 
-        return RawStream { observer in
+        return Signal { observer in
 
             var allowed: Bool = false
 
-            var skipedEvent: Event?
+            var skipedEvent: Event<Element, Error>?
 
             let compositeDisposable = CompositeDisposable()
-            compositeDisposable.addDisposable(by.observeNext { value in
+            compositeDisposable.add(disposable: by.observeNext { value in
+
                 allowed = value
                 if allowed {
-                    queue.after(delayAfterPause, block: {
+                    queue.after(when: delayAfterPause, block: {
 
                         guard let skipedEvent_ = skipedEvent else { return }
                         skipedEvent = nil
@@ -89,7 +92,7 @@ extension RawStreamType {
                 }
             })
 
-            compositeDisposable.addDisposable(self.observe { event in
+            compositeDisposable.add(disposable: self.observe { event in
                 if allowed {
                     skipedEvent = nil
                     observer.on(event)
@@ -102,30 +105,27 @@ extension RawStreamType {
         }
     }
 
-    public func pausable2<R: _StreamType>(_ by: R) -> RawStream<Event> where R.Event.Element == Bool {
+    public func pausable2<R: SignalProtocol>(_ by: R) -> Signal<Element, Error> where R.Element == Bool {
 
-        return RawStream { observer in
+        return Signal { observer in
 
             var allowed: Bool = true
 
-            var skipedEvent: Event?
+            var skipedEvent: Event<Element, Error>?
 
             let compositeDisposable = CompositeDisposable()
-            compositeDisposable += by.observe { value in
-                if let element = value.element {
-                    allowed = element
+            compositeDisposable += by.observeNext { value in
 
-                    if allowed, let skipedEvent_ = skipedEvent {
-                        skipedEvent = nil
-                        observer.observer(skipedEvent_)
-                    }
-                } else {
-                    // ignore?
+                allowed = value
+
+                if allowed, let skipedEvent_ = skipedEvent {
+                    skipedEvent = nil
+                    observer.observer(skipedEvent_)
                 }
             }
 
             compositeDisposable += self.observe { event in
-                if event.isTermination {
+                if event.isTerminal {
                     skipedEvent = nil
                     observer.observer(event)
                 } else if allowed {
@@ -141,21 +141,9 @@ extension RawStreamType {
     }
 }
 
-public extension StreamType {
+public extension SignalProtocol {
 
-    public func flatMap<U: StreamType>(_ transform: (Element) -> U) -> Stream {
-        return flatMap(.Latest, transform: transform)
-    }
-
-    public func throttleIf(_ seconds: Double, predicate: (Element) -> Bool, on queue: Queue) -> Stream {
-        return lift { $0.throttleIf(seconds, predicate: predicate, on: queue) }
-    }
-
-    public func pausable<S: StreamType>(_ by: S, delayAfterPause: Double, on queue: Queue) -> Stream where S.Event.Element == Bool {
-        return lift { $0.pausable(by, delayAfterPause: delayAfterPause, on: queue) }
-    }
-
-    public func pausable2<S: _StreamType>(by other: S) -> Stream where S.Event.Element == Bool {
-        return lift { $0.pausable2(other) }
-    }
+//    public func flatMap<U: SignalProtocol>(_ transform: (Element) -> U) -> Signal<Element, Error> {
+//        return flatMap(.Latest, transform: transform)
+//    }
 }

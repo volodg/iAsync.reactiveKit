@@ -23,7 +23,6 @@ public final class UniqueProperty<Value: Equatable>: Property<Value> {
         set {
             if super.value != newValue {
                 super.value = newValue
-                super.next(newValue)
             }
         }
     }
