@@ -12,7 +12,7 @@ import ReactiveKit
 
 extension RawStreamType {
 
-    public func throttleIf(seconds: Double, predicate: (Event.Element) -> Bool, on queue: Queue) -> RawStream<Event> {
+    public func throttleIf(_ seconds: Double, predicate: (Event.Element) -> Bool, on queue: Queue) -> RawStream<Event> {
 
         return RawStream { observer in
 
@@ -65,7 +65,7 @@ extension RawStreamType {
         }
     }
 
-    public func pausable<S: _StreamType where S.Event.Element == Bool>(by: S, delayAfterPause: Double, on queue: Queue) -> RawStream<Event> {
+    public func pausable<S: _StreamType>(_ by: S, delayAfterPause: Double, on queue: Queue) -> RawStream<Event> where S.Event.Element == Bool {
 
         return RawStream { observer in
 
@@ -102,7 +102,7 @@ extension RawStreamType {
         }
     }
 
-    public func pausable2<R: _StreamType where R.Event.Element == Bool>(by: R) -> RawStream<Event> {
+    public func pausable2<R: _StreamType>(_ by: R) -> RawStream<Event> where R.Event.Element == Bool {
 
         return RawStream { observer in
 
@@ -143,19 +143,19 @@ extension RawStreamType {
 
 public extension StreamType {
 
-    public func flatMap<U: StreamType>(transform: Element -> U) -> Stream<U.Element> {
+    public func flatMap<U: StreamType>(_ transform: (Element) -> U) -> Stream {
         return flatMap(.Latest, transform: transform)
     }
 
-    public func throttleIf(seconds: Double, predicate: (Element) -> Bool, on queue: Queue) -> Stream<Element> {
+    public func throttleIf(_ seconds: Double, predicate: (Element) -> Bool, on queue: Queue) -> Stream {
         return lift { $0.throttleIf(seconds, predicate: predicate, on: queue) }
     }
 
-    public func pausable<S: StreamType where S.Event.Element == Bool>(by: S, delayAfterPause: Double, on queue: Queue) -> Stream<Element> {
+    public func pausable<S: StreamType>(_ by: S, delayAfterPause: Double, on queue: Queue) -> Stream where S.Event.Element == Bool {
         return lift { $0.pausable(by, delayAfterPause: delayAfterPause, on: queue) }
     }
 
-    public func pausable2<S: _StreamType where S.Event.Element == Bool>(by other: S) -> Stream<Element> {
+    public func pausable2<S: _StreamType>(by other: S) -> Stream where S.Event.Element == Bool {
         return lift { $0.pausable2(other) }
     }
 }

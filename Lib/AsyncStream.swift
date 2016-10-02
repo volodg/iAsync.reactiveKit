@@ -12,7 +12,7 @@ import iAsync_utils
 
 import ReactiveKit
 
-public protocol AsyncStreamType: StreamType_ {
+public protocol AsyncStreamType {
     associatedtype ValueT
     associatedtype NextT
     associatedtype ErrorT: Error

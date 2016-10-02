@@ -10,17 +10,17 @@ import Foundation
 
 import ReactiveKit
 
-public func combineLatest<S: SequenceType, T>(producers: S) -> Stream<[T]> where S.Generator.Element == Stream<T> {
+public func combineLatest<S: Sequence, T>(producers: S) -> Signal1<[T]> where S.Iterator.Element == Signal1<T> {
 
     let size = Array(producers).count
 
     if size == 0 {
-        return Stream<[T]>.just([])
+        return Signal1<[T]>.just([])
     }
 
-    return Stream { observer in
+    return Signal1 { observer in
 
-        let queue = Queue(name: "com.ReactiveKit.ReactiveKit.combineLatest")
+        let queue = DispatchQueue(label: "com.ReactiveKit.ReactiveKit.combineLatest")
 
         var results = [Int:T]()
 
@@ -47,7 +47,7 @@ public func combineLatest<S: SequenceType, T>(producers: S) -> Stream<[T]> where
 
         var disposes = [Disposable]()
 
-        for (index, stream) in producers.enumerate() {
+        for (index, stream) in producers.enumerated() {
 
             let dispose = stream.observeNext { event in
                 queue.sync {
@@ -63,34 +63,34 @@ public func combineLatest<S: SequenceType, T>(producers: S) -> Stream<[T]> where
     }
 }
 
-public extension RawStreamType where Event.Element: OptionalType, Event.Element.Wrapped: Equatable {
+public extension SignalProtocol where Element: OptionalProtocol, Element.Wrapped: Equatable, Error == NoError {
 
-    public func distinctOptional2() -> Stream<Event.Element.Wrapped?> {
+    public func distinctOptional2() -> Signal1<Element.Wrapped?> {
 
-        return Stream { observer in
-            var lastEvent: Event.Element.Wrapped? = nil
+        return Signal { observer in
+            var lastEvent: Element.Wrapped? = nil
             var firstEvent: Bool = true
             return self.observe { event in
 
-                if event.isTermination {
+                if event.isTerminal {
 
                     observer.completed()
                     return
                 }
 
-                if let value = event.element {
-
+                switch event {
+                case .next(let value):
                     switch (lastEvent, value._unbox) {
-                    case (.None, .Some(let new)):
+                    case (.none, .some(let new)):
                         firstEvent = false
                         observer.next(new)
-                    case (.Some, .None):
+                    case (.some, .none):
                         firstEvent = false
                         observer.next(nil)
-                    case (.None, .None) where firstEvent:
+                    case (.none, .none) where firstEvent:
                         firstEvent = false
                         observer.next(nil)
-                    case (.Some(let old), .Some(let new)) where old != new:
+                    case (.some(let old), .some(let new)) where old != new:
                         firstEvent = false
                         observer.next(new)
                     default:
@@ -98,15 +98,10 @@ public extension RawStreamType where Event.Element: OptionalType, Event.Element.
                     }
 
                     lastEvent = value._unbox
+                default:
+                    fatalError()
                 }
             }
         }
-    }
-}
-
-public extension StreamType where Element: OptionalType, Element.Wrapped: Equatable {
-
-    public func distinctOptional2() -> Stream<Element.Wrapped?> {
-        return rawStream.distinctOptional2()
     }
 }

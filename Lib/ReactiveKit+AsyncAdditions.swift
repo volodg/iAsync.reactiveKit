@@ -8,10 +8,7 @@
 
 import Foundation
 
-import struct ReactiveKit.Queue
-import protocol ReactiveKit.OptionalType
-import protocol ReactiveKit.Disposable
-import class ReactiveKit.CompositeDisposable
+import ReactiveKit
 
 //TODO test
 public func combineLatest<S: Sequence, T, N, E>(_ producers: S) -> AsyncStream<[T], N, E> where S.Iterator.Element == AsyncStream<T, N, E>, E: Error {
@@ -24,7 +21,7 @@ public func combineLatest<S: Sequence, T, N, E>(_ producers: S) -> AsyncStream<[
 
     return AsyncStream { observer in
 
-        let queue = Queue(name: "com.ReactiveKit.ReactiveKit.combineLatest")
+        let queue = DispatchQueue(label: "com.ReactiveKit.ReactiveKit.combineLatest")
 
         var results = [Int:AsyncEvent<T, N, E>]()
 
