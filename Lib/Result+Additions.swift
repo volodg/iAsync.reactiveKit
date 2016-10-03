@@ -25,7 +25,7 @@ public extension Result {
     /// Case analysis for Result.
     ///
     /// Returns the value produced by applying `ifFailure` to `Failure` Results, or `ifSuccess` to `Success` Results.
-    public func analysis<Result>(_ ifSuccess: (T) -> Result, ifFailure: (Error) -> Result) -> Result {
+    public func analysis<Result>(ifSuccess: (T) -> Result, ifFailure: (Error) -> Result) -> Result {
         switch self {
         case let .success(value):
             return ifSuccess(value)

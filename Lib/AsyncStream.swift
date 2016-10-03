@@ -17,8 +17,8 @@ public protocol AsyncStreamType {
     associatedtype NextT
     associatedtype ErrorT: Error
 
-    associatedtype Event = AsyncEvent<ValueT, NextT, ErrorT>
-    associatedtype ObserverT = (AsyncEvent<ValueT, NextT, ErrorT>) -> ()
+    typealias Event = AsyncEvent<ValueT, NextT, ErrorT>
+    typealias ObserverT = (AsyncEvent<ValueT, NextT, ErrorT>) -> ()
 
     func observe(_ observer: @escaping ObserverT) -> Disposable
 
@@ -67,7 +67,7 @@ public struct AsyncStream<ValueT_, NextT_, ErrorT_: Error>: AsyncStreamType {
 
     public func after(_ delay: TimeInterval) -> AsyncStream<ValueT, NextT, ErrorT> {
 
-        let delayStream = AsyncStream<Void, NextT, ErrorT>.succeededAfter(delay, with: ())
+        let delayStream = AsyncStream<Void, NextT, ErrorT>.succeededAfter(delay: delay, with: ())
         return delayStream.flatMap { self }
     }
 
@@ -90,7 +90,7 @@ public struct AsyncStream<ValueT_, NextT_, ErrorT_: Error>: AsyncStreamType {
         }
     }
 
-    public static func succeededAfter(_ delay: TimeInterval, with value: ValueT) -> AsyncStream<ValueT, NextT, ErrorT> {
+    public static func succeededAfter(delay: TimeInterval, with value: ValueT) -> AsyncStream<ValueT, NextT, ErrorT> {
         return AsyncStream { observer in
 
             let cancel = Timer.sharedByThreadTimer().addBlock({ cancel in
@@ -120,7 +120,7 @@ public struct AsyncStream<ValueT_, NextT_, ErrorT_: Error>: AsyncStreamType {
 
 public extension AsyncStreamType {
 
-    public func on(_ next: ((NextT) -> ())? = nil, success: ((ValueT) -> ())? = nil, failure: ((ErrorT) -> ())? = nil, start: (() -> Void)? = nil, completed: (() -> Void)? = nil) -> AsyncStream<ValueT, NextT, ErrorT> {
+    public func on(next: ((NextT) -> ())? = nil, success: ((ValueT) -> ())? = nil, failure: ((ErrorT) -> ())? = nil, start: (() -> Void)? = nil, completed: (() -> Void)? = nil) -> AsyncStream<ValueT, NextT, ErrorT> {
         return AsyncStream { observer in
             start?()
             return self.observe { event in
