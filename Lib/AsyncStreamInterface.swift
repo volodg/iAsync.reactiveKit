@@ -18,7 +18,7 @@ public protocol AsyncStreamInterface {
     associatedtype ErrorT: Error
 
     func asyncWithCallbacks(
-        success: @escaping (ValueT) -> Void,
+        _ success: @escaping (ValueT) -> Void,
         next   : @escaping (NextT)  -> Void,
         error  : @escaping (ErrorT) -> Void)
 

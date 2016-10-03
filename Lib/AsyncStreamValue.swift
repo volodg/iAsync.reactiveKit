@@ -199,7 +199,7 @@ private struct BindableWithBlock<ValueT, ErrorT: Error> : PropertyProtocol, Bind
         self.getVal = getVal
     }
 
-    func bind(signal: Signal<Element, NoError>) -> Disposable {
+    func bind(_ signal: Signal<Element, NoError>) -> Disposable {
 
         return signal.observe { event in
 

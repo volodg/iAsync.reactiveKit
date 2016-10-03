@@ -10,7 +10,7 @@ import Foundation
 
 import ReactiveKit
 
-public func combineLatest<S: Sequence, T>(producers: S) -> Signal1<[T]> where S.Iterator.Element == Signal1<T> {
+public func combineLatest<S: Sequence, T>(_ producers: S) -> Signal1<[T]> where S.Iterator.Element == Signal1<T> {
 
     let size = Array(producers).count
 
