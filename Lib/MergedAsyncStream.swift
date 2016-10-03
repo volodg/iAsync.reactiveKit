@@ -33,7 +33,7 @@ final public class MergedAsyncStream<KeyT: Hashable, ValueT, NextT, ErrorT: Erro
         setter : ((StreamT.Event) -> Void)? = nil
         ) -> StreamT where T.ValueT == ValueT, T.NextT == NextT, T.ErrorT == ErrorT {
 
-        let result: StreamT = StreamT { observer -> Disposable in
+        let result = StreamT { observer -> Disposable in
 
             let resultStream: StreamT
 
