@@ -18,7 +18,7 @@ extension SignalProtocol {
 
             var timerInFlight: Bool = false
             var latestEvent: Element! = nil
-            var latestEventDate: NSDate! = nil
+            var latestEventDate: Date! = nil
 
             var tryDispatch: (() -> Void)?
             tryDispatch = {
@@ -53,7 +53,7 @@ extension SignalProtocol {
                     }
 
                     latestEvent = element
-                    latestEventDate = NSDate()
+                    latestEventDate = Date()
 
                     guard timerInFlight == false else { return }
                     tryDispatch?()
