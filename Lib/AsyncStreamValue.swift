@@ -68,6 +68,7 @@ public extension AsyncStreamType {
             result.loading = true
 
             let bindedSignal = Property(result)
+            bindedSignal.noComplete = true
 
             let disposes = CompositeDisposable()
 
