@@ -65,7 +65,7 @@ public struct AsyncStream<ValueT_, NextT_, ErrorT_: Error>: AsyncStreamType {
         })
     }
 
-    public func after(_ delay: TimeInterval) -> AsyncStream<ValueT, NextT, ErrorT> {
+    public func after(_ delay: DispatchTimeInterval) -> AsyncStream<ValueT, NextT, ErrorT> {
 
         let delayStream = AsyncStream<Void, NextT, ErrorT>.succeededAfter(delay: delay, with: ())
         return delayStream.flatMap { self }
@@ -90,13 +90,13 @@ public struct AsyncStream<ValueT_, NextT_, ErrorT_: Error>: AsyncStreamType {
         }
     }
 
-    public static func succeededAfter(delay: TimeInterval, with value: ValueT) -> AsyncStream<ValueT, NextT, ErrorT> {
+    public static func succeededAfter(delay: DispatchTimeInterval, with value: ValueT) -> AsyncStream<ValueT, NextT, ErrorT> {
         return AsyncStream { observer in
 
             let cancel = Timer.sharedByThreadTimer().addBlock({ cancel in
                 cancel()
                 observer(.success(value))
-            }, duration: delay)
+            }, delay: delay)
 
             return BlockDisposable(cancel)
         }
@@ -228,7 +228,7 @@ public extension AsyncStreamType {
     }
 
     //TODO test
-    public func retry(_ count: Int?, delay: TimeInterval? = nil, until: @escaping (Result<ValueT, ErrorT>) -> Bool) -> AsyncStream<ValueT, NextT, ErrorT> {
+    public func retry(_ count: Int?, delay: DispatchTimeInterval? = nil, until: @escaping (Result<ValueT, ErrorT>) -> Bool) -> AsyncStream<ValueT, NextT, ErrorT> {
 
         var count_ = count
 
