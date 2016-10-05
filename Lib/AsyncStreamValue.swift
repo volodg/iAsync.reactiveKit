@@ -19,7 +19,7 @@ public struct AsyncValue<ValueT, ErrorT: Error> {
 
     public init() {}
 
-    public init(result: Result<ValueT, ErrorT>?, loading: Bool) {
+    public init(result: Result<ValueT, ErrorT>?, loading: Bool = false) {
         self.result  = result
         self.loading = loading
     }
