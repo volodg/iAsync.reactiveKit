@@ -8,63 +8,43 @@
 
 import Foundation
 
-import ReactiveKit_old
+import enum ReactiveKit.Result
 
 public extension Result {
 
-    func map<U>(f: T -> U) -> Result<U, Error> {
+    func map<U>(_ f: (T) -> U) -> Result<U, Error> {
 
         switch self {
-        case .Success(let value):
-            return .Success(f(value))
-        case .Failure(let error):
-            return .Failure(error)
-        }
-    }
-
-    var value: T? {
-
-        switch self {
-        case .Success(let value):
-            return value
-        case .Failure:
-            return nil
-        }
-    }
-
-    var error: Error? {
-
-        switch self {
-        case .Success:
-            return nil
-        case .Failure(let error):
-            return error
+        case .success(let value):
+            return .success(f(value))
+        case .failure(let error):
+            return .failure(error)
         }
     }
 
     /// Case analysis for Result.
     ///
     /// Returns the value produced by applying `ifFailure` to `Failure` Results, or `ifSuccess` to `Success` Results.
-    public func analysis<Result>(@noescape ifSuccess ifSuccess: T -> Result, @noescape ifFailure: Error -> Result) -> Result {
+    public func analysis<Result>(ifSuccess: (T) -> Result, ifFailure: (Error) -> Result) -> Result {
         switch self {
-        case let .Success(value):
+        case let .success(value):
             return ifSuccess(value)
-        case let .Failure(value):
+        case let .failure(value):
             return ifFailure(value)
         }
     }
 
     /// Returns the result of applying `transform` to `Success`es’ values, or re-wrapping `Failure`’s errors.
-    public func flatMap<U>(@noescape transform: T -> Result<U, Error>) -> Result<U, Error> {
+    public func flatMap<U>( _ transform: (T) -> Result<U, Error>) -> Result<U, Error> {
         return analysis(
             ifSuccess: transform,
-            ifFailure: Result<U, Error>.Failure)
+            ifFailure: Result<U, Error>.failure)
     }
 
     /// Returns the result of applying `transform` to `Success`es’ values, or re-wrapping `Failure`’s errors.
-    public func flatMapError<Error2>(@noescape transform: Error -> Result<T, Error2>) -> Result<T, Error2> {
+    public func flatMapError<Error2>( _ transform: (Error) -> Result<T, Error2>) -> Result<T, Error2> {
         return analysis(
-            ifSuccess: Result<T, Error2>.Success,
+            ifSuccess: Result<T, Error2>.success,
             ifFailure: transform)
     }
 }

@@ -10,15 +10,15 @@ import Foundation
 
 import iAsync_utils
 
-import ReactiveKit_old
+import class ReactiveKit.BlockDisposable
 
 //TODO test
 final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
 
-    private let state = QueueState<Strategy.Value, Strategy.Next, Strategy.Error>()
+    fileprivate let state = QueueState<Strategy.ValueT, Strategy.NextT, Strategy.ErrorT>()
 
-    public typealias StreamT = AsyncStream<Strategy.Value, Strategy.Next, Strategy.Error>
-    public typealias OwnerT  = StreamOwner<Strategy.Value, Strategy.Next, Strategy.Error>
+    public typealias StreamT = AsyncStream<Strategy.ValueT, Strategy.NextT, Strategy.ErrorT>
+    public typealias OwnerT  = StreamOwner<Strategy.ValueT, Strategy.NextT, Strategy.ErrorT>
 
     public var limitCount: Int {
         didSet {
@@ -49,7 +49,7 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
         }
     }
 
-    private func hasStreamsReadyToStartForPendingStream(pendingStream: OwnerT) -> Bool {
+    fileprivate func hasStreamsReadyToStartForPendingStream(_ pendingStream: OwnerT) -> Bool {
 
         if pendingStream.barrier {
             return state.activeStreams.count == 0
@@ -64,25 +64,25 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
         return result
     }
 
-    private func nextPendingStream() -> OwnerT? {
+    fileprivate func nextPendingStream() -> OwnerT? {
         return Strategy.nextPendingStream(state)
     }
 
-    private func performPendingStreams() {
+    fileprivate func performPendingStreams() {
 
         var pendingStream = nextPendingStream()
 
-        while let nextStream = pendingStream where hasStreamsReadyToStartForPendingStream(nextStream) {
+        while let nextStream = pendingStream , hasStreamsReadyToStartForPendingStream(nextStream) {
 
             Strategy.executePendingStream(state, pendingStream: nextStream)
             pendingStream = nextPendingStream()
         }
     }
 
-    public func balancedStream<T: AsyncStreamType where Strategy.Value == T.Value, Strategy.Next == T.Next, Strategy.Error == T.Error>
-        (stream: T, barrier: Bool) -> StreamT {
+    public func balancedStream<T: AsyncStreamType>
+        (_ stream: T, barrier: Bool) -> StreamT where Strategy.ValueT == T.ValueT, Strategy.NextT == T.NextT, Strategy.ErrorT == T.ErrorT {
 
-        return create { observer in
+        return AsyncStream { observer in
 
             let streamOwner = StreamOwner(stream: stream, observer: observer, barrier: barrier, onComplete: {
                 self.didFinishStream($0)
@@ -98,12 +98,12 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
         }
     }
 
-    public func barrierBalancedStream(stream: StreamT) -> StreamT {
+    public func barrierBalancedStream(_ stream: StreamT) -> StreamT {
 
         return balancedStream(stream, barrier:true)
     }
 
-    private func didFinishStream(stream: OwnerT) {
+    fileprivate func didFinishStream(_ stream: OwnerT) {
 
         state.tryRemovePendingStream(stream)
 

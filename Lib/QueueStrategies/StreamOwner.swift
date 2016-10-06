@@ -10,22 +10,22 @@ import Foundation
 
 import iAsync_utils
 
-import ReactiveKit_old
+import class ReactiveKit.SerialDisposable
 
-final public class StreamOwner<Value, Next, Error: ErrorType> {
+final public class StreamOwner<ValueT, NextT, ErrorT: Error> {
 
     let barrier: Bool
 
-    var stream: AsyncStream<Value, Next, Error>!
+    var stream: AsyncStream<ValueT, NextT, ErrorT>!
 
-    private var disposeStream: SerialDisposable? = nil
+    fileprivate var disposeStream: SerialDisposable? = nil
     var observer: ObserverType?
 
-    typealias ObserverType = AsyncEvent<Value, Next, Error> -> Void
-    typealias OnComplete   = StreamOwner<Value, Next, Error> -> Void
-    private let onComplete: OnComplete
+    typealias ObserverType = (AsyncEvent<ValueT, NextT, ErrorT>) -> Void
+    typealias OnComplete   = (StreamOwner<ValueT, NextT, ErrorT>) -> Void
+    fileprivate let onComplete: OnComplete
 
-    init<T: AsyncStreamType where T.Value == Value, T.Next == Next, T.Error == Error>(stream: T, observer: ObserverType, barrier: Bool, onComplete: OnComplete) {
+    init<T: AsyncStreamType>(stream: T, observer: @escaping ObserverType, barrier: Bool, onComplete: @escaping OnComplete) where T.ValueT == ValueT, T.NextT == NextT, T.ErrorT == ErrorT {
 
         self.stream     = stream.map(id_)
         self.observer   = observer
@@ -38,7 +38,7 @@ final public class StreamOwner<Value, Next, Error: ErrorType> {
         self.disposeStream = SerialDisposable(otherDisposable: nil)
 
         let observer = self.observer!
-        let dispose = stream.on(completed: { [weak self] in self?.complete() }).observe(observer: observer)
+        let dispose = stream.on(completed: { [weak self] in self?.complete() }).observe(observer)
 
         if let dispose_ = self.disposeStream {
             dispose_.otherDisposable = dispose
@@ -51,7 +51,7 @@ final public class StreamOwner<Value, Next, Error: ErrorType> {
         complete()
     }
 
-    private func complete() {
+    fileprivate func complete() {
 
         onComplete(self)
         stream = nil

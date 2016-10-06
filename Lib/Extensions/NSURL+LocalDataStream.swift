@@ -9,24 +9,24 @@
 import Foundation
 
 import iAsync_utils
+import ReactiveKit
 
-import ReactiveKit_old
+import protocol ReactiveKit.Disposable
 
-extension NSURL {
+extension URL {
 
-    @warn_unused_result
-    public func localDataStream() -> AsyncStream<NSData, AnyObject, ErrorWithContext> {
+    public func localDataStream() -> AsyncStream<Data, AnyObject, ErrorWithContext> {
 
-        return create { observer -> DisposableType? in
+        return AsyncStream { observer -> Disposable in
 
             self.localDataWithCallbacks({ data in
 
-                observer(.Success(data))
+                observer(.success(data))
             }) { error in
 
-                observer(.Failure(error))
+                observer(.failure(error))
             }
-            return nil
+            return NonDisposable.instance
         }
     }
 }

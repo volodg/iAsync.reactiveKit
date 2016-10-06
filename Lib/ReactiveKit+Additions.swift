@@ -8,20 +8,19 @@
 
 import Foundation
 
-import ReactiveKit_old
+import ReactiveKit
 
-@warn_unused_result(message="Did you forget to call `start` on the producer?")
-public func combineLatest<S: SequenceType, T where S.Generator.Element == Stream<T>>(producers: S) -> Stream<[T]> {
+public func combineLatest<S: Sequence, T>(_ producers: S) -> Signal1<[T]> where S.Iterator.Element == Signal1<T> {
 
     let size = Array(producers).count
 
     if size == 0 {
-        return Stream<[T]>(value: [])
+        return Signal1<[T]>.just([])
     }
 
-    return create { observer in
+    return Signal1 { observer in
 
-        let queue = Queue(name: "com.ReactiveKit.ReactiveKit.combineLatest")
+        let queue = DispatchQueue(label: "com.ReactiveKit.ReactiveKit.combineLatest")
 
         var results = [Int:T]()
 
@@ -42,15 +41,15 @@ public func combineLatest<S: SequenceType, T where S.Generator.Element == Stream
                     varEvent[currIndex] = results[currIndex]!
                 }
 
-                observer(varEvent)
+                observer.next(varEvent)
             }
         }
 
-        var disposes = [DisposableType]()
+        var disposes = [Disposable]()
 
-        for (index, stream) in producers.enumerate() {
+        for (index, stream) in producers.enumerated() {
 
-            let dispose = stream.observe(on: nil) { event in
+            let dispose = stream.observeNext { event in
                 queue.sync {
                     results[index] = event
                     dispatchIfPossible(index)
@@ -64,98 +63,44 @@ public func combineLatest<S: SequenceType, T where S.Generator.Element == Stream
     }
 }
 
-//TODO test
-@warn_unused_result(message="Did you forget to call `start` on the producer?")
-public func combineLatest<S: SequenceType, T, N, E where S.Generator.Element == AsyncStream<T, N, E>, E: ErrorType>(producers: S) -> AsyncStream<[T], N, E> {
+public extension SignalProtocol where Element: OptionalProtocol, Element.Wrapped: Equatable, Error == NoError {
 
-    let size = Array(producers).count
+    public func distinctOptional2() -> Signal1<Element.Wrapped?> {
 
-    if size == 0 {
-        return AsyncStream.succeeded(with: [])
-    }
-
-    return create { observer in
-
-        let queue = Queue(name: "com.ReactiveKit.ReactiveKit.combineLatest")
-
-        var results = [Int:AsyncEvent<T, N, E>]()
-
-        let dispatchIfPossible = { (currIndex: Int, currEv: AsyncEvent<T, N, E>) -> () in
-
-            if let index = results.indexOf({ $0.1.isFailure }) {
-
-                let el = results[index]
-                observer(.Failure(el.1.error!))
-            }
-
-            if results.count == size && results.all({ $0.1.isSuccess }) {
-
-                let els = results.map { $0.1.value! }
-                observer(.Success(els))
-            }
-
-            if case .Next(let val) = currEv {
-                observer(.Next(val))
-            }
-        }
-
-        var disposes = [DisposableType]()
-
-        for (index, stream) in producers.enumerate() {
-
-            let dispose = stream.observe(on: nil) { event in
-                queue.sync {
-                    results[index] = event
-                    dispatchIfPossible(index, event)
-                }
-            }
-
-            disposes.append(dispose)
-        }
-
-        return CompositeDisposable(disposes)
-    }
-}
-
-extension Stream {
-
-    public init(value: Event) {
-
-        self.init { handler -> DisposableType? in
-
-            handler(value)
-            return nil
-        }
-    }
-}
-
-public extension StreamType where Event: OptionalType, Event.Wrapped: Equatable {
-
-    @warn_unused_result
-    public func distinctOptional2() -> Stream<Event.Wrapped?> {
-        return create { observer in
-            var lastEvent: Event.Wrapped? = nil
+        return Signal { observer in
+            var lastEvent: Element.Wrapped? = nil
             var firstEvent: Bool = true
-            return self.observe(on: nil) { event in
+            return self.observe { event in
 
-                switch (lastEvent, event._unbox) {
-                case (.None, .Some(let new)):
-                    firstEvent = false
-                    observer(new)
-                case (.Some, .None):
-                    firstEvent = false
-                    observer(nil)
-                case (.None, .None) where firstEvent:
-                    firstEvent = false
-                    observer(nil)
-                case (.Some(let old), .Some(let new)) where old != new:
-                    firstEvent = false
-                    observer(new)
-                default:
-                    break
+                if event.isTerminal {
+
+                    observer.completed()
+                    return
                 }
 
-                lastEvent = event._unbox
+                switch event {
+                case .next(let value):
+                    switch (lastEvent, value._unbox) {
+                    case (.none, .some(let new)):
+                        firstEvent = false
+                        observer.next(new)
+                    case (.some, .none):
+                        firstEvent = false
+                        observer.next(nil)
+                    case (.none, .none) where firstEvent:
+                        firstEvent = false
+                        observer.next(nil)
+                    case (.some(let old), .some(let new)) where old != new:
+                        firstEvent = false
+                        observer.next(new)
+                    default:
+                        break
+                    }
+
+                    lastEvent = value._unbox
+                default:
+                    fatalError()
+                }
             }
         }
     }

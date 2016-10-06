@@ -8,96 +8,25 @@
 
 import Foundation
 
-import ReactiveKit_old
+import ReactiveKit
 
-extension StreamType {
+extension SignalProtocol {
 
-    @warn_unused_result
-    public func flatMap<S : StreamType>(transform: Self.Event -> S) -> Stream<S.Event> {
-        return flatMap(.Latest, transform: transform)
-    }
+    public func throttleIf(_ seconds: Double, predicate: @escaping (Element) -> Bool, on queue: DispatchQueue) -> Signal<Element, Error> {
 
-    @warn_unused_result
-    public func pausable<S: StreamType where S.Event == Bool>(by: S, delayAfterPause: Double, on queue: Queue) -> Stream<Event> {
-        return create { observer in
-
-            var allowed: Bool = false
-
-            var skipedEvent: Event?
-
-            let compositeDisposable = CompositeDisposable()
-            compositeDisposable += by.observe(on: nil) { value in
-                allowed = value
-                if allowed {
-                    queue.after(delayAfterPause, block: {
-
-                        guard let skipedEvent_ = skipedEvent else { return }
-                        skipedEvent = nil
-
-                        if allowed {
-                            observer(skipedEvent_)
-                        }
-                    })
-                }
-            }
-
-            compositeDisposable += self.observe(on: nil) { event in
-                if allowed {
-                    skipedEvent = nil
-                    observer(event)
-                } else {
-                    skipedEvent = event
-                }
-            }
-
-            return compositeDisposable
-        }
-    }
-
-    @warn_unused_result
-    public func pausable2<S: StreamType where S.Event == Bool>(by: S) -> Stream<Event> {
-        return create { observer in
-
-            var allowed: Bool = false
-
-            var skipedEvent: Event?
-
-            let compositeDisposable = CompositeDisposable()
-            compositeDisposable += by.observe(on: nil) { value in
-                allowed = value
-                if allowed, let skipedEvent_ = skipedEvent {
-                    skipedEvent = nil
-                    observer(skipedEvent_)
-                }
-            }
-
-            compositeDisposable += self.observe(on: nil) { event in
-                if allowed {
-                    observer(event)
-                } else {
-                    skipedEvent = event
-                }
-            }
-
-            return compositeDisposable
-        }
-    }
-
-    @warn_unused_result
-    public func throttleIf(seconds: Double, predicate: (Event) -> Bool, on queue: Queue) -> Stream<Event> {
-        return create { observer in
+        return Signal { observer in
 
             var timerInFlight: Bool = false
-            var latestEvent: Event! = nil
-            var latestEventDate: NSDate! = nil
+            var latestEvent: Element! = nil
+            var latestEventDate: Date! = nil
 
             var tryDispatch: (() -> Void)?
             tryDispatch = {
-                if latestEventDate.dateByAddingTimeInterval(seconds).compare(NSDate()) == NSComparisonResult.OrderedAscending {
-                    observer(latestEvent)
+                if latestEventDate.addingTimeInterval(seconds).compare(Date()) == ComparisonResult.orderedAscending {
+                    observer.next(latestEvent)
                 } else {
                     timerInFlight = true
-                    queue.after(seconds) {
+                    queue.after(when: seconds) {
                         if timerInFlight {
                             timerInFlight = false
                             tryDispatch?()
@@ -108,25 +37,113 @@ extension StreamType {
 
             let blockDisposable = BlockDisposable { tryDispatch = nil }
             let compositeDisposable = CompositeDisposable([blockDisposable])
-            compositeDisposable += self.observe(on: nil) { event in
+            compositeDisposable.add(disposable: self.observe { event in
 
-                if !predicate(event) {
+                switch event {
+                case .next(let element):
 
-                    latestEvent     = nil
-                    latestEventDate = nil
-                    timerInFlight   = false
+                    if !predicate(element) {
 
-                    observer(event)
-                    return
+                        latestEvent     = nil
+                        latestEventDate = nil
+                        timerInFlight   = false
+
+                        observer.next(element)
+                        return
+                    }
+
+                    latestEvent = element
+                    latestEventDate = Date()
+
+                    guard timerInFlight == false else { return }
+                    tryDispatch?()
+                case .failed:
+                    observer.on(event)
+                case .completed:
+                    observer.on(event)
                 }
-
-                latestEvent = event
-                latestEventDate = NSDate()
-
-                guard timerInFlight == false else { return }
-                tryDispatch?()
-            }
+            })
             return compositeDisposable
         }
     }
+
+    public func pausable<S: SignalProtocol>(_ by: S, delayAfterPause: Double, on queue: DispatchQueue) -> Signal<Element, Error> where S.Element == Bool {
+
+        return Signal { observer in
+
+            var allowed: Bool = false
+
+            var skipedEvent: Event<Element, Error>?
+
+            let compositeDisposable = CompositeDisposable()
+            compositeDisposable.add(disposable: by.observeNext { value in
+
+                allowed = value
+                if allowed {
+                    queue.after(when: delayAfterPause, block: {
+
+                        guard let skipedEvent_ = skipedEvent else { return }
+                        skipedEvent = nil
+
+                        if allowed {
+                            observer.on(skipedEvent_)
+                        }
+                    })
+                }
+            })
+
+            compositeDisposable.add(disposable: self.observe { event in
+                if allowed {
+                    skipedEvent = nil
+                    observer.on(event)
+                } else {
+                    skipedEvent = event
+                }
+            })
+
+            return compositeDisposable
+        }
+    }
+
+    public func pausable2<R: SignalProtocol>(_ by: R) -> Signal<Element, Error> where R.Element == Bool {
+
+        return Signal { observer in
+
+            var allowed: Bool = true
+
+            var skipedEvent: Event<Element, Error>?
+
+            let compositeDisposable = CompositeDisposable()
+            compositeDisposable += by.observeNext { value in
+
+                allowed = value
+
+                if allowed, let skipedEvent_ = skipedEvent {
+                    skipedEvent = nil
+                    observer.observer(skipedEvent_)
+                }
+            }
+
+            compositeDisposable += self.observe { event in
+                if event.isTerminal {
+                    skipedEvent = nil
+                    observer.observer(event)
+                } else if allowed {
+                    skipedEvent = nil
+                    observer.observer(event)
+                } else {
+                    skipedEvent = event
+                }
+            }
+
+            return compositeDisposable
+        }
+    }
+}
+
+public extension SignalProtocol {
+
+//    public func flatMap<U: SignalProtocol>(_ transform: (Element) -> U) -> Signal<Element, Error> {
+//        return flatMap(.Latest, transform: transform)
+//    }
 }

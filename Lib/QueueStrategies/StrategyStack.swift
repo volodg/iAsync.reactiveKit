@@ -8,9 +8,9 @@
 
 import Foundation
 
-final internal class StrategyStack<Value, Next, Error: ErrorType> : QueueStrategy {
+final internal class StrategyStack<ValueT, NextT, ErrorT: Error> : QueueStrategy {
 
-    static func nextPendingStream(queueState: QueueState<Value, Next, Error>) -> StreamOwner<Value, Next, Error>? {
+    static func nextPendingStream(_ queueState: QueueState<ValueT, NextT, ErrorT>) -> StreamOwner<ValueT, NextT, ErrorT>? {
         let result = queueState.pendingStreams.last
         return result
     }

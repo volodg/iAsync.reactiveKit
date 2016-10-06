@@ -10,20 +10,20 @@ import Foundation
 
 public protocol QueueStrategy {
 
-    associatedtype Value
-    associatedtype Next
-    associatedtype Error: ErrorType
+    associatedtype ValueT
+    associatedtype NextT
+    associatedtype ErrorT: Error
 
-    static func nextPendingStream(queueState: QueueState<Value, Next, Error>) -> StreamOwner<Value, Next, Error>?
+    static func nextPendingStream(_ queueState: QueueState<ValueT, NextT, ErrorT>) -> StreamOwner<ValueT, NextT, ErrorT>?
 }
 
 extension QueueStrategy {
 
-    internal static func executePendingStream(queueState: QueueState<Value, Next, Error>, pendingStream: StreamOwner<Value, Next, Error>) {
+    internal static func executePendingStream(_ queueState: QueueState<ValueT, NextT, ErrorT>, pendingStream: StreamOwner<ValueT, NextT, ErrorT>) {
 
         var objectIndex: Int?
 
-        for (index, stream) in queueState.pendingStreams.enumerate() {
+        for (index, stream) in queueState.pendingStreams.enumerated() {
             if stream === pendingStream {
                 objectIndex = index
                 break
@@ -31,7 +31,7 @@ extension QueueStrategy {
         }
 
         if let objectIndex = objectIndex {
-            queueState.pendingStreams.removeAtIndex(objectIndex)
+            queueState.pendingStreams.remove(at: objectIndex)
         }
 
         queueState.activeStreams.append(pendingStream)

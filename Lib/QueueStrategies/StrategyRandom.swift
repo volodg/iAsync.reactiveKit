@@ -8,9 +8,9 @@
 
 import Foundation
 
-final internal class StrategyRandom<Value, Next, Error: ErrorType> : QueueStrategy {
+final internal class StrategyRandom<ValueT, NextT, ErrorT: Error> : QueueStrategy {
 
-    static func nextPendingStream(queueState: QueueState<Value, Next, Error>) -> StreamOwner<Value, Next, Error>? {
+    static func nextPendingStream(_ queueState: QueueState<ValueT, NextT, ErrorT>) -> StreamOwner<ValueT, NextT, ErrorT>? {
 
         let index = Int(arc4random_uniform(UInt32(queueState.pendingStreams.count)))
 

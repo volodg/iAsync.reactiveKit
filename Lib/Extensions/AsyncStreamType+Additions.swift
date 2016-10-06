@@ -10,10 +10,9 @@ import Foundation
 
 import iAsync_utils
 
-public extension AsyncStreamType where Error == ErrorWithContext {
+public extension AsyncStreamType where ErrorT == ErrorWithContext {
 
-    @warn_unused_result
-    public func logError() -> AsyncStream<Value, Next, Error> {
+    public func logError() -> AsyncStream<ValueT, NextT, ErrorT> {
 
         return self.on(failure: { $0.postToLog() })
     }
@@ -21,8 +20,7 @@ public extension AsyncStreamType where Error == ErrorWithContext {
 
 public extension AsyncStreamType {
 
-    @warn_unused_result
-    public func mapNext2AnyObject() -> AsyncStream<Value, AnyObject, Error> {
+    public func mapNext2AnyObject() -> AsyncStream<ValueT, AnyObject, ErrorT> {
 
         return mapNext { _ in NSNull() as AnyObject }
     }

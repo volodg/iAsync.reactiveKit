@@ -8,32 +8,32 @@
 
 import Foundation
 
-import ReactiveKit_old
+import protocol ReactiveKit.Disposable
+import class ReactiveKit.BlockDisposable
 
 public protocol AsyncStreamInterface {
 
-    associatedtype Value
-    associatedtype Next
-    associatedtype Error: ErrorType
+    associatedtype ValueT
+    associatedtype NextT
+    associatedtype ErrorT: Error
 
     func asyncWithCallbacks(
-        success _: Value -> Void,
-        next     : Next  -> Void,
-        error    : Error -> Void)
+        success: @escaping (ValueT) -> Void,
+        next   : @escaping (NextT)  -> Void,
+        error  : @escaping (ErrorT) -> Void)
 
     func cancel()
 }
 
-@warn_unused_result
-public func createStream<T: AsyncStreamInterface>(factory: () -> T) -> AsyncStream<T.Value, T.Next, T.Error> {
+public func createStream<T: AsyncStreamInterface>(_ factory: @escaping () -> T) -> AsyncStream<T.ValueT, T.NextT, T.ErrorT> {
 
-    return create(producer: { observer -> DisposableType? in
+    return AsyncStream { observer -> Disposable in
 
-        var observerHolder: (AsyncEvent<T.Value, T.Next, T.Error> -> ())? = observer
+        var observerHolder: ((AsyncEvent<T.ValueT, T.NextT, T.ErrorT>) -> ())? = observer
 
         var objHolder: T? = nil
 
-        let notifyOnce = { (event: AsyncEvent<T.Value, T.Next, T.Error>) -> () in
+        let notifyOnce = { (event: AsyncEvent<T.ValueT, T.NextT, T.ErrorT>) -> () in
             guard let observer = observerHolder else { return }
             objHolder      = nil
             observerHolder = nil
@@ -44,14 +44,14 @@ public func createStream<T: AsyncStreamInterface>(factory: () -> T) -> AsyncStre
         objHolder = obj
 
         obj.asyncWithCallbacks(
-            success: { notifyOnce(.Success($0))   },
-            next   : { observerHolder?(.Next($0)) },
-            error  : { notifyOnce(.Failure($0))   })
+            success: { notifyOnce(.success($0))   },
+            next   : { observerHolder?(.next($0)) },
+            error  : { notifyOnce(.failure($0))   })
 
         return BlockDisposable {
             observerHolder = nil
             objHolder?.cancel()
             objHolder = nil
         }
-    })
+    }
 }
