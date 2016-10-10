@@ -65,7 +65,7 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
     }
 
     fileprivate func nextPendingStream() -> OwnerT? {
-        return Strategy.nextPendingStream(state)
+        return Strategy.nextPendingStream(queueState: state)
     }
 
     fileprivate func performPendingStreams() {
@@ -74,7 +74,7 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
 
         while let nextStream = pendingStream , hasStreamsReadyToStartForPendingStream(nextStream) {
 
-            Strategy.executePendingStream(state, pendingStream: nextStream)
+            Strategy.executePendingStreamFor(queueState: state, pendingStream: nextStream)
             pendingStream = nextPendingStream()
         }
     }
@@ -105,9 +105,9 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
 
     fileprivate func didFinishStream(_ stream: OwnerT) {
 
-        state.tryRemovePendingStream(stream)
+        state.tryRemove(pendingStream: stream)
 
-        if state.tryRemoveActiveStream(stream) {
+        if state.tryRemove(activeStream: stream) {
             performPendingStreams()
         }
     }

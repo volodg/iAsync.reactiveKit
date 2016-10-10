@@ -14,12 +14,12 @@ public protocol QueueStrategy {
     associatedtype NextT
     associatedtype ErrorT: Error
 
-    static func nextPendingStream(_ queueState: QueueState<ValueT, NextT, ErrorT>) -> StreamOwner<ValueT, NextT, ErrorT>?
+    static func nextPendingStream(queueState: QueueState<ValueT, NextT, ErrorT>) -> StreamOwner<ValueT, NextT, ErrorT>?
 }
 
 extension QueueStrategy {
 
-    internal static func executePendingStream(_ queueState: QueueState<ValueT, NextT, ErrorT>, pendingStream: StreamOwner<ValueT, NextT, ErrorT>) {
+    internal static func executePendingStreamFor(queueState: QueueState<ValueT, NextT, ErrorT>, pendingStream: StreamOwner<ValueT, NextT, ErrorT>) {
 
         var objectIndex: Int?
 

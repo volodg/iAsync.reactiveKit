@@ -10,7 +10,7 @@ import Foundation
 
 final internal class StrategyStack<ValueT, NextT, ErrorT: Error> : QueueStrategy {
 
-    static func nextPendingStream(_ queueState: QueueState<ValueT, NextT, ErrorT>) -> StreamOwner<ValueT, NextT, ErrorT>? {
+    static func nextPendingStream(queueState: QueueState<ValueT, NextT, ErrorT>) -> StreamOwner<ValueT, NextT, ErrorT>? {
         let result = queueState.pendingStreams.last
         return result
     }

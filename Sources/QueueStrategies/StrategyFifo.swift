@@ -10,7 +10,7 @@ import Foundation
 
 final public class StrategyFifo<ValueT, NextT, ErrorT: Error> : QueueStrategy {
 
-    public static func nextPendingStream(_ queueState: QueueState<ValueT, NextT, ErrorT>) -> StreamOwner<ValueT, NextT, ErrorT>? {
+    public static func nextPendingStream(queueState: QueueState<ValueT, NextT, ErrorT>) -> StreamOwner<ValueT, NextT, ErrorT>? {
         return queueState.pendingStreams.first
     }
 }

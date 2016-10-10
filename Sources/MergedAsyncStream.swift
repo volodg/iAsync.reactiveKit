@@ -42,7 +42,7 @@ final public class MergedAsyncStream<KeyT: Hashable, ValueT, NextT, ErrorT: Erro
             } else {
                 let stream: StreamT
                 if let setter = setter {
-                    stream = factory().withEventValueSetter(setter)
+                    stream = factory().withEventValue(setter: setter)
                 } else {
                     stream = factory().map(id_)
                 }
@@ -50,7 +50,7 @@ final public class MergedAsyncStream<KeyT: Hashable, ValueT, NextT, ErrorT: Erro
                 resultStream = stream.on(completed: { _ in
                     self.streamsByKey.removeValue(forKey: key)
                     self.disposesByKey.removeValue(forKey: key)
-                }).mergedObservers(self.sharedNextLimit)
+                }).mergedObservers(limit: self.sharedNextLimit)
                 self.streamsByKey[key] = resultStream
             }
 
@@ -89,7 +89,7 @@ final public class MergedAsyncStream<KeyT: Hashable, ValueT, NextT, ErrorT: Erro
         }
 
         if let getter = getter {
-            return result.withEventValueGetter(getter)
+            return result.withEventValue(getter: getter)
         }
 
         return result

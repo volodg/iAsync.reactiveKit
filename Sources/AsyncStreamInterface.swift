@@ -25,7 +25,7 @@ public protocol AsyncStreamInterface {
     func cancel()
 }
 
-public func createStream<T: AsyncStreamInterface>(_ factory: @escaping () -> T) -> AsyncStream<T.ValueT, T.NextT, T.ErrorT> {
+public func createStreamWith<T: AsyncStreamInterface>(factory: @escaping () -> T) -> AsyncStream<T.ValueT, T.NextT, T.ErrorT> {
 
     return AsyncStream { observer -> Disposable in
 

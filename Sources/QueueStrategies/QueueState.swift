@@ -15,7 +15,7 @@ final public class QueueState<ValueT, NextT, ErrorT: Error>  {
     var activeStreams  = [OwnerT]()
     var pendingStreams = [OwnerT]()
 
-    func tryRemoveActiveStream(_ activeStream: OwnerT) -> Bool {
+    func tryRemove(activeStream: OwnerT) -> Bool {
 
         for (index, object) in activeStreams.enumerated() {
             if object === activeStream {
@@ -26,10 +26,10 @@ final public class QueueState<ValueT, NextT, ErrorT: Error>  {
         return false
     }
 
-    func tryRemovePendingStream(_ activeStream: OwnerT) {
+    func tryRemove(pendingStream: OwnerT) {
 
         for (index, object) in pendingStreams.enumerated() {
-            if object === activeStream {
+            if object === pendingStream {
                 pendingStreams.remove(at: index)
                 return
             }

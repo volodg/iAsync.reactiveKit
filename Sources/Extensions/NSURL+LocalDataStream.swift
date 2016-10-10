@@ -19,7 +19,7 @@ extension URL {
 
         return AsyncStream { observer -> Disposable in
 
-            self.localDataWithCallbacks({ data in
+            self.getLocalData(onData: { data in
 
                 observer(.success(data))
             }) { error in

@@ -46,7 +46,7 @@ public extension AsyncStreamType {
         }
     }
 
-    public func withEventValueGetter(_ getter: @escaping () -> AsyncEvent<ValueT, NextT, ErrorT>?) -> AsyncStream<ValueT, NextT, ErrorT> {
+    public func withEventValue(getter: @escaping () -> AsyncEvent<ValueT, NextT, ErrorT>?) -> AsyncStream<ValueT, NextT, ErrorT> {
 
         return AsyncStream { observer in
 
@@ -61,7 +61,7 @@ public extension AsyncStreamType {
         }
     }
 
-    public func withEventValueSetter(_ setter: @escaping (AsyncEvent<ValueT, NextT, ErrorT>) -> Void) -> AsyncStream<ValueT, NextT, ErrorT> {
+    public func withEventValue(setter: @escaping (AsyncEvent<ValueT, NextT, ErrorT>) -> Void) -> AsyncStream<ValueT, NextT, ErrorT> {
 
         return AsyncStream { observer in
 
@@ -73,7 +73,7 @@ public extension AsyncStreamType {
         }
     }
 
-    public func mergedObservers(_ limit: Int = Int.max) -> AsyncStream<ValueT, NextT, ErrorT> {
+    public func mergedObservers(limit: Int = Int.max) -> AsyncStream<ValueT, NextT, ErrorT> {
 
         typealias ObserverHolder = AsyncObserverHolder<ValueT, NextT, ErrorT>
         var observers: [ObserverHolder] = []
@@ -138,7 +138,7 @@ public extension AsyncStreamType {
     }
 }
 
-public func asyncStreamWithSameThreadJob<ValueT, NextT, ErrorT: Error>(_ job: @escaping ((NextT) -> Void) -> Result<ValueT, ErrorT>) -> AsyncStream<ValueT, NextT, ErrorT> {
+public func asyncStreamWith<ValueT, NextT, ErrorT: Error>(sameThreadJob job: @escaping ((NextT) -> Void) -> Result<ValueT, ErrorT>) -> AsyncStream<ValueT, NextT, ErrorT> {
 
     typealias Event = AsyncEvent<ValueT, NextT, ErrorT>
 

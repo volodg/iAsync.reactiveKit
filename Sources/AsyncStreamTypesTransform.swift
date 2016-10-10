@@ -31,7 +31,7 @@ public enum AsyncStreamTypesTransform<Value1, Value2, Next1, Next2, Error1: Erro
 
     public typealias AsyncStreamTransformer = (PackedAsyncStream) -> PackedAsyncStream
 
-    public static func transformStreamsType(_ stream: Stream1, transformer: AsyncStreamTransformer) -> Stream1 {
+    public static func transform(stream: Stream1, transformer: AsyncStreamTransformer) -> Stream1 {
 
         let packedStream = stream.lift { $0.map { (ev: Stream1.Event) -> PackedAsyncStream.Event in
             switch ev {
@@ -60,7 +60,7 @@ public enum AsyncStreamTypesTransform<Value1, Value2, Next1, Next2, Error1: Erro
         }}
     }
 
-    public static func transformStreamsType(_ stream: Stream2, transformer: AsyncStreamTransformer) -> Stream2 {
+    public static func transform(stream: Stream2, transformer: AsyncStreamTransformer) -> Stream2 {
 
         let packedStream = stream.lift { $0.map { ev -> PackedAsyncStream.Event in
             switch ev {
