@@ -93,7 +93,7 @@ public struct AsyncStream<ValueT_, NextT_, ErrorT_: Error>: AsyncStreamType {
     public static func succeededAfter(delay: DispatchTimeInterval, with value: ValueT) -> AsyncStream<ValueT, NextT, ErrorT> {
         return AsyncStream { observer in
 
-            let cancel = Timer.sharedByThreadTimer().addBlock({ cancel in
+            let cancel = Timer.sharedByThreadTimer().add(actionBlock: { cancel in
                 cancel()
                 observer(.success(value))
             }, delay: delay)

@@ -12,7 +12,7 @@ import ReactiveKit
 
 extension SignalProtocol {
 
-    public func throttleIf(_ seconds: Double, predicate: @escaping (Element) -> Bool, on queue: DispatchQueue) -> Signal<Element, Error> {
+    public func throttle(if predicate: @escaping (Element) -> Bool, seconds: Double, on queue: DispatchQueue) -> Signal<Element, Error> {
 
         return Signal { observer in
 
@@ -67,7 +67,7 @@ extension SignalProtocol {
         }
     }
 
-    public func pausable<S: SignalProtocol>(_ by: S, delayAfterPause: Double, on queue: DispatchQueue) -> Signal<Element, Error> where S.Element == Bool {
+    public func pausable<S: SignalProtocol>(by: S, delayAfterPause: Double, on queue: DispatchQueue) -> Signal<Element, Error> where S.Element == Bool {
 
         return Signal { observer in
 
@@ -105,7 +105,7 @@ extension SignalProtocol {
         }
     }
 
-    public func pausable2<R: SignalProtocol>(_ by: R) -> Signal<Element, Error> where R.Element == Bool {
+    public func pausable2<R: SignalProtocol>(by: R) -> Signal<Element, Error> where R.Element == Bool {
 
         return Signal { observer in
 
@@ -139,11 +139,4 @@ extension SignalProtocol {
             return compositeDisposable
         }
     }
-}
-
-public extension SignalProtocol {
-
-//    public func flatMap<U: SignalProtocol>(_ transform: (Element) -> U) -> Signal<Element, Error> {
-//        return flatMap(.Latest, transform: transform)
-//    }
 }
