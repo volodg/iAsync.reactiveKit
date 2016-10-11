@@ -49,6 +49,7 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
         }
     }
 
+    //todo rename?
     fileprivate func hasStreamsReadyToStartForPendingStream(_ pendingStream: OwnerT) -> Bool {
 
         if pendingStream.barrier {
@@ -79,6 +80,7 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
         }
     }
 
+    //todo rename?
     public func balancedStream<T: AsyncStreamType>
         (_ stream: T, barrier: Bool) -> StreamT where Strategy.ValueT == T.ValueT, Strategy.NextT == T.NextT, Strategy.ErrorT == T.ErrorT {
 
@@ -98,11 +100,13 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
         }
     }
 
+    //todo rename?
     public func barrierBalancedStream(_ stream: StreamT) -> StreamT {
 
         return balancedStream(stream, barrier:true)
     }
 
+    //todo rename?
     fileprivate func didFinishStream(_ stream: OwnerT) {
 
         state.tryRemove(pendingStream: stream)
