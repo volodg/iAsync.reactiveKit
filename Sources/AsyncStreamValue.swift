@@ -180,7 +180,7 @@ private struct BindableWithBlock<ValueT, ErrorT: Error> : PropertyProtocol, Bind
     typealias Error   = NoError
     typealias ProperyElement = AsyncValue<ValueT, ErrorT>
 
-    fileprivate let stream = PublishSubject<Element, NoError>()
+    private let stream = PublishSubject<Element, NoError>()
 
     public var value: AsyncValue<ValueT, ErrorT> {
         get {
@@ -192,8 +192,8 @@ private struct BindableWithBlock<ValueT, ErrorT: Error> : PropertyProtocol, Bind
         }
     }
 
-    fileprivate let getVal: () -> Event
-    fileprivate let putVal: (Event) -> ()
+    private let getVal: () -> Event
+    private let putVal: (Event) -> ()
 
     init(putVal: @escaping (Event) -> (), getVal: @escaping () -> Event) {
         self.putVal = putVal

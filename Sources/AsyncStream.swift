@@ -33,7 +33,7 @@ public struct AsyncStream<ValueT_, NextT_, ErrorT_: Error>: AsyncStreamType {
 
     public typealias Event = AsyncEvent<ValueT, NextT, ErrorT>
 
-    fileprivate let stream: Signal1<AsyncEvent<ValueT, NextT, ErrorT>>
+    private let stream: Signal1<AsyncEvent<ValueT, NextT, ErrorT>>
 
     public typealias ObserverT = (AsyncEvent<ValueT, NextT, ErrorT>) -> ()
 

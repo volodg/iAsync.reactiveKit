@@ -18,12 +18,12 @@ final public class StreamOwner<ValueT, NextT, ErrorT: Error> {
 
     var stream: AsyncStream<ValueT, NextT, ErrorT>!
 
-    fileprivate var disposeStream: SerialDisposable? = nil
+    private var disposeStream: SerialDisposable? = nil
     var observer: ObserverType?
 
     typealias ObserverType = (AsyncEvent<ValueT, NextT, ErrorT>) -> Void
     typealias OnComplete   = (StreamOwner<ValueT, NextT, ErrorT>) -> Void
-    fileprivate let onComplete: OnComplete
+    private let onComplete: OnComplete
 
     init<T: AsyncStreamType>(stream: T, observer: @escaping ObserverType, barrier: Bool, onComplete: @escaping OnComplete) where T.ValueT == ValueT, T.NextT == NextT, T.ErrorT == ErrorT {
 
@@ -51,7 +51,7 @@ final public class StreamOwner<ValueT, NextT, ErrorT: Error> {
         complete()
     }
 
-    fileprivate func complete() {
+    private func complete() {
 
         onComplete(self)
         stream = nil

@@ -15,7 +15,7 @@ import class ReactiveKit.BlockDisposable
 //TODO test
 final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
 
-    fileprivate let state = QueueState<Strategy.ValueT, Strategy.NextT, Strategy.ErrorT>()
+    private let state = QueueState<Strategy.ValueT, Strategy.NextT, Strategy.ErrorT>()
 
     public typealias StreamT = AsyncStream<Strategy.ValueT, Strategy.NextT, Strategy.ErrorT>
     public typealias OwnerT  = StreamOwner<Strategy.ValueT, Strategy.NextT, Strategy.ErrorT>
@@ -50,7 +50,7 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
     }
 
     //todo rename?
-    fileprivate func hasStreamsReadyToStartForPendingStream(_ pendingStream: OwnerT) -> Bool {
+    private func hasStreamsReadyToStartForPendingStream(_ pendingStream: OwnerT) -> Bool {
 
         if pendingStream.barrier {
             return state.activeStreams.count == 0
@@ -65,11 +65,11 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
         return result
     }
 
-    fileprivate func nextPendingStream() -> OwnerT? {
+    private func nextPendingStream() -> OwnerT? {
         return Strategy.nextPendingStream(queueState: state)
     }
 
-    fileprivate func performPendingStreams() {
+    private func performPendingStreams() {
 
         var pendingStream = nextPendingStream()
 
@@ -107,7 +107,7 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
     }
 
     //todo rename?
-    fileprivate func didFinishStream(_ stream: OwnerT) {
+    private func didFinishStream(_ stream: OwnerT) {
 
         state.tryRemove(pendingStream: stream)
 

@@ -14,7 +14,7 @@ import ReactiveKit
 
 final public class MergedAsyncStream<KeyT: Hashable, ValueT, NextT, ErrorT: Error> {
 
-    fileprivate let sharedNextLimit: Int
+    private let sharedNextLimit: Int
 
     public init(sharedNextLimit: Int = Int.max) {
         self.sharedNextLimit = sharedNextLimit
@@ -22,8 +22,8 @@ final public class MergedAsyncStream<KeyT: Hashable, ValueT, NextT, ErrorT: Erro
 
     public typealias StreamT = AsyncStream<ValueT, NextT, ErrorT>
 
-    fileprivate var streamsByKey  = [KeyT:AsyncStream<ValueT, NextT, ErrorT>]()
-    fileprivate var disposesByKey = [KeyT:[SerialDisposable]]()
+    private var streamsByKey  = [KeyT:AsyncStream<ValueT, NextT, ErrorT>]()
+    private var disposesByKey = [KeyT:[SerialDisposable]]()
 
     public func mergedStream<
         T: AsyncStreamType>(
