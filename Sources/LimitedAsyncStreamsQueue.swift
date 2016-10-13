@@ -73,7 +73,7 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
 
         var pendingStream = nextPendingStream()
 
-        while let nextStream = pendingStream , hasStreamsReadyToStartForPendingStream(nextStream) {
+        while let nextStream = pendingStream, hasStreamsReadyToStartForPendingStream(nextStream) {
 
             Strategy.executePendingStreamFor(queueState: state, pendingStream: nextStream)
             pendingStream = nextPendingStream()
