@@ -370,7 +370,7 @@ public extension AsyncStreamType {
             var otherValue: S.ValueT?
 
             let dispatchNextIfPossible = {
-                while selfNextBuffer.count > 0 && otherNextBuffer.count > 0 {
+                while !selfNextBuffer.isEmpty && !otherNextBuffer.isEmpty {
                     let next = (selfNextBuffer[0], otherNextBuffer[0])
                     selfNextBuffer.remove(at: 0)
                     otherNextBuffer.remove(at: 0)

@@ -56,7 +56,7 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
             return state.activeStreams.count == 0
         }
 
-        let result = limitCount > state.activeStreams.count && state.pendingStreams.count > 0
+        let result = limitCount > state.activeStreams.count && !state.pendingStreams.isEmpty
 
         if result {
             return state.activeStreams.all { !$0.barrier }
