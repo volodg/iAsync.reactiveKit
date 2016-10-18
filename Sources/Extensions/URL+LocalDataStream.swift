@@ -1,5 +1,5 @@
 //
-//  NSURL+LocalDataStream.swift
+//  URL+LocalDataStream.swift
 //  iAsync_reactiveKit
 //
 //  Created by Gorbenko Vladimir on 25.11.15.
