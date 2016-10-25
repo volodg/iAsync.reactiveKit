@@ -60,7 +60,7 @@ public extension AsyncStreamType {
 
     func bindedToObservableAsyncVal<B : BindableProtocol>
         (_ bindable: B) -> AsyncStream<ValueT, NextT, ErrorT> where
-        B.Element == AsyncValue<ValueT, ErrorT>, B: PropertyProtocol, B.ProperyElement == AsyncValue<ValueT, ErrorT> {
+        B.Element == AsyncValue<ValueT, ErrorT>, B.Error == NoError, B: PropertyProtocol, B.ProperyElement == AsyncValue<ValueT, ErrorT> {
 
         return AsyncStream { observer -> Disposable in
 
@@ -112,7 +112,7 @@ extension MergedAsyncStream {
         lazy    : Bool = true
         ) -> StreamT where T.ValueT == ValueT, T.NextT == NextT, T.ErrorT == ErrorT,
         B.Element == AsyncValue<ValueT, ErrorT>,
-        B: PropertyProtocol, B.ProperyElement == AsyncValue<ValueT, ErrorT> {
+        B: PropertyProtocol, B.Error == NoError, B.ProperyElement == AsyncValue<ValueT, ErrorT> {
 
         let bindedFactory = { () -> AsyncStream<ValueT, NextT, ErrorT> in
             let stream = factory()
@@ -130,7 +130,7 @@ extension MergedAsyncStream {
         })
     }
 
-     public func mergedStream<
+    public func mergedStream<
         T: AsyncStreamType,
         B: BindableProtocol>(
         _ factory: @escaping () -> T,
@@ -139,7 +139,7 @@ extension MergedAsyncStream {
         lazy   : Bool = true
         ) -> StreamT where T.ValueT == ValueT, T.NextT == NextT, T.ErrorT == ErrorT,
         B: NSObjectProtocol,
-        B: PropertyProtocol, B.ProperyElement == [KeyT:AsyncValue<ValueT, ErrorT>] {
+        B: PropertyProtocol, B.Error == NoError, B.ProperyElement == [KeyT:AsyncValue<ValueT, ErrorT>] {
 
         let bindedFactory = { [weak holder] () -> AsyncStream<ValueT, NextT, ErrorT> in
 
