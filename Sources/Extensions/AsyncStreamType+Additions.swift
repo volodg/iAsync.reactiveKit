@@ -20,7 +20,7 @@ public extension AsyncStreamType where ErrorT == ErrorWithContext {
 
 public extension AsyncStreamType {
 
-    public func mapNext2AnyObject() -> AsyncStream<ValueT, AnyObject, ErrorT> {
+    public func mapNext2AnyObject() -> AsyncStream<ValueT, Any, ErrorT> {
 
         return mapNext { _ in NSNull() as AnyObject }
     }

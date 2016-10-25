@@ -15,7 +15,7 @@ import protocol ReactiveKit.Disposable
 
 extension URL {
 
-    public func localDataStream() -> AsyncStream<Data, AnyObject, ErrorWithContext> {
+    public func localDataStream() -> AsyncStream<Data, Any, ErrorWithContext> {
 
         return AsyncStream { observer -> Disposable in
 
