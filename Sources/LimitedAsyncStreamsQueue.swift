@@ -80,14 +80,13 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
         }
     }
 
-    //todo rename?
-    public func balancedStream<T: AsyncStreamType>
-        (_ stream: T, barrier: Bool) -> StreamT where Strategy.ValueT == T.ValueT, Strategy.NextT == T.NextT, Strategy.ErrorT == T.ErrorT {
+    public func balanced<T: AsyncStreamType>
+        (stream: T, barrier: Bool) -> StreamT where Strategy.ValueT == T.ValueT, Strategy.NextT == T.NextT, Strategy.ErrorT == T.ErrorT {
 
         return AsyncStream { observer in
 
             let streamOwner = StreamOwner(stream: stream, observer: observer, barrier: barrier, onComplete: {
-                self.didFinishStream($0)
+                self.didFinish(stream: $0)
             })
 
             weak var weakStreamOwner = streamOwner
@@ -100,14 +99,12 @@ final public class LimitedAsyncStreamsQueue<Strategy: QueueStrategy> {
         }
     }
 
-    //todo rename?
-    public func barrierBalancedStream(_ stream: StreamT) -> StreamT {
+    public func barrierBalanced(stream: StreamT) -> StreamT {
 
-        return balancedStream(stream, barrier:true)
+        return balanced(stream: stream, barrier:true)
     }
 
-    //todo rename?
-    private func didFinishStream(_ stream: OwnerT) {
+    private func didFinish(stream: OwnerT) {
 
         state.tryRemove(pendingStream: stream)
 
