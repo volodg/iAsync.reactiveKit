@@ -105,3 +105,55 @@ public extension SignalProtocol where Element: OptionalProtocol, Element.Wrapped
         }
     }
 }
+
+public extension SignalProtocol {
+
+    /// Throttle the signal to emit at most one element per given `seconds` interval.
+    public func throttle2(seconds: Double) -> Signal<Element, Error> {
+        return Signal { observer in
+
+            let queue = DispatchQueue.main
+
+            var timerInFlight: Bool = false
+            var latestEvent: Element! = nil
+            var lastEventTime: DispatchTime = DispatchTime.now() - 1
+
+            var tryDispatch: (() -> Void)?
+            tryDispatch = {
+                let now = DispatchTime.now()
+
+                if now.rawValue > (lastEventTime + seconds).rawValue {
+                    timerInFlight = false
+                    observer.next(latestEvent)
+                } else {
+                    timerInFlight = true
+                    queue.after(when: seconds) {
+                        if timerInFlight {
+                            timerInFlight = false
+                            tryDispatch?()
+                        }
+                    }
+                }
+            }
+
+            let blockDisposable = BlockDisposable { tryDispatch = nil }
+            let compositeDisposable = CompositeDisposable([blockDisposable])
+
+            let disposable = self.observe { event in
+                switch event {
+                case .next(let element):
+
+                    latestEvent = element
+                    tryDispatch?()
+
+                default:
+                    observer.on(event)
+                }
+            }
+
+            compositeDisposable.add(disposable: disposable)
+
+            return compositeDisposable
+        }
+    }
+}
