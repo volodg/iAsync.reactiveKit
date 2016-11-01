@@ -123,6 +123,7 @@ public extension SignalProtocol {
                 let now = DispatchTime.now()
 
                 if now.rawValue > (lastEventTime + seconds).rawValue {
+                    lastEventTime = now
                     timerInFlight = false
                     observer.next(latestEvent)
                 } else {
