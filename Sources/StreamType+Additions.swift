@@ -120,17 +120,17 @@ extension SignalProtocol {
 
                 if allowed, let skipedEvent_ = skipedEvent {
                     skipedEvent = nil
-                    observer.observer(skipedEvent_)
+                    observer.on(skipedEvent_)
                 }
             }
 
             compositeDisposable += self.observe { event in
                 if event.isTerminal {
                     skipedEvent = nil
-                    observer.observer(event)
+                    observer.on(event)
                 } else if allowed {
                     skipedEvent = nil
-                    observer.observer(event)
+                    observer.on(event)
                 } else {
                     skipedEvent = event
                 }

@@ -116,13 +116,13 @@ public extension SignalProtocol {
 
             var timerInFlight: Bool = false
             var latestEvent: Element! = nil
-            var lastEventTime: DispatchTime = DispatchTime.now() - 1
+            var lastEventTime: DispatchTime?
 
             var tryDispatch: (() -> Void)?
             tryDispatch = {
                 let now = DispatchTime.now()
 
-                if now.rawValue > (lastEventTime + seconds).rawValue {
+                if lastEventTime == nil || now.rawValue > (lastEventTime! + seconds).rawValue {
                     lastEventTime = now
                     timerInFlight = false
                     observer.next(latestEvent)

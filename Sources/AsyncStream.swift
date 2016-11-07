@@ -40,14 +40,14 @@ public struct AsyncStream<ValueT_, NextT_, ErrorT_: Error>: AsyncStreamType {
     public init(producer: @escaping (@escaping ObserverT) -> Disposable) {
 
         stream = Signal1 { observer in
-            var observerHolder: Observer? = observer
+            var observerHolder: AtomicObserver<AsyncEvent<ValueT, NextT, ErrorT>, NoError>? = observer
 
             let dispose = producer { event in
                 if let observer = observerHolder {
                     if event.isTerminal {
                         observerHolder = nil
                     }
-                    observer.observer(.next(event))
+                    observer.on(.next(event))
                 }
             }
 

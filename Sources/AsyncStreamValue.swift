@@ -68,11 +68,10 @@ public extension AsyncStreamType {
             result.loading = true
 
             let bindedSignal = Property(result)
-            bindedSignal.noComplete = true
 
             let disposes = CompositeDisposable()
 
-            let dispose1 = bindable.bind(signal: bindedSignal.toSignal())
+            let dispose1 = bindable.bind(signal: bindedSignal.toSignal().ignoreTerminal())
             disposes.add(disposable: dispose1)
 
             let dispose2 = self.observe { event -> () in
