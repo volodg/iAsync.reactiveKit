@@ -20,20 +20,20 @@ class AsyncStreamTests: XCTestCase {
 
     func testRunMethod() {
 
-        let testFunc = { (numberOfCalls: Int) -> Void in
+        let testFunc = { (numberOfCalls: Int) in
 
             autoreleasepool {
 
                 testStream().run()
 
-                let expectation = self.expectationWithDescription("")
+                let expectation = self.expectation(description: "")
 
-                let _ = Timer.sharedByThreadTimer().addBlock({ cancel -> Void in
+                let _ = Timer.sharedByThreadTimer().add(actionBlock: { cancel in
                     cancel()
                     expectation.fulfill()
-                }, duration: 0.1)
+                }, delay: .milliseconds(100))
             }
-            self.waitForExpectationsWithTimeout(0.5, handler: nil)
+            self.waitForExpectations(timeout: 0.5, handler: nil)
 
             XCTAssertEqual(numberOfCalls, numberOfObservers1)
         }

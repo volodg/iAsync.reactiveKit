@@ -40,25 +40,25 @@ class AsyncStreamFlatMapTests: XCTestCase {
             let deinitTest2 = NSObject()
             weakDeinitTest2 = deinitTest2
 
-            let stream = stream1.flatMap(.Latest) { result -> AsyncStream<Int, Int, NSError> in
+            let stream = stream1.flatMap(.latest) { result -> AsyncStream<Int, Int, NSError> in
 
-                deinitTest1.description
+                _ = deinitTest1.description
                 firstResult = result
                 return testStreamWithValue(32, next: 16)
             }
 
-            let expectation = expectationWithDescription("")
+            let expectation = self.expectation(description: "")
 
-            stream.observe { event -> () in
+            _ = stream.observe { event -> () in
 
                 switch event {
-                case .Success(let value):
-                    deinitTest2.description
+                case .success(let value):
+                    _ = deinitTest2.description
                     secondResult = value
                     expectation.fulfill()
-                case .Next(let next):
+                case .next(let next):
                     nexts.append(next)
-                case .Failure:
+                case .failure:
                     XCTFail()
                 }
             }
@@ -66,7 +66,7 @@ class AsyncStreamFlatMapTests: XCTestCase {
             XCTAssertNotNil(weakDeinitTest1)
             XCTAssertNotNil(weakDeinitTest2)
 
-            waitForExpectationsWithTimeout(0.5, handler: nil)
+            waitForExpectations(timeout: 0.5, handler: nil)
         }
 
         XCTAssertNil(weakDeinitTest1)
@@ -97,16 +97,16 @@ class AsyncStreamFlatMapTests: XCTestCase {
             let deinitTest2 = NSObject()
             weakDeinitTest2 = deinitTest2
 
-            let stream = stream1.flatMap(.Latest) { result -> AsyncStream<Int, Int, NSError> in
+            let stream = stream1.flatMap(.latest) { result -> AsyncStream<Int, Int, NSError> in
 
-                deinitTest1.description
+                _ = deinitTest1.description
                 XCTFail()
                 return testStreamWithValue(32, next: 16)
             }
 
             let dispose = stream.observe { event -> () in
 
-                deinitTest2.description
+                _ = deinitTest2.description
                 XCTFail()
             }
 
@@ -137,27 +137,27 @@ class AsyncStreamFlatMapTests: XCTestCase {
             let deinitTest2 = NSObject()
             weakDeinitTest2 = deinitTest2
 
-            let stream = stream1.flatMap(.Latest) { result -> AsyncStream<Int, Int, NSError> in
+            let stream = stream1.flatMap(.latest) { result -> AsyncStream<Int, Int, NSError> in
 
-                deinitTest1.description
+                _ = deinitTest1.description
                 return testStreamWithValue(32, next: 16)
             }
 
-            let expectation = expectationWithDescription("")
+            let expectation = self.expectation(description: "")
 
             let dispose = stream.observe { event -> () in
 
                 switch event {
-                case .Success:
-                    deinitTest2.description
+                case .success:
+                    _ = deinitTest2.description
                     XCTFail()
-                case .Next(let next):
+                case .next(let next):
                     if next == 2 {
                         expectation.fulfill()
                         return
                     }
                     nexts.append(next)
-                case .Failure:
+                case .failure:
                     XCTFail()
                 }
             }
@@ -165,7 +165,7 @@ class AsyncStreamFlatMapTests: XCTestCase {
             XCTAssertNotNil(weakDeinitTest1)
             XCTAssertNotNil(weakDeinitTest2)
 
-            waitForExpectationsWithTimeout(0.5, handler: nil)
+            waitForExpectations(timeout: 0.5, handler: nil)
             dispose.dispose()
         }
 
@@ -197,30 +197,30 @@ class AsyncStreamFlatMapTests: XCTestCase {
             let deinitTest2 = NSObject()
             weakDeinitTest2 = deinitTest2
 
-            var dispose: DisposableType?
+            var dispose: Disposable?
 
-            let expectation = expectationWithDescription("")
+            let expectation = self.expectation(description: "")
 
-            let stream = stream1.flatMap(.Latest) { result -> AsyncStream<Int, Int, NSError> in
+            let stream = stream1.flatMap(.latest) { result -> AsyncStream<Int, Int, NSError> in
 
                 dispose?.dispose()
                 expectation.fulfill()
                 //dispose = nil
-                deinitTest1.description
+                _ = deinitTest1.description
                 firstResult = result
                 return testStreamWithValue(32, next: 16)
             }
 
             dispose = stream.observe { event -> () in
 
-                deinitTest2.description
+                _ = deinitTest2.description
 
                 switch event {
-                case .Success:
+                case .success:
                     XCTFail()
-                case .Next(let next):
+                case .next(let next):
                     nexts.append(next)
-                case .Failure:
+                case .failure:
                     XCTFail()
                 }
             }
@@ -228,7 +228,7 @@ class AsyncStreamFlatMapTests: XCTestCase {
             XCTAssertNotNil(weakDeinitTest1)
             XCTAssertNotNil(weakDeinitTest2)
 
-            waitForExpectationsWithTimeout(0.5, handler: nil)
+            waitForExpectations(timeout: 0.5, handler: nil)
         }
 
         XCTAssertNil(weakDeinitTest1)
@@ -261,32 +261,32 @@ class AsyncStreamFlatMapTests: XCTestCase {
             let deinitTest2 = NSObject()
             weakDeinitTest2 = deinitTest2
 
-            var dispose: DisposableType?
+            var dispose: Disposable?
 
-            let expectation = expectationWithDescription("")
+            let expectation = self.expectation(description: "")
 
-            let stream = stream1.flatMap(.Latest) { result -> AsyncStream<Int, Int, NSError> in
+            let stream = stream1.flatMap(.latest) { result -> AsyncStream<Int, Int, NSError> in
 
-                let stream2 = testStreamWithValue(32, next: 16).on(start: { () -> Void in
+                let stream2 = testStreamWithValue(32, next: 16).on(start: { () in
                     dispose?.dispose()
                     expectation.fulfill()
                 })
 
-                deinitTest1.description
+                _ = deinitTest1.description
                 firstResult = result
                 return stream2
             }
 
             dispose = stream.observe { event -> () in
 
-                deinitTest2.description
+                _ = deinitTest2.description
 
                 switch event {
-                case .Success:
+                case .success:
                     XCTFail()
-                case .Next(let next):
+                case .next(let next):
                     nexts.append(next)
-                case .Failure:
+                case .failure:
                     XCTFail()
                 }
             }
@@ -294,7 +294,7 @@ class AsyncStreamFlatMapTests: XCTestCase {
             XCTAssertNotNil(weakDeinitTest1)
             XCTAssertNotNil(weakDeinitTest2)
 
-            waitForExpectationsWithTimeout(0.5, handler: nil)
+            waitForExpectations(timeout: 0.5, handler: nil)
         }
 
         XCTAssertNil(weakDeinitTest1)
@@ -327,29 +327,29 @@ class AsyncStreamFlatMapTests: XCTestCase {
             let deinitTest2 = NSObject()
             weakDeinitTest2 = deinitTest2
 
-            let stream = stream1.flatMap(.Latest) { result -> AsyncStream<Int, Int, NSError> in
+            let stream = stream1.flatMap(.latest) { result -> AsyncStream<Int, Int, NSError> in
 
                 firstResult = result
-                deinitTest1.description
+                _ = deinitTest1.description
                 return testStreamWithValue(32, next: 16)
             }
 
-            let expectation = expectationWithDescription("")
+            let expectation = self.expectation(description: "")
 
             let dispose = stream.observe { event -> () in
 
                 switch event {
-                case .Success:
-                    deinitTest2.description
+                case .success:
+                    _ = deinitTest2.description
                     XCTFail()
-                case .Next(let next):
+                case .next(let next):
                     if next == 16 {
                         nexts.append(next)
                         expectation.fulfill()
                         return
                     }
                     nexts.append(next)
-                case .Failure:
+                case .failure:
                     XCTFail()
                 }
             }
@@ -357,7 +357,7 @@ class AsyncStreamFlatMapTests: XCTestCase {
             XCTAssertNotNil(weakDeinitTest1)
             XCTAssertNotNil(weakDeinitTest2)
 
-            waitForExpectationsWithTimeout(0.5, handler: nil)
+            waitForExpectations(timeout: 0.5, handler: nil)
             dispose.dispose()
         }
 

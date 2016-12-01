@@ -16,7 +16,7 @@ private var numberOfJobs = 0
 
 private func testJobStream() -> AsyncStream<String, Int, NSError> {
 
-    return asyncStreamWithJob(job: { (next: Int -> Void) -> Result<String, NSError> in
+    return asyncStreamWithJob(job: { (next: (Int) -> Void) -> Result<String, NSError> in
 
         numberOfJobs += 1
 
@@ -25,7 +25,7 @@ private func testJobStream() -> AsyncStream<String, Int, NSError> {
             usleep(1)
         }
 
-        return .Success("ok")
+        return .success("ok")
     })
 }
 
@@ -47,9 +47,9 @@ class AsyncStreamWithJobTests: XCTestCase {
             let deinitTest = NSObject()
             weakDeinitTest = deinitTest
 
-            let dispose = stream.observe { result -> Void in
+            let dispose = stream.observe { result in
 
-                deinitTest.description
+                _ = deinitTest.description
                 XCTFail()
             }
 
@@ -67,7 +67,7 @@ class AsyncStreamWithJobTests: XCTestCase {
 
         let stream = testJobStream()
 
-        let testFunc = { (numberOfCalls: Int) -> Void in
+        let testFunc = { (numberOfCalls: Int) in
 
             var progressCalledCount = 0
             var resultValue: String?
@@ -79,20 +79,20 @@ class AsyncStreamWithJobTests: XCTestCase {
                 let deinitTest = NSObject()
                 weakDeinitTest = deinitTest
 
-                let expectation = self.expectationWithDescription("")
+                let expectation = self.expectation(description: "")
 
-                stream.observe { ev -> Void in
+                _ = stream.observe { ev in
 
                     switch ev {
-                    case .Success(let value):
-                        XCTAssertTrue(NSThread.isMainThread())
-                        deinitTest.description
+                    case .success(let value):
+                        XCTAssertTrue(Thread.isMainThread)
+                        _ = deinitTest.description
                         resultValue = value
                         expectation.fulfill()
-                    case .Failure:
+                    case .failure:
                         XCTFail()
-                    case .Next(let next):
-                        XCTAssertTrue(NSThread.isMainThread())
+                    case .next(let next):
+                        XCTAssertTrue(Thread.isMainThread)
                         XCTAssertEqual(progressCalledCount, next)
                         progressCalledCount += 1
                     }
@@ -100,7 +100,7 @@ class AsyncStreamWithJobTests: XCTestCase {
 
                 XCTAssertNotNil(weakDeinitTest)
 
-                self.waitForExpectationsWithTimeout(0.5, handler: nil)
+                self.waitForExpectations(timeout: 0.5, handler: nil)
             }
 
             XCTAssertNil(weakDeinitTest)
@@ -133,20 +133,20 @@ class AsyncStreamWithJobTests: XCTestCase {
             let deinitTest1 = NSObject()
             weakDeinitTest1 = deinitTest1
 
-            let expectation1 = expectationWithDescription("")
+            let expectation1 = expectation(description: "")
 
-            stream.observe { ev -> Void in
+            _ = stream.observe { ev in
 
                 switch ev {
-                case .Success(let value):
-                    deinitTest1.description
-                    XCTAssertTrue(NSThread.isMainThread())
+                case .success(let value):
+                    _ = deinitTest1.description
+                    XCTAssertTrue(Thread.isMainThread)
                     resultValue1 = value
                     expectation1.fulfill()
-                case .Failure:
+                case .failure:
                     XCTFail()
-                case .Next(let next):
-                    XCTAssertTrue(NSThread.isMainThread())
+                case .next(let next):
+                    XCTAssertTrue(Thread.isMainThread)
                     XCTAssertEqual(nextCalledCount1, next)
                     nextCalledCount1 += 1
                 }
@@ -155,20 +155,20 @@ class AsyncStreamWithJobTests: XCTestCase {
             let deinitTest2 = NSObject()
             weakDeinitTest2 = deinitTest2
 
-            let expectation2 = expectationWithDescription("")
+            let expectation2 = expectation(description: "")
 
-            stream.observe { ev -> Void in
+            _ = stream.observe { ev in
 
                 switch ev {
-                case .Success(let value):
-                    deinitTest2.description
-                    XCTAssertTrue(NSThread.isMainThread())
+                case .success(let value):
+                    _ = deinitTest2.description
+                    XCTAssertTrue(Thread.isMainThread)
                     resultValue2 = value
                     expectation2.fulfill()
-                case .Failure:
+                case .failure:
                     XCTFail()
-                case .Next(let next):
-                    XCTAssertTrue(NSThread.isMainThread())
+                case .next(let next):
+                    XCTAssertTrue(Thread.isMainThread)
                     XCTAssertEqual(nextCalledCount2, next)
                     nextCalledCount2 += 1
                 }
@@ -177,7 +177,7 @@ class AsyncStreamWithJobTests: XCTestCase {
             XCTAssertNotNil(weakDeinitTest1)
             XCTAssertNotNil(weakDeinitTest2)
 
-            waitForExpectationsWithTimeout(0.5, handler: nil)
+            waitForExpectations(timeout: 0.5, handler: nil)
         }
 
         XCTAssertNil(weakDeinitTest1)

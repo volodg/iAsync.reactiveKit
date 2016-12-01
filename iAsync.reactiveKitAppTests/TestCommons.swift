@@ -20,55 +20,55 @@ typealias Event = AsyncEvent<String, Int, NSError>
 
 func testStream() -> AsyncStream<String, Int, NSError> {
 
-    let stream = AsyncStream(producer: { (observer: Event -> ()) -> DisposableType? in
+    let stream: AsyncStream<String, Int, NSError> = AsyncStream { observer in
 
         numberOfObservers1 += 1
 
         var next = 0
 
-        let cancel = Timer.sharedByThreadTimer().addBlock({ cancel -> Void in
+        let cancel = Timer.sharedByThreadTimer().add(actionBlock: { cancel in
 
             if next == 5 {
                 cancel()
-                observer(.Success("ok"))
-                observer(.Success("ok2"))
+                observer(.success("ok"))
+                observer(.success("ok2"))
 
-                observer(.Next(next))
+                observer(.next(next))
                 next += 1
             }
 
-            observer(.Next(next))
+            observer(.next(next))
             next += 1
-        }, duration: 0.01)
+        }, delay: .milliseconds(10))
 
         return BlockDisposable(cancel)
-    })
+    }
 
     return stream
 }
 
-func testStreamWithValue<Value, Next>(value: Value, next: Next) -> AsyncStream<Value, Next, NSError> {
+func testStreamWithValue<Value, Next>(_ value: Value, next: Next) -> AsyncStream<Value, Next, NSError> {
 
-    let stream = AsyncStream(producer: { (observer: AsyncEvent<Value, Next, NSError> -> ()) -> DisposableType? in
+    let stream: AsyncStream<Value, Next, NSError> = AsyncStream { observer in
 
         numberOfObservers2 += 1
         var nextCount = 0
 
-        let cancel = Timer.sharedByThreadTimer().addBlock({ (cancel) -> Void in
+        let cancel = Timer.sharedByThreadTimer().add(actionBlock: { cancel in
 
             if nextCount == 2 {
                 cancel()
-                observer(.Success(value))
+                observer(.success(value))
             } else {
-                observer(.Next(next))
+                observer(.next(next))
                 nextCount += 1
             }
-        }, duration: 0.01)
+        }, delay: .milliseconds(10))
 
         return BlockDisposable({ () -> () in
             cancel()
         })
-    })
+    }
 
     return stream
 }

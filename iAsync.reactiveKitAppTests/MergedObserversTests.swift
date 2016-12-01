@@ -33,18 +33,18 @@ class MergedObserversTests: XCTestCase {
             let deinitTest1 = NSObject()
             weakDeinitTest1 = deinitTest1
 
-            let expectation1 = expectationWithDescription("")
+            let expectation1 = expectation(description: "")
 
-            stream.observe { ev -> Void in
+            _ = stream.observe { ev in
 
                 switch ev {
-                case .Success(let value):
-                    deinitTest1.description
+                case .success(let value):
+                    _ = deinitTest1.description
                     resultValue1 = value
                     expectation1.fulfill()
-                case .Failure:
+                case .failure:
                     XCTFail()
-                case .Next(let next):
+                case .next(let next):
                     XCTAssertEqual(nextCalledCount1, next)
                     nextCalledCount1 += 1
                 }
@@ -53,18 +53,18 @@ class MergedObserversTests: XCTestCase {
             let deinitTest2 = NSObject()
             weakDeinitTest2 = deinitTest2
 
-            let expectation2 = expectationWithDescription("")
+            let expectation2 = expectation(description: "")
 
-            stream.observe { ev -> Void in
+            _ = stream.observe { ev in
 
                 switch ev {
-                case .Success(let value):
-                    deinitTest2.description
+                case .success(let value):
+                    _ = deinitTest2.description
                     resultValue2 = value
                     expectation2.fulfill()
-                case .Failure:
+                case .failure:
                     XCTFail()
-                case .Next(let next):
+                case .next(let next):
                     XCTAssertEqual(nextCalledCount2, next)
                     nextCalledCount2 += 1
                 }
@@ -73,7 +73,7 @@ class MergedObserversTests: XCTestCase {
             XCTAssertNotNil(weakDeinitTest1)
             XCTAssertNotNil(weakDeinitTest2)
 
-            waitForExpectationsWithTimeout(0.5, handler: nil)
+            waitForExpectations(timeout: 0.5, handler: nil)
         }
 
         XCTAssertNil(weakDeinitTest1)
@@ -107,15 +107,15 @@ class MergedObserversTests: XCTestCase {
                 let deinitTest1 = NSObject()
                 weakDeinitTest1 = deinitTest1
 
-                let dispose1 = stream.observe { ev -> Void in
+                let dispose1 = stream.observe { ev in
 
                     switch ev {
-                    case .Success(let value):
-                        deinitTest1.description
+                    case .success(let value):
+                        _ = deinitTest1.description
                         resultValue1 = value
-                    case .Failure:
+                    case .failure:
                         XCTFail()
-                    case .Next(let next):
+                    case .next(let next):
                         XCTAssertEqual(nextCalledCount1, next)
                         nextCalledCount1 += 1
                     }
@@ -124,18 +124,18 @@ class MergedObserversTests: XCTestCase {
                 let deinitTest2 = NSObject()
                 weakDeinitTest2 = deinitTest2
 
-                let expectation2 = expectationWithDescription("")
+                let expectation2 = expectation(description: "")
 
-                stream.observe { ev -> Void in
+                _ = stream.observe { ev in
 
                     switch ev {
-                    case .Success(let value):
-                        deinitTest2.description
+                    case .success(let value):
+                        _ = deinitTest2.description
                         resultValue2 = value
                         expectation2.fulfill()
-                    case .Failure:
+                    case .failure:
                         XCTFail()
-                    case .Next(let next):
+                    case .next(let next):
                         XCTAssertEqual(nextCalledCount2, next)
                         nextCalledCount2 += 1
                     }
@@ -149,7 +149,7 @@ class MergedObserversTests: XCTestCase {
 
             XCTAssertNil(weakDeinitTest1)
 
-            waitForExpectationsWithTimeout(0.5, handler: nil)
+            waitForExpectations(timeout: 0.5, handler: nil)
         }
 
         XCTAssertNil(weakDeinitTest2)
@@ -181,15 +181,15 @@ class MergedObserversTests: XCTestCase {
                 let deinitTest1 = NSObject()
                 weakDeinitTest1 = deinitTest1
 
-                let dispose1 = stream.observe { ev -> Void in
+                let dispose1 = stream.observe { ev in
 
                     switch ev {
-                    case .Success(let value):
-                        deinitTest1.description
+                    case .success(let value):
+                        _ = deinitTest1.description
                         resultValue1 = value
-                    case .Failure:
+                    case .failure:
                         XCTFail()
-                    case .Next(let next):
+                    case .next(let next):
                         XCTAssertEqual(nextCalledCount1, next)
                         nextCalledCount1 += 1
                     }
@@ -202,18 +202,18 @@ class MergedObserversTests: XCTestCase {
             let deinitTest2 = NSObject()
             weakDeinitTest2 = deinitTest2
 
-            let expectation2 = expectationWithDescription("")
+            let expectation2 = expectation(description: "")
 
-            stream.observe { ev -> Void in
+            _ = stream.observe { ev in
 
                 switch ev {
-                case .Success(let value):
-                    deinitTest2.description
+                case .success(let value):
+                    _ = deinitTest2.description
                     resultValue2 = value
                     expectation2.fulfill()
-                case .Failure:
+                case .failure:
                     XCTFail()
-                case .Next(let next):
+                case .next(let next):
                     XCTAssertEqual(nextCalledCount2, next)
                     nextCalledCount2 += 1
                 }
@@ -221,7 +221,7 @@ class MergedObserversTests: XCTestCase {
 
             XCTAssertNotNil(weakDeinitTest2)
 
-            waitForExpectationsWithTimeout(0.5, handler: nil)
+            waitForExpectations(timeout: 0.5, handler: nil)
         }
 
         XCTAssertNil(weakDeinitTest2)
@@ -252,18 +252,18 @@ class MergedObserversTests: XCTestCase {
             let deinitTest1 = NSObject()
             weakDeinitTest1 = deinitTest1
 
-            let expectation1 = expectationWithDescription("")
+            let expectation1 = expectation(description: "")
 
-            stream.observe { ev -> Void in
+            _ = stream.observe { ev in
 
                 switch ev {
-                case .Success(let value):
-                    deinitTest1.description
+                case .success(let value):
+                    _ = deinitTest1.description
                     resultValue1 = value
                     expectation1.fulfill()
-                case .Failure:
+                case .failure:
                     XCTFail()
-                case .Next(let next):
+                case .next(let next):
                     XCTAssertEqual(nextCalledCount1, next)
                     nextCalledCount1 += 1
                 }
@@ -274,15 +274,15 @@ class MergedObserversTests: XCTestCase {
                 let deinitTest2 = NSObject()
                 weakDeinitTest2 = deinitTest2
 
-                let dispose2 = stream.observe { ev -> Void in
+                let dispose2 = stream.observe { ev in
 
                     switch ev {
-                    case .Success(let value):
-                        deinitTest2.description
+                    case .success(let value):
+                        _ = deinitTest2.description
                         resultValue2 = value
-                    case .Failure:
+                    case .failure:
                         XCTFail()
-                    case .Next(let next):
+                    case .next(let next):
                         XCTAssertEqual(nextCalledCount2, next)
                         nextCalledCount2 += 1
                     }
@@ -294,7 +294,7 @@ class MergedObserversTests: XCTestCase {
             XCTAssertNotNil(weakDeinitTest1)
             XCTAssertNil(weakDeinitTest2)
 
-            waitForExpectationsWithTimeout(0.5, handler: nil)
+            waitForExpectations(timeout: 0.5, handler: nil)
         }
 
         XCTAssertNil(weakDeinitTest1)
@@ -325,15 +325,15 @@ class MergedObserversTests: XCTestCase {
             let deinitTest1 = NSObject()
             weakDeinitTest1 = deinitTest1
 
-            let dispose1 = stream.observe { ev -> Void in
+            let dispose1 = stream.observe { ev in
 
                 switch ev {
-                case .Success(let value):
-                    deinitTest1.description
+                case .success(let value):
+                    _ = deinitTest1.description
                     resultValue1 = value
-                case .Failure:
+                case .failure:
                     XCTFail()
-                case .Next(let next):
+                case .next(let next):
                     XCTAssertEqual(nextCalledCount1, next)
                     nextCalledCount1 += 1
                 }
@@ -342,15 +342,15 @@ class MergedObserversTests: XCTestCase {
             let deinitTest2 = NSObject()
             weakDeinitTest2 = deinitTest2
 
-            let dispose2 = stream.observe { ev -> Void in
+            let dispose2 = stream.observe { ev in
 
                 switch ev {
-                case .Success(let value):
-                    deinitTest2.description
+                case .success(let value):
+                    _ = deinitTest2.description
                     resultValue2 = value
-                case .Failure:
+                case .failure:
                     XCTFail()
-                case .Next(let next):
+                case .next(let next):
                     XCTAssertEqual(nextCalledCount2, next)
                     nextCalledCount2 += 1
                 }
@@ -389,15 +389,15 @@ class MergedObserversTests: XCTestCase {
             let deinitTest1 = NSObject()
             weakDeinitTest1 = deinitTest1
 
-            let dispose1 = stream.observe { ev -> Void in
+            let dispose1 = stream.observe { ev in
 
                 switch ev {
-                case .Success(let value):
-                    deinitTest1.description
+                case .success(let value):
+                    _ = deinitTest1.description
                     resultValue1 = value
-                case .Failure:
+                case .failure:
                     XCTFail()
-                case .Next(let next):
+                case .next(let next):
                     XCTAssertEqual(nextCalledCount1, next)
                     nextCalledCount1 += 1
                 }
@@ -406,15 +406,15 @@ class MergedObserversTests: XCTestCase {
             let deinitTest2 = NSObject()
             weakDeinitTest2 = deinitTest2
 
-            let dispose2 = stream.observe { ev -> Void in
+            let dispose2 = stream.observe { ev in
 
                 switch ev {
-                case .Success(let value):
-                    deinitTest2.description
+                case .success(let value):
+                    _ = deinitTest2.description
                     resultValue2 = value
-                case .Failure:
+                case .failure:
                     XCTFail()
-                case .Next(let next):
+                case .next(let next):
                     XCTAssertEqual(nextCalledCount2, next)
                     nextCalledCount2 += 1
                 }
